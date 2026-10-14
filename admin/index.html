@@ -7,17 +7,19 @@
 <title>Админка — Дыхание Воды</title>
 <style>
   :root {
-    --bg: #0a141e;
-    --panel: #0f1f2f;
-    --panel2: #142a3d;
+    /* та же единственная тёмная тема воды, что и на сайте (content/theme.css) */
+    --bg: #040a14;        /* океан */
+    --panel: #091929;     /* карточки */
+    --panel2: #0f2438;    /* поля ввода */
     --line: rgba(224, 240, 248, 0.14);
-    --text: #e0f0f8;
-    --muted: #8ab0c2;
-    --red: #1e8cb8;
-    --red2: #3ab4e0;
-    --gold: #d2b500;
-    --ok: #3ecf6e;
-    --err: #ff5c5c;
+    --text: #e0f0f8;      /* кость */
+    --muted: #8ab0c2;     /* зола */
+    --accent: #0a3a5a;    /* глубокий синий */
+    --accent2: #3ab4e0;   /* вода */
+    --foam: #7ad6f2;      /* вспышка */
+    --ink: #030e18;       /* надпись по залитой водой кнопке */
+    --ok: #3ecf8e;
+    --err: #ff7a7a;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -29,7 +31,7 @@
   }
   .wrap { max-width: 980px; margin: 0 auto; padding: 24px 18px 120px; }
   h1 { font: 600 26px/1.2 Unbounded, Manrope, sans-serif; margin: 0 0 6px; letter-spacing: .04em; }
-  h1 .kanji { color: var(--red2); }
+  h1 .kanji { color: var(--accent2); }
   .sub { color: var(--muted); margin: 0 0 22px; }
   .card {
     background: var(--panel);
@@ -39,7 +41,7 @@
     margin: 0 0 16px;
   }
   .card h2 { margin: 0 0 12px; font-size: 17px; letter-spacing: .03em; }
-  .card h3 { margin: 18px 0 8px; font-size: 15px; color: var(--gold); }
+  .card h3 { margin: 18px 0 8px; font-size: 15px; color: var(--foam); }
   label { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 10px 0 4px; }
   input[type=text], input[type=password], textarea, select {
     width: 100%;
@@ -51,12 +53,12 @@
     font: inherit;
   }
   textarea { min-height: 90px; resize: vertical; }
-  input:focus, textarea:focus, select:focus { outline: 1px solid var(--red2); border-color: var(--red2); }
+  input:focus, textarea:focus, select:focus { outline: 1px solid var(--accent2); border-color: var(--accent2); }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
   .row > div { flex: 1 1 200px; min-width: 160px; }
   button, .btn {
-    background: var(--red);
-    color: #fff;
+    background: var(--accent);
+    color: var(--ink);
     border: 0;
     border-radius: 8px;
     padding: 10px 16px;
@@ -65,28 +67,28 @@
     text-transform: uppercase;
     cursor: pointer;
   }
-  button:hover { background: var(--red2); }
+  button:hover { background: var(--accent2); }
   button.ghost, .btn.ghost {
     background: transparent;
     border: 1px solid var(--line);
     color: var(--text);
   }
-  button.ghost:hover { border-color: var(--red2); color: var(--red2); }
+  button.ghost:hover { border-color: var(--accent2); color: var(--accent2); }
   button.mini { padding: 6px 10px; font-size: 11px; }
   button:disabled { opacity: .45; cursor: not-allowed; }
   .hint { font-size: 12.5px; color: var(--muted); }
-  .hint a { color: var(--red2); }
+  .hint a { color: var(--accent2); }
   .status { margin: 12px 0 0; font-size: 13.5px; min-height: 20px; }
   .status.ok { color: var(--ok); }
   .status.err { color: var(--err); }
-  .status a { color: var(--red2); }
+  .status a { color: var(--accent2); }
   .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
   .tabs button {
     background: transparent;
     border: 1px solid var(--line);
     color: var(--muted);
   }
-  .tabs button.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .tabs button.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
   .topbar {
     display: flex;
     justify-content: space-between;
@@ -125,13 +127,13 @@
     color: var(--text);
     list-style: none;
   }
-  details.block > summary::before { content: "▸ "; color: var(--red2); }
+  details.block > summary::before { content: "▸ "; color: var(--accent2); }
   details.block[open] > summary::before { content: "▾ "; }
   .grp-toolbar, .item-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 4px; }
   .pair { border: 1px dashed var(--line); border-radius: 8px; padding: 10px; margin: 8px 0; }
   .hidden { display: none !important; }
   .brand-line { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
-  .brand-line .kanji { color: var(--red2); }
+  .brand-line .kanji { color: var(--accent2); }
 </style>
 </head>
 <body>
@@ -365,7 +367,7 @@ function noteMissing(path) {
   state.missingNoted[path] = true;
   const s = $("#save-status");
   s.className = "status";
-  s.style.color = "#e8b34b";
+  s.style.color = "#7ad6f2";
   s.textContent = "Файла " + path + " нет на ветке «" + (state.branch || getBranch()) + "» — он будет создан при первом сохранении.";
 }
 async function saveFile(path, text, message, sha) {
