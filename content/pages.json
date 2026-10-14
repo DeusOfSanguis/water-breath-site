@@ -1,0 +1,118 @@
+{
+  "site": {
+    "name": "Дыхание Воды — yufu",
+    "short": "yufu",
+    "domain": "water-breath-yufu.ru",
+    "pages_url": "https://water-breath-yufu.ru/",
+    "home_label": "ДЫХАНИЕ·ВОДЫ",
+    "lang": "ru",
+    "description": "Дыхание Воды — фракция истребителей демонов: устав, кодекс, ката, повышения и поместье Бабочки."
+  },
+  "assets": {
+    "cover.jpg": "water-moon.jpg",
+    "water-moon.jpg": "https://water-breath-yufu.ru/assets/img/water-moon.jpg",
+    "water-surface.jpg": "https://water-breath-yufu.ru/assets/img/water-surface.jpg",
+    "butterfly-estate.jpg": "https://water-breath-yufu.ru/assets/img/butterfly-estate.jpg"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "source": "https://waterbreathingyufu.tilda.ws/",
+      "title": "Главная",
+      "nav": null,
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Дыхание воды",
+      "hero_title_1": "ДЫХАНИЕ",
+      "hero_title_2": "ВОДЫ",
+      "hero_quote": "Вода принимает любую форму. Стань как вода.",
+      "cover_image": "water-moon.jpg",
+      "hero_quote_author": "Томиока Гию · Столп Воды"
+    },
+    {
+      "slug": "law",
+      "source": "https://waterbreathingyufu.tilda.ws/law",
+      "title": "Устав Организации",
+      "nav": "Устав",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Устав организации",
+      "cover_image": "water-moon.jpg"
+    },
+    {
+      "slug": "codex",
+      "source": "https://waterbreathingyufu.tilda.ws/codex",
+      "title": "Кодекс Воды",
+      "nav": "Кодекс",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Кодекс воды",
+      "cover_image": "water-moon.jpg"
+    },
+    {
+      "slug": "elevation",
+      "source": "https://waterbreathingyufu.tilda.ws/elevation",
+      "title": "Повышения",
+      "nav": "Повышения",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Повышения",
+      "cover_image": "water-moon.jpg"
+    },
+    {
+      "slug": "kata",
+      "source": "https://waterbreathingyufu.tilda.ws/kata",
+      "title": "Ката — 10 форм",
+      "nav": "Ката",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Десять форм воды",
+      "cover_image": "water-moon.jpg"
+    },
+    {
+      "slug": "butterfly",
+      "source": "https://waterbreathingyufu.tilda.ws/butterfly",
+      "title": "Поместье Бабочки",
+      "nav": "Поместье",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Поместье Кочо",
+      "cover_image": "water-moon.jpg"
+    },
+    {
+      "slug": "ranking",
+      "source": "https://waterbreathingyufu.tilda.ws/ranking",
+      "title": "Рейтинг",
+      "nav": "Рейтинг",
+      "cover_uptitle": "Дыхание воды",
+      "cover_title": "Рейтинг истребителей",
+      "cover_image": "water-moon.jpg"
+    }
+  ],
+  "quotes": {
+    "marquee": [
+      {
+        "text": "Вода принимает любую форму. Стань как вода.",
+        "author": "Томиока Гию · Столп Воды"
+      },
+      {
+        "text": "Не позволяй другим решать, почему ты не можешь простить себя.",
+        "author": "Томиока Гию · Столп Воды"
+      },
+      {
+        "text": "Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.",
+        "author": "Урокодаки Саконджи · Бывший Столп Воды"
+      },
+      {
+        "text": "Стань сильнее, пока не сможешь защитить то, что дорого.",
+        "author": "Томиока Гию · Столп Воды"
+      },
+      {
+        "text": "Боевой товарищ всегда лучше, чем самая лучшая катана.",
+        "author": "Кодекс Воды"
+      }
+    ],
+    "footer": {
+      "text": "Вода принимает любую форму. Стань как вода.",
+      "author": "Томиока Гию · Столп Воды"
+    },
+    "not_found": {
+      "text": "Как вода ищет куда просочиться, так и ты ищи выход.",
+      "author": "Кодекс Воды"
+    }
+  }
+}

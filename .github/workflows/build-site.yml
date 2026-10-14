@@ -1,0 +1,49 @@
+# Автосборка сайта при изменении контента.
+# Админка (/admin/) коммитит правки в content/ через GitHub API,
+# этот workflow пересобирает сайт и коммитит результат.
+# GitHub Pages публикует ветку main; если для тестов захостлена другая ветка —
+# пересборка обновит и её тоже.
+name: Сборка сайта
+
+on:
+  push:
+    paths:
+      - "content/**"
+      - "build.py"
+  pull_request:
+    paths:
+      - "content/**"
+      - "build.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Собрать сайт
+        run: python3 build.py
+
+      # На PR только проверяем, что сборка проходит.
+      - name: Закоммитить собранное (push в main)
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Сборка ничего не изменила."
+          else
+            git commit -m "Сборка сайта (автоматически)"
+            git push
+          fi

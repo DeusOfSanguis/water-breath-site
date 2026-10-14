@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Админка — Дыхание Воды</title>
+<style>
+  :root {
+    --bg: #0a141e;
+    --panel: #0f1f2f;
+    --panel2: #142a3d;
+    --line: rgba(224, 240, 248, 0.14);
+    --text: #e0f0f8;
+    --muted: #8ab0c2;
+    --red: #1e8cb8;
+    --red2: #3ab4e0;
+    --gold: #d2b500;
+    --ok: #3ecf6e;
+    --err: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 Manrope, "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 18px 120px; }
+  h1 { font: 600 26px/1.2 Unbounded, Manrope, sans-serif; margin: 0 0 6px; letter-spacing: .04em; }
+  h1 .kanji { color: var(--red2); }
+  .sub { color: var(--muted); margin: 0 0 22px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 0 0 16px;
+  }
+  .card h2 { margin: 0 0 12px; font-size: 17px; letter-spacing: .03em; }
+  .card h3 { margin: 18px 0 8px; font-size: 15px; color: var(--gold); }
+  label { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 10px 0 4px; }
+  input[type=text], input[type=password], textarea, select {
+    width: 100%;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font: inherit;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: 1px solid var(--red2); border-color: var(--red2); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .row > div { flex: 1 1 200px; min-width: 160px; }
+  button, .btn {
+    background: var(--red);
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font: 600 13px/1 Manrope, sans-serif;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  button:hover { background: var(--red2); }
+  button.ghost, .btn.ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+  button.ghost:hover { border-color: var(--red2); color: var(--red2); }
+  button.mini { padding: 6px 10px; font-size: 11px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .hint { font-size: 12.5px; color: var(--muted); }
+  .hint a { color: var(--red2); }
+  .status { margin: 12px 0 0; font-size: 13.5px; min-height: 20px; }
+  .status.ok { color: var(--ok); }
+  .status.err { color: var(--err); }
+  .status a { color: var(--red2); }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+  .tabs button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .tabs button.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 18px;
+    flex-wrap: wrap;
+  }
+  .who { color: var(--muted); font-size: 13px; }
+  .who b { color: var(--text); }
+  .savebar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(10, 20, 30, 0.94);
+    border-top: 1px solid var(--line);
+    padding: 12px 18px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .savebar .status { margin: 0; flex: 1 1 260px; }
+  details.block {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px 14px;
+    margin: 0 0 12px;
+    background: var(--panel2);
+  }
+  details.block > summary {
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: .03em;
+    padding: 4px 0;
+    color: var(--text);
+    list-style: none;
+  }
+  details.block > summary::before { content: "▸ "; color: var(--red2); }
+  details.block[open] > summary::before { content: "▾ "; }
+  .grp-toolbar, .item-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 4px; }
+  .pair { border: 1px dashed var(--line); border-radius: 8px; padding: 10px; margin: 8px 0; }
+  .hidden { display: none !important; }
+  .brand-line { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+  .brand-line .kanji { color: var(--red2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="login-view">
+    <h1><span class="kanji">水</span> Админка «Дыхание Воды»</h1>
+    <p class="brand-line">Правка без кода · вход только для админов</p>
+    <div class="card">
+      <h2>Вход через GitHub</h2>
+      <p class="hint">
+        Админка пишет в репозиторий через GitHub API. Право есть только у тех, у кого есть доступ на запись к репозиторию.
+      </p>
+      <label for="token">Токен GitHub (Personal Access Token)</label>
+      <input type="password" id="token" placeholder="github_pat_... или ghp_..." autocomplete="off">
+      <label for="branch">Ветка репозитория</label>
+      <input type="text" id="branch" placeholder="main" autocomplete="off">
+      <p class="hint" style="margin:10px 0 14px">
+        Обычно <b>main</b>. Для тестов можно указать другую ветку или добавить <code>?branch=имя</code> к адресу.<br>
+        Токен: <a href="https://github.com/settings/personal-access-tokens/new?name=water-breath-admin&permissions=contents:read_write" target="_blank" rel="noopener">Fine-grained token</a> → Repository access: <b>только DeusOfSanguis/water-breath-site</b> → Contents: <b>Read and write</b>.<br>
+        Или <a href="https://github.com/settings/tokens/new?scopes=repo&description=water-breath-admin" target="_blank" rel="noopener">классический token</a> со scope <b>repo</b>.
+      </p>
+      <button id="login-btn">Войти</button>
+      <p class="status" id="login-status"></p>
+    </div>
+  </section>
+
+  <section id="app-view" class="hidden">
+    <div class="topbar">
+      <h1><span class="kanji">水</span> Админка</h1>
+      <div class="who">Вошли как: <b id="user-login">…</b> &nbsp;·&nbsp;
+        <button class="ghost mini" id="logout-btn">Выйти</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button data-tab="roster" class="on">Состав</button>
+      <button data-tab="kata">Ката</button>
+      <button data-tab="promotions">Повышения</button>
+      <button data-tab="ranking">Рейтинг</button>
+      <button data-tab="quotes">Цитаты</button>
+      <button data-tab="files">Файлы</button>
+    </div>
+
+    <div class="tab-page" id="tab-roster">
+      <div class="card">
+        <h2>Состав Воды</h2>
+        <p class="hint">Группы: Столп, Цугуко, Инструкторы и т.д. Внутри — участники.</p>
+        <div id="roster-list"></div>
+        <button class="ghost" id="add-roster-group">+ Добавить группу</button>
+      </div>
+    </div>
+
+    <div class="tab-page hidden" id="tab-kata">
+      <div class="card">
+        <h2>Ката — 10 форм</h2>
+        <p class="hint">Место для гифок готово — путь вида assets/kata/1-kata.mp4 или gif. Пока оставь заглушки, потом заменишь на конвертнутые.</p>
+        <div id="kata-list"></div>
+        <button class="ghost" id="add-kata">+ Добавить форму</button>
+      </div>
+    </div>
+
+    <div class="tab-page hidden" id="tab-promotions">
+      <div class="card">
+        <h2>Повышения — Истребители</h2>
+        <div id="promo-fighters"></div>
+        <button class="ghost" id="add-fighter-promo">+ Добавить ступень</button>
+      </div>
+      <div class="card">
+        <h2>Повышения — Инструкторы / Цугуко</h2>
+        <div id="promo-instructors"></div>
+        <button class="ghost" id="add-instructor-promo">+ Добавить ступень</button>
+      </div>
+    </div>
+
+    <div class="tab-page hidden" id="tab-ranking">
+      <div class="card">
+        <h2>Чемпион</h2>
+        <div class="row">
+          <div>
+            <label>Имя чемпиона</label>
+            <input type="text" data-path="champion.name">
+          </div>
+          <div>
+            <label>Подпись на печати</label>
+            <input type="text" data-path="champion.status" placeholder="Место свободно">
+          </div>
+        </div>
+        <div style="margin:10px 0"><label><input type="checkbox" data-path="champion.free" data-type="bool" id="champ-free"> Место свободно</label></div>
+      </div>
+      <div class="card">
+        <h2>Таблица мест</h2>
+        <div id="ranking-entries"></div>
+        <button class="ghost" id="add-entry">+ Добавить место</button>
+      </div>
+    </div>
+
+    <div class="tab-page hidden" id="tab-quotes">
+      <div class="card">
+        <h2>Бегущая строка</h2>
+        <p class="hint">Цитаты Томиоки, Урокодаки и кодекса.</p>
+        <div id="marquee-quotes"></div>
+        <button class="ghost" id="add-marquee">+ Добавить цитату</button>
+      </div>
+      <div class="card">
+        <h2>Цитата в подвале</h2>
+        <div class="row">
+          <div><label>Текст</label><input type="text" data-path="footer.text"></div>
+          <div><label>Автор</label><input type="text" data-path="footer.author"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Цитата на странице 404</h2>
+        <div class="row">
+          <div><label>Текст</label><input type="text" data-path="not_found.text"></div>
+          <div><label>Автор</label><input type="text" data-path="not_found.author"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-page hidden" id="tab-files">
+      <div class="card">
+        <h2>Тексты страниц (файлы)</h2>
+        <p class="hint">Правка любых файлов контента: <code>content/*.html</code>, <code>content/data/*.json</code>, <code>content/pages.json</code></p>
+        <label>Файл</label>
+        <select id="file-select"><option value="">— выберите файл —</option></select>
+        <label>Содержимое</label>
+        <textarea id="file-text" style="min-height:340px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></textarea>
+        <div class="item-toolbar">
+          <button id="file-reload" class="ghost">Перезагрузить файл</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="savebar">
+      <button id="save-btn">Сохранить</button>
+      <button id="discard-btn" class="ghost">Отменить изменения</button>
+      <p class="status" id="save-status"></p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+const CONFIG = {
+  owner: "DeusOfSanguis",
+  repo: "water-breath-site",
+  defaultBranch: "main",
+  actionsUrl: "https://github.com/DeusOfSanguis/water-breath-site/actions",
+  files: {
+    roster: "content/data/roster.json",
+    kata: "content/data/kata.json",
+    promotions: "content/data/promotions.json",
+    ranking: "content/data/ranking.json",
+    pages: "content/pages.json",
+  },
+};
+const BRANCH_KEY = "wb_admin_branch";
+function getBranch() {
+  try { return localStorage.getItem(BRANCH_KEY) || CONFIG.defaultBranch; }
+  catch (e) { return CONFIG.defaultBranch; }
+}
+function setBranch(b) {
+  b = (b || "").trim() || CONFIG.defaultBranch;
+  try { localStorage.setItem(BRANCH_KEY, b); } catch (e) {}
+  return b;
+}
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+const TOKEN_KEY = "wb_admin_token";
+function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } }
+function setToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} }
+function clearToken() { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+function b64encode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(bin);
+}
+function b64decode(b64) {
+  const bin = atob(b64.replace(/\s/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function gh(path, opts) {
+  opts = opts || {};
+  const headers = Object.assign({
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  }, opts.headers || {});
+  const token = getToken();
+  if (token) headers["Authorization"] = "Bearer " + token;
+  const res = await fetch("https://api.github.com" + path, { method: opts.method || "GET", headers, body: opts.body });
+  if (res.status === 401) {
+    clearToken();
+    showLogin("Сессия истекла или токен недействителен — войдите снова.");
+    throw new Error("401 unauthorized");
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+  if (!res.ok) {
+    const msg = (data && data.message) ? data.message : res.statusText;
+    const err = new Error("GitHub API " + res.status + ": " + msg);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+async function getFile(path) {
+  const data = await gh(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${encodeURIComponent(state.branch || getBranch())}`);
+  return { sha: data.sha, text: data.content ? b64decode(data.content) : "" };
+}
+async function getFileOrDefault(path, defaultText) {
+  try {
+    return await getFile(path);
+  } catch (e) {
+    if (e.status === 404) {
+      noteMissing(path);
+      return { sha: "", text: defaultText };
+    }
+    throw e;
+  }
+}
+function noteMissing(path) {
+  if (state.missingNoted[path]) return;
+  state.missingNoted[path] = true;
+  const s = $("#save-status");
+  s.className = "status";
+  s.style.color = "#e8b34b";
+  s.textContent = "Файла " + path + " нет на ветке «" + (state.branch || getBranch()) + "» — он будет создан при первом сохранении.";
+}
+async function saveFile(path, text, message, sha) {
+  const body = {
+    message: message,
+    content: b64encode(text),
+    branch: state.branch || getBranch(),
+  };
+  if (sha) body.sha = sha;
+  return gh(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+const state = {
+  user: null,
+  branch: "",
+  tab: "roster",
+  models: { roster: null, kata: null, promotions: null, ranking: null, quotes: null },
+  raw: { roster: "", kata: "", promotions: "", ranking: "", pages: "" },
+  shas: { roster: "", kata: "", promotions: "", ranking: "", pages: "" },
+  dirty: false,
+  filePath: null,
+  fileSha: "",
+  fileDirty: false,
+  missingNoted: {},
+};
+function markDirty() {
+  state.dirty = true;
+  $("#save-status").className = "status";
+  $("#save-status").textContent = "Есть несохранённые изменения…";
+}
+function getPath(obj, path) {
+  return path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+function setPath(obj, path, value) {
+  const keys = path.split(".");
+  let o = obj;
+  for (let i = 0; i < keys.length - 1; i++) o = o[keys[i]];
+  o[keys[keys.length - 1]] = value;
+}
+function showLogin(msg) {
+  $("#app-view").classList.add("hidden");
+  $("#login-view").classList.remove("hidden");
+  if (msg) {
+    const s = $("#login-status");
+    s.className = "status err";
+    s.textContent = msg;
+  }
+}
+function showApp() {
+  $("#login-view").classList.add("hidden");
+  $("#app-view").classList.remove("hidden");
+  $("#user-login").textContent = state.user ? (state.user.name || state.user.login) + " (" + state.user.login + ")" : "…";
+}
+async function boot() {
+  const urlBranch = new URLSearchParams(location.search).get("branch");
+  if (urlBranch) setBranch(urlBranch);
+  state.branch = getBranch();
+  const bi = $("#branch");
+  if (bi) bi.value = state.branch;
+  const token = getToken();
+  if (!token) { showLogin(); return; }
+  try {
+    state.user = await gh("/user");
+    await enterApp();
+  } catch (e) {
+    showLogin("Не удалось войти: " + e.message);
+  }
+}
+async function enterApp() {
+  showApp();
+  await loadTab("roster");
+}
+$("#login-btn").addEventListener("click", async () => {
+  const token = $("#token").value.trim();
+  if (!token) {
+    const s = $("#login-status");
+    s.className = "status err";
+    s.textContent = "Вставьте токен GitHub.";
+    return;
+  }
+  setToken(token);
+  state.branch = setBranch($("#branch").value);
+  const btn = $("#login-btn");
+  btn.disabled = true;
+  try {
+    state.user = await gh("/user");
+    $("#login-status").textContent = "";
+    await enterApp();
+  } catch (e) {
+    clearToken();
+    const s = $("#login-status");
+    s.className = "status err";
+    s.textContent = "Не удалось войти: " + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+$("#logout-btn").addEventListener("click", () => {
+  clearToken();
+  state.user = null;
+  location.reload();
+});
+$("#tabs").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-tab]");
+  if (!btn) return;
+  if (state.dirty && !confirm("Есть несохранённые изменения. Уйти со вкладки и потерять их?")) return;
+  state.dirty = false;
+  state.tab = btn.dataset.tab;
+  $$("#tabs button").forEach(b => b.classList.toggle("on", b === btn));
+  $$(".tab-page").forEach(p => p.classList.add("hidden"));
+  $("#tab-" + state.tab).classList.remove("hidden");
+  $("#save-status").textContent = "";
+  await loadTab(state.tab);
+});
+async function loadTab(tab) {
+  try {
+    if (tab === "roster") await loadRoster();
+    else if (tab === "kata") await loadKata();
+    else if (tab === "promotions") await loadPromotions();
+    else if (tab === "ranking") await loadRanking();
+    else if (tab === "quotes") await loadQuotes();
+    else if (tab === "files") await loadFiles();
+  } catch (e) {
+    const s = $("#save-status");
+    s.className = "status err";
+    s.textContent = "Ошибка загрузки: " + e.message;
+  }
+}
+async function loadRoster() {
+  if (!state.models.roster) {
+    const f = await getFileOrDefault(CONFIG.files.roster, JSON.stringify({ updates: [], groups: [] }, null, 2) + "\n");
+    state.shas.roster = f.sha;
+    state.raw.roster = f.text;
+    state.models.roster = JSON.parse(f.text) || {};
+    if (!Array.isArray(state.models.roster.groups)) state.models.roster.groups = [];
+  }
+  renderRoster();
+}
+function renderRoster() {
+  const m = state.models.roster;
+  const root = $("#roster-list");
+  root.innerHTML = "";
+  (m.groups || []).forEach((g, gi) => {
+    const det = document.createElement("details");
+    det.className = "block";
+    det.open = true;
+    det.innerHTML = `
+      <summary>Группа: ${escapeHtml(g.name || "Без названия")}</summary>
+      <label>Название группы</label>
+      <input type="text" data-path="groups.${gi}.name" value="${escapeAttr(g.name || "")}">
+      <label>Роль / подпись</label>
+      <input type="text" data-path="groups.${gi}.role" value="${escapeAttr(g.role || "")}">
+      <div class="pair"><b style="font-size:13px">Участники</b><div data-members="${gi}"></div><button class="ghost mini" data-act="member-add" data-g="${gi}">+ Добавить участника</button></div>
+      <div class="item-toolbar">
+        <button class="ghost mini" data-act="group-up" data-g="${gi}">↑ Выше</button>
+        <button class="ghost mini" data-act="group-down" data-g="${gi}">↓ Ниже</button>
+        <button class="ghost mini" data-act="group-del" data-g="${gi}">Удалить группу</button>
+      </div>`;
+    const memHolder = det.querySelector(`[data-members="${gi}"]`);
+    (g.members || []).forEach((mem, mi) => {
+      const div = document.createElement("div");
+      div.className = "pair";
+      div.innerHTML = `
+        <label>Имя</label><input type="text" data-path="groups.${gi}.members.${mi}.name" value="${escapeAttr(mem.name || "")}">
+        <label>Титул</label><input type="text" data-path="groups.${gi}.members.${mi}.title" value="${escapeAttr(mem.title || "")}">
+        <label>Статус</label><input type="text" data-path="groups.${gi}.members.${mi}.status" value="${escapeAttr(mem.status || "")}">
+        <label>Описание</label><textarea data-path="groups.${gi}.members.${mi}.description">${escapeHtml(mem.description || "")}</textarea>
+        <div class="item-toolbar"><button class="ghost mini" data-act="member-del" data-g="${gi}" data-m="${mi}">Удалить участника</button></div>`;
+      memHolder.appendChild(div);
+    });
+    root.appendChild(det);
+  });
+}
+$("#add-roster-group").addEventListener("click", () => {
+  state.models.roster.groups.push({ name: "Новая группа", role: "", members: [] });
+  renderRoster(); markDirty();
+});
+
+async function loadKata() {
+  if (!state.models.kata) {
+    const f = await getFileOrDefault(CONFIG.files.kata, JSON.stringify({ forms: [] }, null, 2) + "\n");
+    state.shas.kata = f.sha;
+    state.raw.kata = f.text;
+    state.models.kata = JSON.parse(f.text) || {};
+    if (!Array.isArray(state.models.kata.forms)) state.models.kata.forms = [];
+  }
+  renderKata();
+}
+function renderKata() {
+  const m = state.models.kata;
+  const root = $("#kata-list");
+  root.innerHTML = "";
+  (m.forms || []).forEach((k, i) => {
+    const det = document.createElement("details");
+    det.className = "block";
+    det.innerHTML = `
+      <summary>Ката ${k.id || i+1}: ${escapeHtml(k.name || "Без названия")}</summary>
+      <div class="row"><div><label>ID</label><input type="text" data-path="forms.${i}.id" value="${escapeAttr(k.id || "")}"></div><div><label>Японское название</label><input type="text" data-path="forms.${i}.name_jp" value="${escapeAttr(k.name_jp || "")}"></div></div>
+      <label>Название</label><input type="text" data-path="forms.${i}.name" value="${escapeAttr(k.name || "")}">
+      <label>Описание</label><textarea data-path="forms.${i}.description">${escapeHtml(k.description || "")}</textarea>
+      <label>Совет</label><input type="text" data-path="forms.${i}.tips" value="${escapeAttr(k.tips || "")}">
+      <label>GIF / MP4 путь</label><input type="text" data-path="forms.${i}.gif" value="${escapeAttr(k.gif || "")}" placeholder="assets/kata/1-kata.mp4">
+      <div class="item-toolbar"><button class="ghost mini" data-act="kata-up" data-i="${i}">↑</button><button class="ghost mini" data-act="kata-down" data-i="${i}">↓</button><button class="ghost mini" data-act="kata-del" data-i="${i}">Удалить</button></div>`;
+    root.appendChild(det);
+  });
+}
+$("#add-kata").addEventListener("click", () => {
+  const id = (state.models.kata.forms.length + 1);
+  state.models.kata.forms.push({ id: id, name: "Новая ката", name_jp: "", description: "", tips: "", gif: `assets/kata/${id}-kata.mp4` });
+  renderKata(); markDirty();
+});
+
+async function loadPromotions() {
+  if (!state.models.promotions) {
+    const f = await getFileOrDefault(CONFIG.files.promotions, JSON.stringify({ fighters: [], instructors: [] }, null, 2) + "\n");
+    state.shas.promotions = f.sha;
+    state.raw.promotions = f.text;
+    state.models.promotions = JSON.parse(f.text) || {};
+    if (!Array.isArray(state.models.promotions.fighters)) state.models.promotions.fighters = [];
+    if (!Array.isArray(state.models.promotions.instructors)) state.models.promotions.instructors = [];
+  }
+  renderPromotions();
+}
+function renderPromotions() {
+  const m = state.models.promotions;
+  const rootF = $("#promo-fighters");
+  rootF.innerHTML = "";
+  (m.fighters || []).forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "pair";
+    div.innerHTML = `
+      <div class="row"><div><label>От</label><input type="text" data-path="fighters.${i}.from" value="${escapeAttr(p.from || "")}"></div><div><label>До</label><input type="text" data-path="fighters.${i}.to" value="${escapeAttr(p.to || "")}"></div></div>
+      <label>Требования (каждое с новой строки)</label><textarea data-lines="fighters.${i}.requirements">${escapeHtml((p.requirements || []).join("\n"))}</textarea>
+      <div class="item-toolbar"><button class="ghost mini" data-act="pf-up" data-i="${i}">↑</button><button class="ghost mini" data-act="pf-down" data-i="${i}">↓</button><button class="ghost mini" data-act="pf-del" data-i="${i}">Удалить</button></div>`;
+    rootF.appendChild(div);
+  });
+  const rootI = $("#promo-instructors");
+  rootI.innerHTML = "";
+  (m.instructors || []).forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "pair";
+    div.innerHTML = `
+      <div class="row"><div><label>От</label><input type="text" data-path="instructors.${i}.from" value="${escapeAttr(p.from || "")}"></div><div><label>До</label><input type="text" data-path="instructors.${i}.to" value="${escapeAttr(p.to || "")}"></div></div>
+      <label>Требования</label><textarea data-lines="instructors.${i}.requirements">${escapeHtml((p.requirements || []).join("\n"))}</textarea>
+      <div class="item-toolbar"><button class="ghost mini" data-act="pi-up" data-i="${i}">↑</button><button class="ghost mini" data-act="pi-down" data-i="${i}">↓</button><button class="ghost mini" data-act="pi-del" data-i="${i}">Удалить</button></div>`;
+    rootI.appendChild(div);
+  });
+}
+$("#add-fighter-promo").addEventListener("click", () => { state.models.promotions.fighters.push({ from: "", to: "", requirements: [] }); renderPromotions(); markDirty(); });
+$("#add-instructor-promo").addEventListener("click", () => { state.models.promotions.instructors.push({ from: "", to: "", requirements: [] }); renderPromotions(); markDirty(); });
+
+async function loadRanking() {
+  if (!state.models.ranking) {
+    const f = await getFileOrDefault(CONFIG.files.ranking, JSON.stringify({ champion: { name: "Пока нет чемпиона", status: "Место свободно", free: true }, entries: [] }, null, 2) + "\n");
+    state.shas.ranking = f.sha;
+    state.raw.ranking = f.text;
+    state.models.ranking = JSON.parse(f.text) || {};
+    if (!Array.isArray(state.models.ranking.entries)) state.models.ranking.entries = [];
+    if (!state.models.ranking.champion) state.models.ranking.champion = {};
+  }
+  renderRanking();
+}
+function renderRanking() {
+  const m = state.models.ranking;
+  $('[data-path="champion.name"]').value = (m.champion && m.champion.name) || "";
+  $('[data-path="champion.status"]').value = (m.champion && m.champion.status) || "";
+  $("#champ-free").checked = !!(m.champion && m.champion.free);
+  const root = $("#ranking-entries");
+  root.innerHTML = "";
+  (m.entries || []).forEach((e, i) => {
+    const div = document.createElement("div");
+    div.className = "pair";
+    div.innerHTML = `
+      <div class="row">
+        <div><label>Место / подпись</label><input type="text" data-path="entries.${i}.label" value="${escapeAttr(e.label || "")}" placeholder="2 место"></div>
+        <div><label>Имя (пусто = свободно)</label><input type="text" data-path="entries.${i}.name" value="${escapeAttr(e.name || "")}"></div>
+      </div>
+      <div style="margin:8px 0"><label><input type="checkbox" data-path="entries.${i}.highlight" data-type="bool" ${e.highlight ? "checked" : ""}> Выделить как «Претендент»</label></div>
+      <div class="item-toolbar"><button class="ghost mini" data-act="entry-up" data-i="${i}">↑ Выше</button><button class="ghost mini" data-act="entry-down" data-i="${i}">↓ Ниже</button><button class="ghost mini" data-act="entry-del" data-i="${i}">Удалить</button></div>`;
+    root.appendChild(div);
+  });
+}
+$("#add-entry").addEventListener("click", () => {
+  state.models.ranking.entries.push({ label: (state.models.ranking.entries.length + 1) + " место", name: "", highlight: false });
+  renderRanking(); markDirty();
+});
+
+async function loadQuotes() {
+  if (!state.models.quotes) {
+    let f;
+    try { f = await getFile(CONFIG.files.pages); }
+    catch (e) {
+      if (e.status === 404) throw new Error("Не найден " + CONFIG.files.pages);
+      throw e;
+    }
+    state.shas.pages = f.sha;
+    state.raw.pages = f.text;
+    const pages = JSON.parse(f.text) || {};
+    state.models.quotes = pages.quotes || {};
+    if (!Array.isArray(state.models.quotes.marquee)) state.models.quotes.marquee = [];
+    if (!state.models.quotes.footer) state.models.quotes.footer = { text: "", author: "" };
+    if (!state.models.quotes.not_found) state.models.quotes.not_found = { text: "", author: "" };
+    pages.quotes = state.models.quotes;
+    state.models._pages = pages;
+  }
+  renderQuotes();
+}
+function renderQuotes() {
+  const m = state.models.quotes;
+  const root = $("#marquee-quotes");
+  root.innerHTML = "";
+  (m.marquee || []).forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "pair";
+    div.innerHTML = `
+      <div class="row"><div><label>Текст цитаты</label><input type="text" data-path="marquee.${i}.text" value="${escapeAttr(q.text || "")}"></div><div><label>Автор</label><input type="text" data-path="marquee.${i}.author" value="${escapeAttr(q.author || "")}"></div></div>
+      <div class="item-toolbar"><button class="ghost mini" data-act="mq-up" data-i="${i}">↑ Выше</button><button class="ghost mini" data-act="mq-down" data-i="${i}">↓ Ниже</button><button class="ghost mini" data-act="mq-del" data-i="${i}">Удалить</button></div>`;
+    root.appendChild(div);
+  });
+  $('[data-path="footer.text"]').value = (m.footer && m.footer.text) || "";
+  $('[data-path="footer.author"]').value = (m.footer && m.footer.author) || "";
+  $('[data-path="not_found.text"]').value = (m.not_found && m.not_found.text) || "";
+  $('[data-path="not_found.author"]').value = (m.not_found && m.not_found.author) || "";
+}
+$("#add-marquee").addEventListener("click", () => {
+  if (!state.models.quotes.marquee) state.models.quotes.marquee = [];
+  state.models.quotes.marquee.push({ text: "Новая цитата", author: "Автор" });
+  renderQuotes(); markDirty();
+});
+
+function onListAction(e) {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  const act = btn.dataset.act;
+  const m = state.models[state.tab];
+  const g = +btn.dataset.g, mi = +btn.dataset.m, i = +btn.dataset.i;
+  const move = (arr, from, to) => { if (to < 0 || to >= arr.length) return; const [x] = arr.splice(from, 1); arr.splice(to, 0, x); };
+  if (act === "group-up") move(m.groups, g, g - 1);
+  else if (act === "group-down") move(m.groups, g, g + 1);
+  else if (act === "group-del") { if (confirm("Удалить группу?")) m.groups.splice(g, 1); else return; }
+  else if (act === "member-add") { m.groups[g].members = m.groups[g].members || []; m.groups[g].members.push({ name: "Новый участник", title: "", status: "", description: "" }); }
+  else if (act === "member-del") m.groups[g].members.splice(mi, 1);
+  else if (act === "kata-up") move(m.forms, i, i - 1);
+  else if (act === "kata-down") move(m.forms, i, i + 1);
+  else if (act === "kata-del") m.forms.splice(i, 1);
+  else if (act === "pf-up") move(m.fighters, i, i - 1);
+  else if (act === "pf-down") move(m.fighters, i, i + 1);
+  else if (act === "pf-del") m.fighters.splice(i, 1);
+  else if (act === "pi-up") move(m.instructors, i, i - 1);
+  else if (act === "pi-down") move(m.instructors, i, i + 1);
+  else if (act === "pi-del") m.instructors.splice(i, 1);
+  else if (act === "entry-up") move(m.entries, i, i - 1);
+  else if (act === "entry-down") move(m.entries, i, i + 1);
+  else if (act === "entry-del") m.entries.splice(i, 1);
+  else if (act === "mq-up") move(m.marquee, i, i - 1);
+  else if (act === "mq-down") move(m.marquee, i, i + 1);
+  else if (act === "mq-del") m.marquee.splice(i, 1);
+  else return;
+  if (state.tab === "roster") renderRoster();
+  else if (state.tab === "kata") renderKata();
+  else if (state.tab === "promotions") renderPromotions();
+  else if (state.tab === "ranking") renderRanking();
+  else if (state.tab === "quotes") renderQuotes();
+  markDirty();
+}
+document.addEventListener("click", (e) => { if (e.target.closest("button[data-act]")) onListAction(e); });
+document.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.dataset.lines !== undefined && el.dataset.lines !== "") {
+    const arr = el.value.split("\n").map(s => s.trim()).filter(Boolean);
+    setPath(currentModel(), el.dataset.lines, arr);
+    markDirty(); return;
+  }
+  if (el.dataset.path !== undefined && el.dataset.path !== "") {
+    if (el.id === "file-text") return;
+    const model = currentModel();
+    if (!model) return;
+    const val = el.dataset.type === "bool" ? el.checked : el.value;
+    setPath(model, el.dataset.path, val);
+    markDirty();
+  }
+});
+function currentModel() {
+  if (state.tab === "roster") return state.models.roster;
+  if (state.tab === "kata") return state.models.kata;
+  if (state.tab === "promotions") return state.models.promotions;
+  if (state.tab === "ranking") return state.models.ranking;
+  if (state.tab === "quotes") return state.models.quotes;
+  return null;
+}
+async function loadFiles() {
+  const sel = $("#file-select");
+  if (sel.options.length > 1) return;
+  const paths = [];
+  for (const dir of ["content", "content/data"]) {
+    try {
+      const items = await gh(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${dir}?ref=${encodeURIComponent(state.branch || getBranch())}`);
+      for (const it of items) if (it.type === "file") paths.push(it.path);
+    } catch (e) {}
+  }
+  paths.sort();
+  for (const p of paths) {
+    const opt = document.createElement("option");
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  }
+}
+$("#file-select").addEventListener("change", async () => {
+  const path = $("#file-select").value;
+  if (!path) return;
+  try {
+    const f = await getFile(path);
+    state.filePath = path;
+    state.fileSha = f.sha;
+    $("#file-text").value = f.text;
+    state.fileDirty = false;
+    $("#save-status").textContent = "Загружен " + path;
+  } catch (e) {
+    $("#save-status").className = "status err";
+    $("#save-status").textContent = "Ошибка: " + e.message;
+  }
+});
+$("#file-text").addEventListener("input", () => { state.fileDirty = true; markDirty(); });
+$("#file-reload").addEventListener("click", () => {
+  const path = state.filePath;
+  state.fileDirty = false;
+  state.dirty = false;
+  $("#file-select").value = path;
+  $("#file-select").dispatchEvent(new Event("change"));
+});
+$("#save-btn").addEventListener("click", async () => {
+  const btn = $("#save-btn");
+  const s = $("#save-status");
+  btn.disabled = true;
+  s.style.color = "";
+  s.className = "status";
+  s.textContent = "Сохранение…";
+  try {
+    let path, text, message, sha, key;
+    const model = currentModel();
+    if (state.tab !== "files" && !model) throw new Error("Данные ещё не загрузились — подождите.");
+    if (state.tab === "files") {
+      if (!state.filePath) throw new Error("Сначала выберите файл.");
+      path = state.filePath;
+      text = $("#file-text").value;
+      message = "Админка: правка " + path;
+      sha = state.fileSha;
+    } else if (state.tab === "roster") {
+      key = "roster"; path = CONFIG.files.roster;
+      text = JSON.stringify(state.models.roster, null, 2) + "\n";
+      message = "Админка: обновлён состав воды"; sha = state.shas.roster;
+    } else if (state.tab === "kata") {
+      key = "kata"; path = CONFIG.files.kata;
+      text = JSON.stringify(state.models.kata, null, 2) + "\n";
+      message = "Админка: обновлены ката"; sha = state.shas.kata;
+    } else if (state.tab === "promotions") {
+      key = "promotions"; path = CONFIG.files.promotions;
+      text = JSON.stringify(state.models.promotions, null, 2) + "\n";
+      message = "Админка: обновлены повышения"; sha = state.shas.promotions;
+    } else if (state.tab === "ranking") {
+      key = "ranking"; path = CONFIG.files.ranking;
+      text = JSON.stringify(state.models.ranking, null, 2) + "\n";
+      message = "Админка: обновлён рейтинг"; sha = state.shas.ranking;
+    } else if (state.tab === "quotes") {
+      key = "pages"; path = CONFIG.files.pages;
+      state.models._pages.quotes = state.models.quotes;
+      text = JSON.stringify(state.models._pages, null, 2) + "\n";
+      message = "Админка: обновлены цитаты"; sha = state.shas.pages;
+    }
+    const res = await saveFile(path, text, message, sha);
+    const newSha = res && res.content && res.content.sha ? res.content.sha : "";
+    if (state.tab === "files") { state.fileSha = newSha; state.fileDirty = false; }
+    else { state.shas[key] = newSha; state.raw[key] = text; }
+    state.dirty = false;
+    state.missingNoted = {};
+    s.className = "status ok";
+    s.innerHTML = "Сохранено в ветку «" + (state.branch || getBranch()) + "»! Сайт пересоберётся за 1–2 минуты. <a href=\"" + CONFIG.actionsUrl + "\" target=\"_blank\">Смотреть сборку →</a>";
+  } catch (e) {
+    s.className = "status err";
+    if (e.status === 403) s.textContent = "Нет прав на запись. Нужен доступ на запись к репозиторию и токен с Contents: Read and write.";
+    else if (e.status === 409) s.textContent = "Конфликт версий: файл изменился. Обновите страницу.";
+    else if (e.status === 404) s.textContent = "Файл или ветка не найдены (404). Проверьте ветку, сейчас «" + (state.branch || getBranch()) + "».";
+    else if (e.status === 422) s.textContent = "GitHub отклонил (422): " + e.message;
+    else s.textContent = "Ошибка: " + e.message;
+  } finally { btn.disabled = false; }
+});
+$("#discard-btn").addEventListener("click", async () => {
+  if (state.tab === "files") {
+    if (state.filePath) $("#file-select").dispatchEvent(new Event("change"));
+    state.dirty = false;
+    $("#save-status").textContent = "";
+    return;
+  }
+  if (!state.dirty) return;
+  if (!confirm("Отменить несохранённые изменения?")) return;
+  const key = state.tab === "roster" ? "roster" : state.tab === "kata" ? "kata" : state.tab === "promotions" ? "promotions" : state.tab === "ranking" ? "ranking" : "quotes";
+  state.models[key] = null;
+  if (key === "quotes") state.models._pages = null;
+  state.dirty = false;
+  await loadTab(state.tab);
+  $("#save-status").className = "status ok";
+  $("#save-status").textContent = "Изменения отменены.";
+});
+window.addEventListener("beforeunload", (e) => {
+  if (state.dirty || state.fileDirty) { e.preventDefault(); e.returnValue = ""; }
+});
+function escapeHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
+boot();
+</script>
+</body>
+</html>
