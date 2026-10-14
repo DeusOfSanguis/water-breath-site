@@ -10,7 +10,7 @@
 <meta property="og:description" content="Дыхание Воды — фракция истребителей демонов: устав, кодекс, ката, повышения и поместье Бабочки.">
 <meta property="og:image" content="https://water-breath-yufu.ru/assets/img/water-moon.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%A7%3C/text%3E%3C/svg%3E">
-<script>try{var t=localStorage.getItem('wb-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}</script>
+
 <script>try{if(sessionStorage.getItem('wb-visited')){document.documentElement.classList.add('bp-seen');}else{sessionStorage.setItem('wb-visited','1');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,20 +18,20 @@
 <style>
 
 /* =====================================================================
-   ДЫХАНИЕ ВОДЫ — оформление в стиле «чистая вода / глубокий океан»
-   Светлая тема по умолчанию (добро), тёмная — data-theme="dark"
+   ДЫХАНИЕ ВОДЫ — оформление в стиле «тёмный океан / истребители»
+   Только тёмная тема — глубокий синий, бирюзовое свечение, вода
    ===================================================================== */
 
 :root {
-  --void: #f4f9fd;        /* светлый фон — почти белый с голубым */
-  --coal: #ffffff;        /* фон карточек */
-  --water: #1e8cb8;       /* основной синий воды */
-  --water-deep: #0f4a64;  /* глубокий синий */
-  --ember: #2aa0d1;       /* яркий акцент */
-  --bone: #10202e;        /* основной текст — тёмно-синий */
-  --ash: #6b8a9a;         /* второстепенный */
-  --line: rgba(16, 32, 46, 0.12);
-  --card: #ffffff;
+  --void: #050c18;        /* тёмный океан — основной фон */
+  --coal: #0a1a2a;        /* фон карточек */
+  --water: #3ab4e0;       /* основной бирюзовый воды */
+  --water-deep: #0a3a5a;  /* глубокий синий */
+  --ember: #5ac8e8;       /* яркий акцент */
+  --bone: #e0f0f8;        /* основной текст — светлый */
+  --ash: #8ab0c2;         /* второстепенный */
+  --line: rgba(224, 240, 248, 0.14);
+  --card: #0a1a2a;
 
   --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
   --font-serif: "Cormorant", Georgia, "Times New Roman", serif;
@@ -43,17 +43,7 @@
   --radius: 16px;
 }
 
-[data-theme="dark"] {
-  --void: #050c18;        /* тёмный океан */
-  --coal: #0a1a2a;
-  --water: #3ab4e0;
-  --water-deep: #0a3a5a;
-  --ember: #5ac8e8;
-  --bone: #e0f0f8;
-  --ash: #8ab0c2;
-  --line: rgba(224, 240, 248, 0.12);
-  --card: #0a1a2a;
-}
+
 
 /* =====================================================================
    ПАКТ КРОВИ — оформление в стиле «кровавая луна»
@@ -93,11 +83,11 @@ a { color: inherit; }
 ::selection { background: var(--water); color: var(--bone); }
 
 ::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: #0a060c; }
+::-webkit-scrollbar-track { background: var(--void); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--water-deep), var(--water));
   border-radius: 8px;
-  border: 2px solid #0a060c;
+  border: 2px solid var(--void);
 }
 
 /* Зерно/рябь убраны специально: сдвигающееся feTurbulence
@@ -1512,23 +1502,23 @@ body.ready .hero__crest { animation: fadeIn 1s 1.15s both; }
   to { opacity: 1; transform: none; }
 }
 
-/* глаза лун — два у высших, один у низших */
+/* ранги истребителей — без глаз, только значки воды */
 .moonrow .eye {
   font-size: 0;
   display: flex;
   gap: 6px;
-  color: inherit;
+  color: var(--water);
 }
-.moonrow .eye::before,
-.mooncol--upper .moonrow .eye::after {
-  content: "";
-  width: 16px;
-  height: 16px;
-  background: currentColor;
-  -webkit-mask: var(--m) center / contain no-repeat;
-  mask: var(--m) center / contain no-repeat;
+.moonrow .eye::before {
+  content: "💧";
+  font-size: 14px;
+  background: none;
+  -webkit-mask: none;
+  mask: none;
 }
 .mooncol:not(.mooncol--upper) .moonrow .eye::after { content: none; }
+.mooncol--upper .moonrow .eye::after { content: none; }
+
 
 /* ---------- иконки ---------- */
 .ico { --m: none; }
@@ -2424,53 +2414,9 @@ body.embed .hero__crest { display: none; }
 .permit__detail--warning { border-left-color: rgba(42, 160, 209, 0.7); }
 @media (min-width: 768px) { .permit__detail { font-size: 14px; } }
 
-/* ---------- Переключатель темы ---------- */
-.theme-toggle {
-  display: grid;
-  place-items: center;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--water);
-  cursor: pointer;
-  font-size: 16px;
-  transition: all 0.3s;
-}
-.theme-toggle:hover {
-  border-color: var(--water);
-  background: var(--water);
-  color: white;
-  box-shadow: 0 0 20px -5px var(--water);
-}
 
-/* Light theme specific adjustments */
-:root:not([data-theme="dark"]) .hero__shade {
-  background: linear-gradient(180deg, rgba(244,249,253,0.4), transparent 40%, var(--void) 100%);
-}
-:root:not([data-theme="dark"]) .hero__shade::after {
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(244,249,253,0.6) 100%);
-}
-:root:not([data-theme="dark"]) .nav.scrolled {
-  background: rgba(244, 249, 253, 0.85);
-  border-bottom-color: rgba(30, 140, 184, 0.15);
-}
-:root:not([data-theme="dark"]) .faction,
-:root:not([data-theme="dark"]) .tcard,
-:root:not([data-theme="dark"]) .mooncol,
-:root:not([data-theme="dark"]) .tnode__card,
-:root:not([data-theme="dark"]) .squadcard,
-:root:not([data-theme="dark"]) .article .s {
-  box-shadow: 0 10px 40px -20px rgba(16, 32, 46, 0.15);
-  border-color: var(--line);
-}
-:root:not([data-theme="dark"]) .marquee {
-  background: rgba(255,255,255,0.8);
-}
 
-/* Water specific — replace blood kanji glow with water */
-.hero__title .water { color: var(--water); text-shadow: 0 0 90px rgba(30, 140, 184, 0.4); }
-.hero__title .red { color: var(--water); text-shadow: 0 0 90px rgba(30, 140, 184, 0.5); }
+
 
 /* Kata grid */
 .kata-grid { display: grid; gap: 24px; }
@@ -2548,6 +2494,92 @@ body.embed .hero__crest { display: none; }
 .roster__card h4 { margin: 0; font-family: var(--font-display); font-weight: 700; }
 .roster__card .role { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--water); margin-top: 4px; }
 .roster__card p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--ash); }
+
+/* ---------- HUD истребителей — вода, а не кровь ---------- */
+.nav__drop {
+  background: rgba(58, 180, 224, 0.15);
+  border-color: rgba(58, 180, 224, 0.4);
+  box-shadow: 0 0 20px -5px rgba(58, 180, 224, 0.5);
+}
+.seal i {
+  border-color: rgba(58, 180, 224, 0.4);
+  color: var(--water);
+}
+.seal--on {
+  background: rgba(58, 180, 224, 0.15);
+  border-color: var(--water);
+  box-shadow: 0 0 20px -8px rgba(58, 180, 224, 0.8);
+}
+.seal--on i {
+  background: var(--water);
+  color: white;
+  border-color: var(--water);
+}
+.hero__eyebrow::before, .hero__eyebrow::after {
+  background: rgba(58, 180, 224, 0.6);
+}
+.hero__kanji .t {
+  color: rgba(58, 180, 224, 0.9);
+}
+.footer__big .fill {
+  color: var(--water);
+  text-shadow: 0 0 60px rgba(58, 180, 224, 0.5);
+}
+.shead__num {
+  color: var(--water);
+}
+.shead__line {
+  background: linear-gradient(90deg, var(--water), transparent);
+}
+.shead__kanji {
+  color: var(--water);
+}
+/* Ранги истребителей — новый стиль без глаз */
+.rank-list {
+  display: grid;
+  gap: 12px;
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  transition: border-color 0.3s;
+}
+.rank-item:hover {
+  border-color: var(--water);
+}
+.rank-item__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.rank-item__num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--water);
+  min-width: 28px;
+}
+.rank-item__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+.rank-item__desc {
+  font-size: 12px;
+  color: var(--ash);
+  margin-top: 2px;
+}
+.rank-item__badge {
+  font-size: 20px;
+  color: var(--water);
+}
 
 </style>
 </head>
@@ -2926,40 +2958,6 @@ body.embed .hero__crest { display: none; }
     })();
   })();
 })();
-
-  /* ---------- Переключатель темы вода (светлая/тёмная) ---------- */
-  (function () {
-    var btn = document.querySelector("[data-theme-toggle]");
-    if (!btn) return;
-    function apply(t) {
-      if (t === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-        btn.textContent = "☀";
-        btn.setAttribute("aria-label", "Светлая тема");
-      } else {
-        document.documentElement.removeAttribute("data-theme");
-        btn.textContent = "☾";
-        btn.setAttribute("aria-label", "Тёмная тема");
-      }
-    }
-    var saved = null;
-    try { saved = localStorage.getItem("wb-theme"); } catch(e){}
-    if (saved) apply(saved);
-    else {
-      // auto: if user prefers dark
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        // leave light as default for dobra, but we respect system if no saved
-        // apply("dark");
-      }
-      apply(document.documentElement.getAttribute("data-theme") || "light");
-    }
-    btn.addEventListener("click", function () {
-      var cur = document.documentElement.getAttribute("data-theme");
-      var next = cur === "dark" ? "light" : "dark";
-      try { localStorage.setItem("wb-theme", next); } catch(e){}
-      apply(next);
-    });
-  })();
 
 </script>
 </body>

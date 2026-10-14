@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Сборка сайта «Дыхание Воды» из папки content/.
-Адаптировано с bloodpact-site, но под светлую тему воды + добра.
+Сборка сайта «Дыхание Воды — корпус истребителей» из папки content/.
+Адаптировано с bloodpact-site, но под тёмную тему воды — фракция истребителей.
 
 Результат (GitHub Pages публикует КОРЕНЬ ветки main):
   ./                 — сайт: index.html, law/, codex/, kata/, …
@@ -59,11 +59,9 @@ SIGIL = {
 
 SPINE = [
     ("faction", "01", "Вода"),
-    ("laws", "02", "Устав"),
-    ("ranks", "03", "Ранги"),
-    ("rebirth", "04", "Путь"),
-    ("hierarchy", "05", "Иерархия"),
-    ("kata", "06", "Ката"),
+    ("codex", "02", "Кодекс"),
+    ("path", "03", "Путь"),
+    ("hierarchy", "04", "Иерархия"),
 ]
 
 def load():
@@ -164,11 +162,8 @@ def render_nav(data, current_page):
         '<div class="nav__seals" data-seals><div class="nav__seals-track">'
         + "".join(seals) +
         "</div></div>"
-        '<div style="display:flex;gap:8px;align-items:center">'
-        '<button class="theme-toggle" data-theme-toggle aria-label="Переключить тему">☾</button>'
         '<button class="nav__burger" data-menu-open aria-label="Открыть кодекс">'
         '<span class="nav__burger-k">水</span><span class="nav__burger-t">Кодекс</span></button>'
-        "</div>"
         "</div></header>"
     )
 
@@ -414,8 +409,8 @@ def render_footer(data, current_page):
         "</div>"
         "</div>"
         '<div class="footer__bot">'
-        f'<p>© <span data-year>2026</span> {html.escape(site["name"])}. Светлая фракция.</p>'
-        "<p>水 · 律 · 型</p>"
+        f'<p>© <span data-year>2026</span> {html.escape(site["name"])}. Корпус истребителей демонов — фракция добра.</p>'
+        "<p>水 · 隊 · 蝶 · 斬</p>"
         "</div>"
         "</div></footer>"
     )
@@ -453,12 +448,7 @@ def render_document(page, data, body, css_link=None, css_inline=None,
         "else{sessionStorage.setItem('wb-visited','1');}"
         "}catch(e){}</script>"
     )
-    theme_init = (
-        "<script>try{"
-        "var t=localStorage.getItem('wb-theme');"
-        "if(t){document.documentElement.setAttribute('data-theme',t);}"
-        "}catch(e){}</script>"
-    )
+    theme_init = ""
     return f"""<!DOCTYPE html>
 <html lang="{site['lang']}">
 <head>

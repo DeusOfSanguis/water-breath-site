@@ -272,37 +272,3 @@
     })();
   })();
 })();
-
-  /* ---------- Переключатель темы вода (светлая/тёмная) ---------- */
-  (function () {
-    var btn = document.querySelector("[data-theme-toggle]");
-    if (!btn) return;
-    function apply(t) {
-      if (t === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-        btn.textContent = "☀";
-        btn.setAttribute("aria-label", "Светлая тема");
-      } else {
-        document.documentElement.removeAttribute("data-theme");
-        btn.textContent = "☾";
-        btn.setAttribute("aria-label", "Тёмная тема");
-      }
-    }
-    var saved = null;
-    try { saved = localStorage.getItem("wb-theme"); } catch(e){}
-    if (saved) apply(saved);
-    else {
-      // auto: if user prefers dark
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        // leave light as default for dobra, but we respect system if no saved
-        // apply("dark");
-      }
-      apply(document.documentElement.getAttribute("data-theme") || "light");
-    }
-    btn.addEventListener("click", function () {
-      var cur = document.documentElement.getAttribute("data-theme");
-      var next = cur === "dark" ? "light" : "dark";
-      try { localStorage.setItem("wb-theme", next); } catch(e){}
-      apply(next);
-    });
-  })();
