@@ -1,0 +1,34 @@
+{
+  "champion": {
+    "name": "Пока нет чемпиона",
+    "status": "Место свободно",
+    "free": true
+  },
+  "entries": [
+    {
+      "label": "Претендент",
+      "name": "💧",
+      "highlight": true
+    },
+    {
+      "label": "2 место",
+      "name": "",
+      "highlight": false
+    },
+    {
+      "label": "3 место",
+      "name": "",
+      "highlight": false
+    },
+    {
+      "label": "4 место",
+      "name": "",
+      "highlight": false
+    },
+    {
+      "label": "5 место",
+      "name": "",
+      "highlight": false
+    }
+  ]
+}
