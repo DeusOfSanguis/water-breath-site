@@ -74,12 +74,12 @@
       "cover_image": "water-moon.jpg"
     },
     {
-      "slug": "ranking",
-      "source": "https://waterbreathingyufu.tilda.ws/ranking",
-      "title": "Рейтинг",
-      "nav": "Рейтинг",
+      "slug": "roster",
+      "source": "",
+      "title": "Состав и иерархия",
+      "nav": "Состав",
       "cover_uptitle": "Дыхание воды",
-      "cover_title": "Рейтинг истребителей",
+      "cover_title": "Состав и иерархия",
       "cover_image": "water-moon.jpg"
     }
   ],

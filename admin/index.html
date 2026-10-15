@@ -173,7 +173,6 @@
       <button data-tab="roster" class="on">Состав</button>
       <button data-tab="kata">Ката</button>
       <button data-tab="promotions">Повышения</button>
-      <button data-tab="ranking">Рейтинг</button>
       <button data-tab="quotes">Цитаты</button>
       <button data-tab="files">Файлы</button>
     </div>
@@ -206,28 +205,6 @@
         <h2>Повышения — Инструкторы / Цугуко</h2>
         <div id="promo-instructors"></div>
         <button class="ghost" id="add-instructor-promo">+ Добавить ступень</button>
-      </div>
-    </div>
-
-    <div class="tab-page hidden" id="tab-ranking">
-      <div class="card">
-        <h2>Чемпион</h2>
-        <div class="row">
-          <div>
-            <label>Имя чемпиона</label>
-            <input type="text" data-path="champion.name">
-          </div>
-          <div>
-            <label>Подпись на печати</label>
-            <input type="text" data-path="champion.status" placeholder="Место свободно">
-          </div>
-        </div>
-        <div style="margin:10px 0"><label><input type="checkbox" data-path="champion.free" data-type="bool" id="champ-free"> Место свободно</label></div>
-      </div>
-      <div class="card">
-        <h2>Таблица мест</h2>
-        <div id="ranking-entries"></div>
-        <button class="ghost" id="add-entry">+ Добавить место</button>
       </div>
     </div>
 
@@ -288,7 +265,6 @@ const CONFIG = {
     roster: "content/data/roster.json",
     kata: "content/data/kata.json",
     promotions: "content/data/promotions.json",
-    ranking: "content/data/ranking.json",
     pages: "content/pages.json",
   },
 };
@@ -387,9 +363,9 @@ const state = {
   user: null,
   branch: "",
   tab: "roster",
-  models: { roster: null, kata: null, promotions: null, ranking: null, quotes: null },
-  raw: { roster: "", kata: "", promotions: "", ranking: "", pages: "" },
-  shas: { roster: "", kata: "", promotions: "", ranking: "", pages: "" },
+  models: { roster: null, kata: null, promotions: null, quotes: null },
+  raw: { roster: "", kata: "", promotions: "", pages: "" },
+  shas: { roster: "", kata: "", promotions: "", pages: "" },
   dirty: false,
   filePath: null,
   fileSha: "",
@@ -490,7 +466,6 @@ async function loadTab(tab) {
     if (tab === "roster") await loadRoster();
     else if (tab === "kata") await loadKata();
     else if (tab === "promotions") await loadPromotions();
-    else if (tab === "ranking") await loadRanking();
     else if (tab === "quotes") await loadQuotes();
     else if (tab === "files") await loadFiles();
   } catch (e) {
@@ -622,42 +597,6 @@ function renderPromotions() {
 $("#add-fighter-promo").addEventListener("click", () => { state.models.promotions.fighters.push({ from: "", to: "", requirements: [] }); renderPromotions(); markDirty(); });
 $("#add-instructor-promo").addEventListener("click", () => { state.models.promotions.instructors.push({ from: "", to: "", requirements: [] }); renderPromotions(); markDirty(); });
 
-async function loadRanking() {
-  if (!state.models.ranking) {
-    const f = await getFileOrDefault(CONFIG.files.ranking, JSON.stringify({ champion: { name: "Пока нет чемпиона", status: "Место свободно", free: true }, entries: [] }, null, 2) + "\n");
-    state.shas.ranking = f.sha;
-    state.raw.ranking = f.text;
-    state.models.ranking = JSON.parse(f.text) || {};
-    if (!Array.isArray(state.models.ranking.entries)) state.models.ranking.entries = [];
-    if (!state.models.ranking.champion) state.models.ranking.champion = {};
-  }
-  renderRanking();
-}
-function renderRanking() {
-  const m = state.models.ranking;
-  $('[data-path="champion.name"]').value = (m.champion && m.champion.name) || "";
-  $('[data-path="champion.status"]').value = (m.champion && m.champion.status) || "";
-  $("#champ-free").checked = !!(m.champion && m.champion.free);
-  const root = $("#ranking-entries");
-  root.innerHTML = "";
-  (m.entries || []).forEach((e, i) => {
-    const div = document.createElement("div");
-    div.className = "pair";
-    div.innerHTML = `
-      <div class="row">
-        <div><label>Место / подпись</label><input type="text" data-path="entries.${i}.label" value="${escapeAttr(e.label || "")}" placeholder="2 место"></div>
-        <div><label>Имя (пусто = свободно)</label><input type="text" data-path="entries.${i}.name" value="${escapeAttr(e.name || "")}"></div>
-      </div>
-      <div style="margin:8px 0"><label><input type="checkbox" data-path="entries.${i}.highlight" data-type="bool" ${e.highlight ? "checked" : ""}> Выделить как «Претендент»</label></div>
-      <div class="item-toolbar"><button class="ghost mini" data-act="entry-up" data-i="${i}">↑ Выше</button><button class="ghost mini" data-act="entry-down" data-i="${i}">↓ Ниже</button><button class="ghost mini" data-act="entry-del" data-i="${i}">Удалить</button></div>`;
-    root.appendChild(div);
-  });
-}
-$("#add-entry").addEventListener("click", () => {
-  state.models.ranking.entries.push({ label: (state.models.ranking.entries.length + 1) + " место", name: "", highlight: false });
-  renderRanking(); markDirty();
-});
-
 async function loadQuotes() {
   if (!state.models.quotes) {
     let f;
@@ -722,9 +661,6 @@ function onListAction(e) {
   else if (act === "pi-up") move(m.instructors, i, i - 1);
   else if (act === "pi-down") move(m.instructors, i, i + 1);
   else if (act === "pi-del") m.instructors.splice(i, 1);
-  else if (act === "entry-up") move(m.entries, i, i - 1);
-  else if (act === "entry-down") move(m.entries, i, i + 1);
-  else if (act === "entry-del") m.entries.splice(i, 1);
   else if (act === "mq-up") move(m.marquee, i, i - 1);
   else if (act === "mq-down") move(m.marquee, i, i + 1);
   else if (act === "mq-del") m.marquee.splice(i, 1);
@@ -732,7 +668,6 @@ function onListAction(e) {
   if (state.tab === "roster") renderRoster();
   else if (state.tab === "kata") renderKata();
   else if (state.tab === "promotions") renderPromotions();
-  else if (state.tab === "ranking") renderRanking();
   else if (state.tab === "quotes") renderQuotes();
   markDirty();
 }
@@ -757,7 +692,6 @@ function currentModel() {
   if (state.tab === "roster") return state.models.roster;
   if (state.tab === "kata") return state.models.kata;
   if (state.tab === "promotions") return state.models.promotions;
-  if (state.tab === "ranking") return state.models.ranking;
   if (state.tab === "quotes") return state.models.quotes;
   return null;
 }
@@ -830,10 +764,6 @@ $("#save-btn").addEventListener("click", async () => {
       key = "promotions"; path = CONFIG.files.promotions;
       text = JSON.stringify(state.models.promotions, null, 2) + "\n";
       message = "Админка: обновлены повышения"; sha = state.shas.promotions;
-    } else if (state.tab === "ranking") {
-      key = "ranking"; path = CONFIG.files.ranking;
-      text = JSON.stringify(state.models.ranking, null, 2) + "\n";
-      message = "Админка: обновлён рейтинг"; sha = state.shas.ranking;
     } else if (state.tab === "quotes") {
       key = "pages"; path = CONFIG.files.pages;
       state.models._pages.quotes = state.models.quotes;
@@ -866,7 +796,7 @@ $("#discard-btn").addEventListener("click", async () => {
   }
   if (!state.dirty) return;
   if (!confirm("Отменить несохранённые изменения?")) return;
-  const key = state.tab === "roster" ? "roster" : state.tab === "kata" ? "kata" : state.tab === "promotions" ? "promotions" : state.tab === "ranking" ? "ranking" : "quotes";
+  const key = state.tab === "roster" ? "roster" : state.tab === "kata" ? "kata" : state.tab === "promotions" ? "promotions" : "quotes";
   state.models[key] = null;
   if (key === "quotes") state.models._pages = null;
   state.dirty = false;

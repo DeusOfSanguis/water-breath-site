@@ -3037,6 +3037,41 @@ body.embed .hero__crest { display: none; }
 
   /* ---------- Плавные переходы отключены: обычная навигация ---------- */
 
+  /* ---------- Ката: видео как в тестовом сайте ---------- */
+  (function () {
+    var cards = document.querySelectorAll('.kata-card');
+    if (!cards.length) return;
+    function playVideo(video) {
+      if (!video || !video.paused) return;
+      video.muted = true;
+      var p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(function () {});
+    }
+    cards.forEach(function (card) {
+      var video = card.querySelector('video');
+      if (!video) return;
+      card.addEventListener('mouseenter', function () { playVideo(video); });
+      card.addEventListener('mouseleave', function () { video.pause(); });
+      card.addEventListener('click', function () {
+        if (video.paused) playVideo(video); else video.pause();
+      });
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target.querySelector('video');
+          if (!video) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.2 && !document.hidden) playVideo(video);
+          else video.pause();
+        });
+      }, { threshold: [0, 0.2, 0.5], rootMargin: '0px 0px -60px 0px' });
+      cards.forEach(function (card) { io.observe(card); });
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) document.querySelectorAll('#kataGrid video').forEach(function (v) { v.pause(); });
+    });
+  })();
+
 })();
 
 </script>
