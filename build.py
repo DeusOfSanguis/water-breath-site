@@ -68,8 +68,10 @@ SIGIL = {
 
 SPINE = [
     ("faction", "01", "Вода"),
-    ("path", "02", "Путь"),
-    ("hierarchy", "03", "Иерархия"),
+    ("codex7", "02", "Кодекс"),
+    ("path", "03", "Путь"),
+    ("kata", "04", "Ката"),
+    ("groups", "05", "Состав"),
 ]
 
 def load():
@@ -135,13 +137,39 @@ def render_fragment(fragment, data, prefix="", asset_base=None, kind="site"):
     out = out.replace("{{marquee:reverse}}", render_marquee(data, True))
     out = out.replace("{{roster}}", render_roster(data))
     out = out.replace("{{kata}}", render_kata(data, prefix=prefix, asset_base=asset_base))
-    out = out.replace("{{kata-teaser}}", render_kata_teaser(data, prefix=prefix, asset_base=asset_base))
+    out = out.replace("{{kata-teaser}}", render_kata_teaser(data, prefix=prefix, asset_base=asset_base, kind=kind))
+    out = out.replace("{{ranks}}", render_ranks(data, prefix=prefix, kind=kind))
+    out = out.replace("{{groups}}", render_groups(data, prefix=prefix, kind=kind))
     out = out.replace("{{promotions}}", render_promotions(data))
     out = out.replace("{{ranking-top}}", render_ranking_top(data))
     return out
 
 def _sigil(page):
     return page.get("sigil") or SIGIL.get(page["slug"], "水")
+
+def plural(n, forms=("требование", "требования", "требований")):
+    """Русская форма слова по числу."""
+    n = abs(int(n))
+    if n % 10 == 1 and n % 100 != 11:
+        return forms[0]
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return forms[1]
+    return forms[2]
+
+
+def hb_head(num, kanji, title, sub="", tail=""):
+    """Заголовок секции главной: номер, иероглиф, крупное название и подпись."""
+    sub_html = f'<p class="hb-head__sub">{sub}</p>' if sub else ""
+    tail_html = f'<span class="hb-head__tail" aria-hidden="true">{tail}</span>' if tail else ""
+    return (
+        '<header class="hb-head reveal">'
+        f'<span class="hb-head__kanji" aria-hidden="true">{kanji}</span>'
+        f'<p class="hb-head__num"><span>{num}</span><i aria-hidden="true"></i>{tail_html}</p>'
+        f'<h2 class="hb-head__title">{title}</h2>'
+        f"{sub_html}"
+        "</header>"
+    )
+
 
 def render_nav(data, current_page):
     """Шапка: логотип + лента вкладок-разделов (новый вариант — «жидкая» полоса
@@ -257,6 +285,13 @@ def render_quote(text, author, css_class):
 def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=False):
     is_index = page["slug"] == "index" and not compact
     bg = resolve_asset(page.get("cover_image") or "cover.jpg", data, prefix, asset_base)
+
+    def hero_link(slug, fallback="#faction"):
+        for pg in data["pages"]:
+            if pg["slug"] == slug:
+                return prefix + page_path(pg)
+        return fallback
+
     media = f'<img class="bg" src="{bg}" alt="" fetchpriority="high">'
     if is_index:
         w1 = page.get("hero_title_1") or "ДЫХАНИЕ"
@@ -271,14 +306,46 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
             '<span class="t">дыхание воды</span>'
             "</div>"
         )
-        cue = '<a class="hero__cue" href="#faction" aria-label="Дальше"><span aria-hidden="true">﹀</span></a>'
-        cls = "hero"
+        cue = (
+            '<a class="hero__cue" href="#faction">'
+            '<span class="hero__cue-t">Листай вниз</span><span aria-hidden="true">﹀</span></a>'
+        )
+        cls = "hero hero--index"
+        stats = [
+            ("10", "форм воды"),
+            ("7", "принципов кодекса"),
+            ("10", "рангов пути"),
+            ("4", "завета"),
+        ]
+        stats_html = "".join(
+            f'<li><b>{n}</b><span>{html.escape(label)}</span></li>' for n, label in stats
+        )
         content = (
-            f'<p class="hero__eyebrow">💧&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
+            f'<p class="hero__eyebrow">水&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
             f'<h1 class="hero__title">{title}</h1>'
             f"{quote_html}"
+            '<div class="hero__btns">'
+            f'<a class="btn btn--water" href="{hero_link("codex")}"><span>Кодекс воды</span></a>'
+            f'<a class="btn btn--ghost" href="{hero_link("kata")}">Десять форм →</a>'
+            "</div>"
+            f'<ul class="hero__stats">{stats_html}</ul>'
         )
-        crest = ""
+        crest = (
+            '<div class="hero__crest hero__crest--index" aria-hidden="true">'
+            '<span class="hero__crest-k">水</span>'
+            '<span class="hero__crest-t">стань как вода</span>'
+            "</div>"
+        )
+        waves = (
+            '<div class="hero__waves" aria-hidden="true">'
+            '<svg viewBox="0 0 1440 120" preserveAspectRatio="none" class="hero__wave hero__wave--back">'
+            '<path d="M0,70 C160,20 320,20 480,70 C640,120 800,120 960,70 C1120,20 1280,20 1440,70 L1440,120 L0,120 Z"/>'
+            "</svg>"
+            '<svg viewBox="0 0 1440 120" preserveAspectRatio="none" class="hero__wave hero__wave--front">'
+            '<path d="M0,80 C160,40 320,40 480,80 C640,120 800,120 960,80 C1120,40 1280,40 1440,80 L1440,120 L0,120 Z"/>'
+            "</svg>"
+            "</div>"
+        )
     else:
         sig = html.escape(_sigil(page))
         label = page.get("nav") or page["cover_uptitle"]
@@ -293,6 +360,7 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
             "</div>"
         )
         crest = f'<div class="hero__crest" aria-hidden="true"><span>{sig}</span></div>'
+        waves = ""
         content = (
             f'<p class="hero__eyebrow">{sig}&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
             f'<h1 class="hero__title">{title}</h1>'
@@ -304,6 +372,7 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
         f"{kanji}{crest}"
         f'<div class="hero__in">{content}</div>'
         f"{cue}"
+        f"{waves}"
         "</section>"
     )
 
@@ -382,9 +451,6 @@ def kata_media(f, prefix="", asset_base=None):
             f' data-kata-video aria-label="{label}">'
             + "".join(sources) +
             "</video>"
-            '<button class="kata-card__play" type="button" data-kata-toggle'
-            f' aria-label="Проиграть анимацию: {name}"><span class="kata-card__play-ico" aria-hidden="true"></span></button>'
-            '<span class="kata-card__hint" aria-hidden="true">наведи — играет</span>'
             "</figure>"
         )
     if exists(str(f.get("gif") or "")):
@@ -426,46 +492,140 @@ def render_kata(data, prefix="", asset_base=None):
     return '<section class="s"><div class="kata-grid" id="kataGrid">' + "".join(cards) + "</div></section>"
 
 
-def render_kata_teaser(data, prefix="", asset_base=None):
-    """Превью ката для главной: один ролик-превью + список всех 10 форм."""
+def render_kata_teaser(data, prefix="", asset_base=None, kind="site"):
+    """Секция ката для главной: ролик-превью + список всех форм."""
     kata = (data.get("lists") or {}).get("kata") or {}
     forms = kata.get("forms") or []
     if not forms:
         return ""
-    href = prefix + "kata/"
-    preview = None
+    href = page_url(data, "kata", kind, prefix)
+
+    preview = forms[-1]
     for f in forms:
         if str(f.get("id")) == "10":
             preview = f
-    preview = preview or forms[-1]
+    pname = str(preview.get("name", ""))
+    short = pname.split(":", 1)[-1].strip() or pname
 
-    items = []
+    chips = []
     for f in forms:
         fid = f.get("id", "")
         num = f"{int(fid):02d}" if str(fid).isdigit() else html.escape(str(fid))
-        short = str(f.get("name", "")).split(":", 1)[-1].strip() or str(f.get("name", ""))
-        items.append(
-            f'<li><a class="kchip" href="{href}">'
-            f'<span class="kchip__n">{num}</span>'
-            f'<span class="kchip__t">{html.escape(short)}</span>'
-            f'<span class="kchip__jp" aria-hidden="true">{html.escape(str(f.get("name_jp", "")))}</span>'
-            "</a></li>"
+        fname = str(f.get("name", ""))
+        fshort = fname.split(":", 1)[-1].strip() or fname
+        chips.append(
+            f'<a class="hb-kata__chip" href="{href}">'
+            f'<span class="hb-kata__chip-n">{num}</span>'
+            f'<span class="hb-kata__chip-t">{html.escape(fshort)}</span>'
+            f'<span class="hb-kata__chip-jp" aria-hidden="true">{html.escape(str(f.get("name_jp", "")))}</span>'
+            "</a>"
         )
 
+    head = hb_head(
+        "04", "型", 'Десять форм <em>воды</em>',
+        'От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.',
+        "ката",
+    )
     return (
-        '<section class="s">'
-        '<div class="katateaser reveal">'
-        '<div class="katateaser__preview">'
+        '<section class="hb-section hb-section--dim hb-kata" id="kata">'
+        '<div class="hb-wrap">'
+        + head +
+        '<div class="hb-kata__grid">'
+        '<div class="hb-kata__preview reveal">'
         + kata_media(preview, prefix=prefix, asset_base=asset_base) +
-        '<p class="katateaser__cap">'
-        f'<span class="katateaser__cap-n">{html.escape(str(preview.get("name", "")))}</span>'
-        '<span>Наведи — анимация оживёт. На телефоне нажми ▶.</span>'
-        "</p>"
+        '<div class="hb-kata__cap">'
+        f'<span class="hb-kata__cap-n">{html.escape(short)}</span>'
+        f'<span class="hb-kata__cap-jp">{html.escape(str(preview.get("name_jp", "")))}</span>'
         "</div>"
-        '<ol class="katateaser__list">' + "".join(items) + "</ol>"
         "</div>"
-        f'<div class="katateaser__more"><a class="btn btn--water" href="{href}"><span>Все десять форм →</span></a></div>'
-        "</section>"
+        '<div class="hb-kata__list">' + "".join(chips) + "</div>"
+        "</div>"
+        f'<div class="hb-kata__more"><a class="btn btn--water" href="{href}">'
+        "<span>Разобрать все формы →</span></a></div>"
+        "</div></section>"
+    )
+
+
+def render_ranks(data, prefix="", kind="site"):
+    """Секция рангов для главной: лестница из промоушен-документа."""
+    prom = (data.get("lists") or {}).get("promotions") or {}
+    steps = prom.get("fighters") or []
+    if not steps:
+        return ""
+    rows = []
+    total = len(steps)
+    for i, step in enumerate(steps):
+        fr = html.escape(str(step.get("from", "")))
+        to = html.escape(str(step.get("to", "")))
+        req = len(step.get("requirements") or [])
+        pct = int(round((i + 1) / total * 100))
+        rows.append(
+            f'<li class="hb-rank reveal" style="--p:{pct}%">'
+            f'<span class="hb-rank__i">{i + 1:02d}</span>'
+            f'<p class="hb-rank__path"><span>{fr}</span><i aria-hidden="true">→</i><b>{to}</b></p>'
+            f'<span class="hb-rank__req">{req}&nbsp;{plural(req)}</span>'
+            f'<span class="hb-rank__bar" aria-hidden="true"></span>'
+            "</li>"
+        )
+    head = hb_head(
+        "03", "昇", 'Десять рангов <em>пути</em>',
+        'Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.',
+        "ранги",
+    )
+    return (
+        '<section class="hb-section hb-ranks" id="ranks">'
+        '<div class="hb-wrap">'
+        + head +
+        '<ol class="hb-ranks__ladder">' + "".join(rows) + "</ol>"
+        '<div class="hb-ranks__more">'
+        f'<a class="btn btn--ghost" href="{page_url(data, "elevation", kind, prefix)}">Требования к каждому рангу →</a>'
+        "</div>"
+        "</div></section>"
+    )
+
+
+def render_groups(data, prefix="", kind="site"):
+    """Секция состава для главной: группы дыхания воды (Столп, цугуко, инструкторы…)."""
+    roster = (data.get("lists") or {}).get("roster") or {}
+    groups = roster.get("groups") or []
+    if not groups:
+        return ""
+    cards = []
+    for g in groups:
+        members = []
+        for m in g.get("members") or []:
+            name = html.escape(str(m.get("name", "")))
+            title = html.escape(str(m.get("title", "")))
+            status = html.escape(str(m.get("status", "")))
+            desc = html.escape(str(m.get("description", "")))
+            free = "Вакантно" in str(m.get("name", "")) or "свободно" in str(m.get("status", "")).lower()
+            members.append(
+                f'<li class="hb-group__m{" is-free" if free else ""}">'
+                f'<span class="hb-group__name">{name}</span>'
+                f'<span class="hb-group__meta">{title}{" · " + status if status else ""}</span>'
+                f'<p class="hb-group__desc">{desc}</p>'
+                "</li>"
+            )
+        cards.append(
+            '<article class="hb-card hb-group reveal">'
+            f'<p class="hb-card__role">{html.escape(str(g.get("role", "")))}</p>'
+            f'<h3 class="hb-card__title">{html.escape(str(g.get("name", "")))}</h3>'
+            '<ul class="hb-group__list">' + "".join(members) + "</ul>"
+            "</article>"
+        )
+    head = hb_head(
+        "05", "隊", 'Состав <em>корпуса</em>',
+        'Столп воды, его преемники, инструкторы, истребители и ученики — одна река.',
+        "состав",
+    )
+    return (
+        '<section class="hb-section hb-groups" id="groups">'
+        '<div class="hb-wrap">'
+        + head +
+        '<div class="hb-groups__grid">' + "".join(cards) + "</div>"
+        '<div class="hb-groups__more"><a class="btn btn--ghost" href="'
+        + page_url(data, "roster", kind, prefix) + '">Полный состав и иерархия →</a></div>'
+        "</div></section>"
     )
 
 

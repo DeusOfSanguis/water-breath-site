@@ -63,9 +63,17 @@
   --ink: rgb(var(--ink-rgb));
   --line: rgb(var(--bone-rgb) / 0.14);
 
-  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
-  --font-serif: "Cormorant", Georgia, "Times New Roman", serif;
-  --font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* иероглифы 水 · 型 · 隊 · 律: Unbounded и Manrope их не содержат */
+  --font-cjk: "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", Meiryo,
+              "Noto Sans JP", "Noto Sans CJK JP", "MS PGothic", "MS Gothic",
+              "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+
+  /* в конце каждой связки — японские/китайские шрифты: латиница и кириллица
+     берутся из Unbounded/Manrope, а иероглифы 水 · 型 · 隊 падают в CJK-шрифт
+     и никогда не превращаются в пустые квадраты */
+  --font-display: "Unbounded", "Arial Black", system-ui, var(--font-cjk), sans-serif;
+  --font-serif: "Cormorant", Georgia, "Times New Roman", var(--font-cjk), serif;
+  --font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, var(--font-cjk), sans-serif;
 
   --container: 1300px;
   --narrow: 760px;
@@ -1556,6 +1564,8 @@ body:not(.ready) .hero__crest { opacity: 0; }
 body.ready .hero__eyebrow { animation: fadeUp 0.8s 0.12s both; }
 body.ready .hero__quote { animation: fadeUp 0.9s 1.45s both; }
 body.ready .hero__btns { animation: fadeUp 0.7s 1.75s both; }
+body:not(.ready) .hero__stats { opacity: 0; }
+body.ready .hero__stats { animation: fadeUp 0.8s 1.95s both; }
 body.ready .hero__kanji,
 body.ready .hero__cue,
 body.ready .hero__crest { animation: fadeIn 1s 1.15s both; }
@@ -2024,7 +2034,11 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
    .is-away   — вода ушла вверх (новая страница открылась);
    html.veil-cover — состояние НА ПРИХОДЕ: штора уже накрыта ещё до первой
    отрисовки (ставится инлайн-скриптом в <head>) и уезжает вверх сама,
-   даже если JS не выполнился.                                              */
+   даже если JS не выполнился.
+
+   Движение медленное и мягкое: длинный плавный ход (почти секунда),
+   текст и полоска проявляются со задержкой, содержимое страницы за шторой
+   тихо уплывает в размытие — без рывков и резких вспышек.                 */
 .veil {
   position: fixed;
   inset: 0;
@@ -2033,47 +2047,58 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
   pointer-events: none;
 }
 .veil.is-cover { pointer-events: auto; }
+
 .veil__panel {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  height: calc(100% + 240px);
-  transform: translateY(110%);
-  transition: transform 0.66s cubic-bezier(0.66, 0, 0.34, 1);
+  height: calc(100% + 320px);
+  transform: translateY(112%);
+  transition: transform 0.95s cubic-bezier(0.5, 0.02, 0.22, 1);
   will-change: transform;
 }
-.veil.is-cover .veil__panel { transform: translateY(-120px); }
+.veil.is-cover .veil__panel { transform: translateY(-190px); }
 .veil.is-away .veil__panel { transform: translateY(-100%); }
 
-.veil__wave { position: absolute; left: 0; width: 100%; height: 120px; display: block; }
+.veil__wave { position: absolute; left: 0; width: 100%; height: 140px; display: block; }
 .veil__wave path { fill: rgb(var(--abyss-rgb)); }
 .veil__wave--in { top: 0; }
 .veil__wave--out { bottom: 0; }
 .veil__fill {
   position: absolute;
   left: 0; right: 0;
-  top: 120px; bottom: 120px;
+  top: 140px; bottom: 140px;
   display: grid;
   place-items: center;
-  gap: 10px;
+  gap: 12px;
   align-content: center;
   background:
-    radial-gradient(120% 70% at 50% 42%, rgb(var(--deep-rgb) / 0.55), transparent 72%),
+    radial-gradient(130% 75% at 50% 44%, rgb(var(--deep-rgb) / 0.5), transparent 74%),
     linear-gradient(180deg, rgb(var(--abyss-rgb)), rgb(var(--void-rgb)) 55%, rgb(var(--abyss-rgb)));
 }
+.veil__fill > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.veil.is-cover .veil__fill > * { opacity: 1; transform: none; }
+.veil.is-cover .veil__fill > .veil__kanji { transition-delay: 0.1s; }
+.veil.is-cover .veil__fill > .veil__label { transition-delay: 0.2s; }
+.veil.is-cover .veil__fill > .veil__bar { transition-delay: 0.3s; }
+
 .veil__kanji {
   font-family: var(--font-display);
   font-weight: 900;
   font-size: min(22vw, 190px);
   line-height: 1;
   color: rgb(var(--water-rgb) / 0.3);
-  text-shadow: 0 0 70px rgb(var(--water-rgb) / 0.35);
-  animation: veilFloat 3.4s ease-in-out infinite;
+  text-shadow: 0 0 80px rgb(var(--water-rgb) / 0.35);
+  animation: veilFloat 6s ease-in-out infinite;
 }
 @keyframes veilFloat {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.02); }
+  50% { transform: translateY(-8px) scale(1.012); }
 }
 .veil__label {
   font-family: var(--font-display);
@@ -2083,10 +2108,10 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
   text-transform: uppercase;
   color: var(--bone);
   text-align: center;
-  padding: 0 16px;
+  padding: 0 18px;
 }
 .veil__bar {
-  margin-top: 6px;
+  margin-top: 8px;
   width: min(240px, 54vw);
   height: 2px;
   border-radius: 2px;
@@ -2101,25 +2126,47 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
   transform-origin: left;
   background: linear-gradient(90deg, var(--water-deep), var(--water), var(--glow));
 }
-.veil.is-cover .veil__bar i { animation: veilBar 0.62s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.veil.is-cover .veil__bar i { animation: veilBar 0.9s 0.28s cubic-bezier(0.32, 0.72, 0.24, 1) forwards; }
 @keyframes veilBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* уход: страница за шторой мягко уходит в глубину.
+   Только opacity и transform — их считает видеокарта, поэтому переход
+   не дёргается и на слабых машинах (никаких filter: blur на весь экран). */
+body.is-leaving .hero,
+body.is-leaving main,
+body.is-leaving .marquee,
+body.is-leaving .footer,
+body.is-leaving .spine {
+  opacity: 0.55;
+  transform: scale(0.988);
+  transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.5, 0.02, 0.22, 1);
+  will-change: opacity, transform;
+}
 
 /* приход: штора накрыта до первой отрисовки и уезжает вверх сама */
 html.veil-cover .veil__panel {
-  transform: translateY(-120px);
+  transform: translateY(-190px);
   transition: none;
-  animation: veilAway 0.9s 0.3s both cubic-bezier(0.66, 0, 0.34, 1);
+  animation: veilAway 1.15s 0.38s both cubic-bezier(0.32, 0.72, 0.24, 1);
 }
 @keyframes veilAway {
-  from { transform: translateY(-120px); }
+  from { transform: translateY(-190px); }
   to { transform: translateY(-100%); }
 }
 html.veil-cover .veil__kanji { animation: none; }
-html.veil-cover .veil__bar i { animation: veilBar 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+html.veil-cover .veil__fill > * { opacity: 1; transform: none; transition: opacity 0.5s ease; }
+html.veil-cover .veil__bar i { animation: veilBar 0.7s cubic-bezier(0.32, 0.72, 0.24, 1) forwards; }
+
+/* когда всё закончилось — убираем штору совсем */
 html.veil-done .veil { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .veil { display: none !important; }
+  body.is-leaving .hero,
+  body.is-leaving main,
+  body.is-leaving .marquee,
+  body.is-leaving .footer,
+  body.is-leaving .spine { opacity: 1; transform: none; }
 }
 
 /* ---------- внутренний герой ---------- */
@@ -2744,7 +2791,7 @@ body.embed .hero__crest { display: none; }
   font-weight: 900;
   font-size: 34px;
   line-height: 1;
-  color: transparent;
+  color: rgb(var(--water-rgb) / 0.22);
   -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.5);
   letter-spacing: -0.02em;
 }
@@ -2799,61 +2846,12 @@ body.embed .hero__crest { display: none; }
 .kata-card__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .kata-card__media video { background: #04101c; }
 .kata-card__media--soon { border-style: dashed; border-color: var(--line); }
-.kata-card__play {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 1px solid rgb(var(--glow-rgb) / 0.55);
-  background: rgb(var(--void-rgb) / 0.55);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 30px -6px rgb(var(--water-rgb) / 0.85);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
+/* без кнопок и подписей в плеере — только лёгкая подсветка, когда играет */
+.kata-card__media.is-playing {
+  border-color: rgb(var(--water-rgb) / 0.5);
+  box-shadow: 0 0 34px -18px rgb(var(--water-rgb) / 1);
 }
-.kata-card__play:hover { background: rgb(var(--water-rgb) / 0.35); transform: scale(1.06); }
-.kata-card__play-ico {
-  width: 0;
-  height: 0;
-  margin-left: 4px;
-  border-style: solid;
-  border-width: 9px 0 9px 15px;
-  border-color: transparent transparent transparent var(--bone);
-}
-.kata-card__media.is-playing .kata-card__play { opacity: 0; transform: scale(0.8); }
-.kata-card__media.is-playing:hover .kata-card__play { opacity: 0.9; transform: none; }
-.kata-card__media.is-playing .kata-card__play-ico {
-  border-width: 0;
-  width: 12px;
-  height: 12px;
-  margin: 0;
-  background:
-    linear-gradient(var(--bone), var(--bone)) 0 0 / 4px 100% no-repeat,
-    linear-gradient(var(--bone), var(--bone)) 100% 0 / 4px 100% no-repeat;
-}
-.kata-card__hint {
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgb(var(--foam-rgb) / 0.6);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-.kata-card:hover .kata-card__hint { opacity: 1; }
-.kata-card__media.is-playing .kata-card__hint { opacity: 0; }
-@media (pointer: coarse) {
-  .kata-card__hint { display: none; }
-  .kata-card__play { width: 62px; height: 62px; margin: -31px 0 0 -31px; }
-}
+.kata-card__media { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .kata-card, .kata-card:hover { transform: none; }
 }
@@ -3020,9 +3018,11 @@ body.embed .hero__crest { display: none; }
   inset: 0;
   z-index: 9998;
   pointer-events: none;
-  mix-blend-mode: screen;
   opacity: 1;
   transition: opacity 0.3s ease;
+  /* без mix-blend-mode и filter: на слабых машинах они заставляют
+     перерисовывать весь экран каждый кадр. Тот же вид даёт мягкий
+     радиальный градиент — он рисуется только внутри своих границ. */
 }
 .wcur.is-out { opacity: 0; }
 .wcur__glow,
@@ -3031,15 +3031,20 @@ body.embed .hero__crest { display: none; }
 .wcur__fx { position: absolute; left: 0; top: 0; }
 
 .wcur__glow {
-  width: 240px;
-  height: 240px;
-  margin: -120px 0 0 -120px;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(var(--water-rgb) / 0.22), rgb(var(--glow-rgb) / 0.07) 46%, transparent 70%);
-  filter: blur(6px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  background: radial-gradient(circle,
+    rgb(var(--water-rgb) / 0.20) 0%,
+    rgb(var(--glow-rgb) / 0.10) 34%,
+    rgb(var(--glow-rgb) / 0.05) 56%,
+    transparent 72%);
+  transition: opacity 0.4s ease;
+  will-change: transform;
 }
 .wcur__ring {
+  will-change: transform;
   width: 30px;
   height: 30px;
   margin: -15px 0 0 -15px;
@@ -3049,6 +3054,7 @@ body.embed .hero__crest { display: none; }
   transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
 }
 .wcur__dot {
+  will-change: transform;
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
@@ -3109,219 +3115,1050 @@ body.embed .hero__crest { display: none; }
 
 @media (prefers-reduced-motion: reduce) { .wcur { display: none; } }
 
+/* =====================================================================
+   ГЛАВНАЯ — НОВАЯ ВЕРСИЯ
+   Манифест → кодекс → путь → ранги → ката → состав → порядок → присяга.
+   Всё построено на тех же токенах темы: глубокая вода, бирюзовый акцент,
+   тонкие водные линии и печати-иероглифы. Классы с префиксом .hb —
+   только для главной, внутренние страницы не затронуты.
+   ===================================================================== */
+
+.hb-wrap {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (min-width: 768px) { .hb-wrap { padding: 0 40px; } }
+
+.hb-section {
+  position: relative;
+  padding: 84px 0;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hb-section { padding: 120px 0; } }
+.hb-section--dim {
+  background:
+    radial-gradient(90% 60% at 50% 0%, rgb(var(--deep-rgb) / 0.16), transparent 65%),
+    rgb(var(--abyss-rgb) / 0.4);
+  border-top: 1px solid rgb(var(--water-rgb) / 0.12);
+  border-bottom: 1px solid rgb(var(--water-rgb) / 0.12);
+}
+
+/* ---------- заголовок секции ---------- */
+.hb-head { position: relative; margin-bottom: 44px; }
+@media (min-width: 768px) { .hb-head { margin-bottom: 62px; } }
+.hb-head__kanji {
+  position: absolute;
+  top: -34px;
+  right: -6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(96px, 18vw, 168px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.07);
+  pointer-events: none;
+  user-select: none;
+}
+@media (min-width: 900px) { .hb-head__kanji { right: 0; top: -52px; } }
+.hb-head__num {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+.hb-head__num > span:first-child { color: var(--water); }
+.hb-head__num i {
+  width: 44px;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(var(--water-rgb) / 0.8), transparent);
+}
+.hb-head__title {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(28px, 5.4vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.hb-head__title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--water);
+}
+.hb-head__sub {
+  max-width: 62ch;
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ash);
+}
+
+/* ---------- 01 манифест ---------- */
+.hb-manifest__grid { display: grid; gap: 34px; }
+@media (min-width: 900px) {
+  .hb-manifest__grid { grid-template-columns: 260px minmax(0, 1fr); gap: 56px; align-items: start; }
+}
+.hb-manifest__side {
+  position: relative;
+  padding: 26px 22px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(var(--water-rgb) / 0.28);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(var(--kelp-rgb) / 0.3), transparent 70%),
+    linear-gradient(160deg, rgb(var(--coal-rgb)), rgb(var(--abyss-rgb)));
+  text-align: center;
+}
+.hb-manifest__kanji {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(76px, 14vw, 118px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.85);
+  text-shadow: 0 0 60px rgb(var(--water-rgb) / 0.45);
+}
+.hb-manifest__stamp {
+  margin: 14px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ash);
+  line-height: 1.9;
+}
+.hb-manifest__motto {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgb(var(--bone-rgb) / 0.1);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--foam);
+}
+.hb-manifest__lead {
+  margin: 0 0 18px;
+  font-size: clamp(17px, 2.4vw, 21px);
+  line-height: 1.6;
+  color: var(--bone);
+}
+.hb-manifest__lead::first-letter {
+  float: left;
+  margin: 4px 12px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 58px;
+  line-height: 0.8;
+  color: var(--water);
+}
+.hb-manifest__text {
+  margin: 0 0 30px;
+  max-width: 74ch;
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgb(var(--bone-rgb) / 0.82);
+}
+.hb-manifest__cap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-manifest__cap .k {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.45);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* заветы */
+.hb-vows { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 720px) { .hb-vows { grid-template-columns: 1fr 1fr; } }
+.hb-vow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px 32px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: start;
+  padding: 20px 20px 20px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgb(var(--bone-rgb) / 0.03), transparent 60%), rgb(var(--void-rgb) / 0.5);
+  transition: border-color 0.35s ease, transform 0.35s ease, background 0.35s ease;
+}
+.hb-vow:hover {
+  border-color: rgb(var(--water-rgb) / 0.5);
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgb(var(--water-rgb) / 0.08), transparent 60%), rgb(var(--void-rgb) / 0.5);
+}
+.hb-vow__num {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.1;
+  color: rgb(var(--water-rgb) / 0.55);
+}
+.hb-vow__icon { grid-column: 2; width: 30px; height: 30px; color: var(--water); }
+.hb-vow__icon::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 26px;
+  background: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat;
+  mask: var(--m) center / contain no-repeat;
+}
+.hb-vow__body { grid-column: 3; }
+.hb-vow h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+.hb-vow p { margin: 0; font-size: 14px; line-height: 1.65; color: var(--ash); }
+
+/* ---------- 02 кодекс: семь принципов ---------- */
+.hb-codex__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 700px) { .hb-codex__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .hb-codex__grid { grid-template-columns: repeat(3, 1fr); } }
+.hb-principle {
+  position: relative;
+  overflow: hidden;
+  padding: 26px 24px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgb(var(--deep-rgb) / 0.22), transparent 60%),
+    var(--coal);
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+.hb-principle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(var(--water-rgb) / 0.7), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-principle:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -46px rgb(var(--water-rgb) / 1);
+}
+.hb-principle:hover::after { transform: scaleX(1); }
+.hb-principle__n {
+  display: block;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.22);
+  -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.5);
+}
+.hb-principle h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.3;
+}
+.hb-principle p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ash); }
+@media (min-width: 700px) { .hb-principle--wide { grid-column: span 2; } }
+@media (min-width: 1100px) { .hb-principle--wide { grid-column: span 3; } }
+.hb-codex__more,
+.hb-ranks__more,
+.hb-kata__more,
+.hb-groups__more { margin-top: 34px; }
+
+/* ---------- 03 путь: русло ---------- */
+.hb-path__grid { display: grid; gap: 40px; }
+@media (min-width: 980px) {
+  .hb-path__grid { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px; align-items: start; }
+}
+.hb-path__aside { position: relative; }
+.hb-path__kanji {
+  position: absolute;
+  top: -46px;
+  left: -6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(90px, 16vw, 150px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.08);
+  pointer-events: none;
+  user-select: none;
+}
+.hb-path__title {
+  position: relative;
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.04;
+  text-transform: uppercase;
+}
+.hb-path__note { margin: 0 0 26px; font-size: 15px; line-height: 1.75; color: var(--ash); }
+.hb-path__btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.hb-river { position: relative; padding-left: 44px; }
+.hb-river__rail {
+  position: absolute;
+  left: 13px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgb(var(--bone-rgb) / 0.1);
+  overflow: hidden;
+}
+.hb-river__rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(180deg, rgb(var(--water-rgb) / 0.5) 0 6px, transparent 6px 14px);
+  background-size: 100% 14px;
+  opacity: 0.55;
+}
+.hb-river__fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--water-deep), var(--water), var(--glow));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.hb-river__stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.hb-stop { position: relative; }
+.hb-stop__dot {
+  position: absolute;
+  left: -37px;
+  top: 26px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.7);
+  background: var(--void);
+  box-shadow: 0 0 0 4px rgb(var(--water-rgb) / 0.08);
+}
+.hb-stop__dot::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--water);
+}
+.hb-stop__card {
+  position: relative;
+  padding: 22px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgb(var(--coal-rgb)), rgb(var(--void-rgb) / 0.6));
+  transition: border-color 0.35s ease, transform 0.35s ease;
+}
+.hb-stop:hover .hb-stop__card { border-color: rgb(var(--water-rgb) / 0.45); transform: translateX(4px); }
+.hb-stop__cap {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-stop__card h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+.hb-stop__card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ash); }
+.hb-stop__k {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 54px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.08);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hb-duty {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 44px 0 0;
+  padding: 0;
+}
+@media (min-width: 700px) { .hb-duty { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .hb-duty { grid-template-columns: repeat(4, 1fr); } }
+.hb-duty li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.45);
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--bone-rgb) / 0.85);
+}
+.hb-duty__k {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.4);
+  color: var(--water);
+  font-family: var(--font-display);
+  font-size: 13px;
+}
+
+/* ---------- 04 ранги: лестница ---------- */
+.hb-ranks__ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hb-rank {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.42);
+  overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.hb-rank:hover { border-color: rgb(var(--water-rgb) / 0.45); transform: translateX(5px); }
+.hb-rank__bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--p, 0%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--water-deep), var(--water));
+  opacity: 0.75;
+}
+.hb-rank__i {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--water);
+}
+.hb-rank__path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+}
+.hb-rank__path span { color: var(--ash); }
+.hb-rank__path i { color: rgb(var(--water-rgb) / 0.7); font-style: normal; }
+.hb-rank__path b { font-weight: 700; color: var(--bone); }
+.hb-rank__req {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mist);
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .hb-rank { grid-template-columns: 32px minmax(0, 1fr); }
+  .hb-rank__req { grid-column: 2; }
+}
+
+/* ---------- 05 ката: превью и список форм ---------- */
+.hb-kata__grid { display: grid; gap: 24px; }
+@media (min-width: 940px) { .hb-kata__grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 32px; align-items: start; } }
+.hb-kata__preview .kata-card__media { margin: 0; }
+.hb-kata__cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--ash);
+}
+.hb-kata__cap-n { color: var(--bone); font-weight: 600; }
+.hb-kata__cap-jp { letter-spacing: 0.1em; color: var(--water); }
+.hb-kata__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hb-kata__chip {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.42);
+  text-decoration: none;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.hb-kata__chip:hover {
+  border-color: rgb(var(--water-rgb) / 0.55);
+  background: rgb(var(--water-rgb) / 0.08);
+  transform: translateX(4px);
+}
+.hb-kata__chip-n {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--water);
+  text-align: center;
+}
+.hb-kata__chip-t { font-size: 14px; line-height: 1.3; }
+.hb-kata__chip-jp { font-size: 11px; color: var(--ash); white-space: nowrap; }
+@media (max-width: 520px) { .hb-kata__chip-jp { display: none; } }
+
+/* ---------- 06 состав: карточки групп ---------- */
+.hb-groups__grid { display: grid; gap: 16px; }
+@media (min-width: 700px) { .hb-groups__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .hb-groups__grid { grid-template-columns: repeat(3, 1fr); } }
+.hb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgb(var(--deep-rgb) / 0.18), transparent 62%),
+    var(--coal);
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+.hb-card:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px -52px rgb(var(--water-rgb) / 1);
+}
+.hb-card__k {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 46px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.12);
+  pointer-events: none;
+}
+.hb-card__role {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-card__title {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
+}
+.hb-card__text { margin: 0 0 16px; font-size: 14px; line-height: 1.7; color: var(--ash); }
+.hb-card .btn { align-self: flex-start; margin-top: auto; }
+
+.hb-group__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.hb-group__m {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.45);
+}
+.hb-group__m.is-free { border-style: dashed; }
+.hb-group__name {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+}
+.hb-group__meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-group__desc { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: var(--ash); }
+
+/* ---------- 07 порядок: устав и поместье ---------- */
+.hb-order__grid { display: grid; gap: 16px; }
+@media (min-width: 860px) { .hb-order__grid { grid-template-columns: 1fr 1fr; gap: 22px; } }
+.hb-order__card--butterfly .hb-card__k { color: rgb(var(--foam-rgb) / 0.16); }
+.hb-list { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 8px; }
+.hb-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgb(var(--bone-rgb) / 0.8);
+}
+.hb-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: rgb(var(--water-rgb) / 0.7);
+}
+
+/* ---------- 08 присяга ---------- */
+.hb-cta {
+  position: relative;
+  padding: 96px 0 110px;
+  text-align: center;
+  overflow: hidden;
+  border-top: 1px solid rgb(var(--water-rgb) / 0.14);
+}
+@media (min-width: 768px) { .hb-cta { padding: 130px 0 150px; } }
+.hb-cta__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 120% at 50% 120%, rgb(var(--deep-rgb) / 0.5), transparent 70%),
+    radial-gradient(50% 80% at 50% 0%, rgb(var(--kelp-rgb) / 0.25), transparent 70%);
+  pointer-events: none;
+}
+.hb-cta__in { position: relative; max-width: 780px; margin: 0 auto; padding: 0 20px; }
+.hb-cta__eyebrow {
+  margin: 0 0 16px;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-cta__title {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(38px, 8vw, 84px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.hb-cta__title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--water);
+  text-shadow: 0 0 70px rgb(var(--water-rgb) / 0.5);
+}
+.hb-cta__text {
+  max-width: 56ch;
+  margin: 0 auto 32px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgb(var(--bone-rgb) / 0.82);
+}
+.hb-cta__btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+/* ---------- герой главной: кнопки, статистика, волны ---------- */
+.hero--index .hero__in { padding-bottom: 150px; }
+.hero__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 30px;
+}
+.hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 40px;
+  margin: 38px 0 0;
+  padding: 22px 0 0;
+  list-style: none;
+  border-top: 1px solid rgb(var(--bone-rgb) / 0.12);
+}
+.hero__stats li { display: flex; align-items: baseline; gap: 9px; }
+.hero__stats b {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--water);
+}
+.hero__stats span {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+/* большой 水 — водяной знак за заголовком главной */
+.hero__crest--index {
+  display: block;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  top: 41%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.hero__crest--index .hero__crest-k {
+  display: block;
+  color: rgb(var(--water-rgb) / 0.07);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(200px, 34vw, 430px);
+  line-height: 0.8;
+}
+.hero__crest--index .hero__crest-t { display: none; }
+.hero__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 130px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1; /* над фотографией, но под текстом и стрелкой */
+}
+.hero__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  display: block;
+}
+.hero__wave--back { animation: heroWave 22s linear infinite; }
+.hero__wave--back path { fill: rgb(var(--abyss-rgb) / 0.55); }
+.hero__wave--front {
+  height: 78%;
+  animation: heroWave 15s linear infinite reverse;
+}
+.hero__wave--front path { fill: rgb(var(--void-rgb) / 0.85); }
+@keyframes heroWave { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.hero__cue-t { font-size: 10px; }
+
+@media (max-width: 900px) {
+  .hero--index .hero__in { padding-bottom: 130px; }
+  .hero__crest--index { top: 36%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__wave--back,
+  .hero__wave--front { animation: none; }
+}
+
+/* =====================================================================
+   ИЕРОГЛИФЫ — где именно нужен CJK-шрифт
+   Сама связка --font-cjk объявлена в :root выше и уже подставлена в конец
+   --font-display / --font-serif / --font-sans. Здесь — элементы, у которых
+   иероглиф это не текст, а знак: печати разделов, номера заветов, штампы.
+   ===================================================================== */
+.nav__drop,
+.nav__burger-k,
+.ntab__k,
+.codex__k,
+.preloader__kanji,
+.veil__kanji,
+.hero__kanji .v,
+.hero__crest span,
+.hero__crest-k,
+.shead__kanji,
+.creed__k,
+.creed__seal,
+.hb-head__kanji,
+.hb-manifest__kanji,
+.hb-path__kanji,
+.hb-vow__num,
+.hb-stop__k,
+.hb-duty__k,
+.hb-card__k,
+.kata-card__tip-k,
+.hb-manifest__cap .k,
+.traits__cap .k,
+.duty__cap .k,
+.mmenu__brand i,
+.spine a i,
+.footer__bot p + p,
+.marquee__dot {
+  font-family: var(--font-cjk);
+}
+
 </style>
 </head>
 <body id="top" class="page-index embed" data-sigil="水">
 <div class="veil" data-veil aria-hidden="true"><div class="veil__panel"><svg class="veil__wave veil__wave--in" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C120,20 240,20 360,64 C480,108 600,108 720,64 C840,20 960,20 1080,64 C1200,108 1320,108 1440,64 L1440,120 L0,120 Z"/></svg><div class="veil__fill"><span class="veil__kanji" data-veil-kanji>水</span><span class="veil__label" data-veil-label>Дыхание воды</span><span class="veil__bar"><i></i></span></div><svg class="veil__wave veil__wave--out" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,56 C120,100 240,100 360,56 C480,12 600,12 720,56 C840,100 960,100 1080,56 C1200,12 1320,12 1440,56 L1440,0 L0,0 Z"/></svg></div></div>
 <section class="hero hero--inner"><div class="hero__media"><img class="bg" src="assets/img/water-moon.jpg" alt="" fetchpriority="high"></div><div class="hero__shade"></div><div class="hero__kanji"><span class="v">水</span><span class="line"></span><span class="t">Дыхание воды</span></div><div class="hero__crest" aria-hidden="true"><span>水</span></div><div class="hero__in"><p class="hero__eyebrow">水&nbsp;&nbsp;Дыхание воды</p><h1 class="hero__title"><span class="hero__plain"><span>Дыхание воды</span></span></h1></div><a class="hero__cue" href="#content"><span>Читать свиток</span><span>﹀</span></a></section><div class="marquee" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div><main id="content">
-<!-- Главная — Дыхание Воды — фракция истребителей, без дублей -->
-<!-- 01 ВОДА — что это -->
-<section class="section" id="faction">
-  <div class="wrap">
-    <div class="shead">
-      <span class="shead__kanji">水</span>
-      <div class="shead__top"><span class="shead__num">01</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Дыхание воды</span></span></h2>
-      <p class="shead__sub">Спокойное, плавное и адаптивное. Путь защиты, а не разрушения.</p>
-    </div>
+<!-- ГЛАВНАЯ — Дыхание Воды. Новая версия: манифест → кодекс → путь → ранги → ката → состав → поместье → присяга -->
 
-    <div class="faction reveal">
-      <span class="creed__k" aria-hidden="true">水</span>
-      <p class="creed__stamp">水&nbsp;&nbsp;·&nbsp;&nbsp;корпус истребителей</p>
-      <p class="creed__text"><strong>Дыхание Воды</strong> — одно из пяти основных дыханий от Солнца. Десять форм, текучих как река. Мы — не демоны, мы — те, кто их истребляет, чтобы защитить людей.</p>
+<!-- 01 ВОДА: манифест и четыре завета -->
+<section class="hb-section hb-manifest" id="faction">
+  <div class="hb-wrap hb-manifest__grid">
+    <aside class="hb-manifest__side reveal">
+      <span class="hb-manifest__kanji" aria-hidden="true">水</span>
+      <p class="hb-manifest__stamp">корпус истребителей<br>дыхание воды</p>
+      <p class="hb-manifest__motto">«Течение не остановить.»</p>
+    </aside>
 
-      <p class="traits__cap"><span class="k" aria-hidden="true">四</span>Четыре завета воды</p>
-      <div class="traits">
-        <div class="trait">
-          <span class="trait__num">01</span>
-          <span class="trait__icon ico" data-ico="drops"></span>
-          <div>
+    <div class="hb-manifest__body reveal">
+      <p class="hb-manifest__lead">Дыхание Воды — одно из пяти основных дыханий, рождённых от Дыхания Солнца. Десять форм, текучих как река: от рассекающей поверхность до постоянного потока.</p>
+      <p class="hb-manifest__text">Мы не демоны и не охотники за славой. Мы — те, кто встаёт между людьми и тьмой, чтобы никто больше не потерял близкого. Вода не спорит с камнем — она его обтекает; истребитель воды не ломает судьбу силой, он ищет путь и проходит его.</p>
+
+      <p class="hb-manifest__cap"><span class="k" aria-hidden="true">四</span>Четыре завета воды</p>
+      <ul class="hb-vows">
+        <li class="hb-vow">
+          <span class="hb-vow__num">壱</span>
+          <span class="hb-vow__icon ico" data-ico="drops"></span>
+          <div class="hb-vow__body">
             <h3>Адаптивность</h3>
             <p>Вода принимает форму сосуда. Истребитель подстраивается под любого врага.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">02</span>
-          <span class="trait__icon ico" data-ico="shield"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">弐</span>
+          <span class="hb-vow__icon ico" data-ico="shield"></span>
+          <div class="hb-vow__body">
             <h3>Спокойствие</h3>
             <p>Поверхность спокойна даже в бурю. Эмоции не берут верх в бою.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">03</span>
-          <span class="trait__icon ico" data-ico="target"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">参</span>
+          <span class="hb-vow__icon ico" data-ico="target"></span>
+          <div class="hb-vow__body">
             <h3>Текучесть</h3>
             <p>Как вода ищет щель, так и мечник ищет путь к победе.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">04</span>
-          <span class="trait__icon ico" data-ico="scroll"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">肆</span>
+          <span class="hb-vow__icon ico" data-ico="scroll"></span>
+          <div class="hb-vow__body">
             <h3>Защита</h3>
-            <p>Сила — для защиты гражданских и товарищей.</p>
+            <p>Сила дана для защиты гражданских и товарищей, а не для хвастовства.</p>
           </div>
-        </div>
-      </div>
-
-      <p class="creed__sign"><span class="creed__seal" aria-hidden="true">水</span>Корпус истребителей · дыхание воды</p>
+        </li>
+      </ul>
     </div>
   </div>
 </section>
 
 <div class="marquee marquee--reverse" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div>
 
-<!-- 02 ПУТЬ — русло реки: четыре ступени от ученика до мечника -->
-<section class="section" id="path">
-  <div class="wrap wrap--mid">
-    <div class="shead">
-      <span class="shead__kanji">道</span>
-      <div class="shead__top"><span class="shead__num">02</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Путь истребителя</span></span></h2>
-      <p class="shead__sub">Одно русло, четыре ступени. От ученика без клинка до мечника, способного защитить.</p>
-    </div>
+<!-- 02 КОДЕКС: семь принципов -->
+<section class="hb-section hb-codex" id="codex7">
+  <div class="hb-wrap">
+    <header class="hb-head reveal">
+      <span class="hb-head__kanji" aria-hidden="true">律</span>
+      <p class="hb-head__num"><span>02</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">кодекс</span></p>
+      <h2 class="hb-head__title">Семь принципов <em>воды</em></h2>
+      <p class="hb-head__sub">Не закон, а путь. Кодекс — это то, что ты выбираешь сам, каждый день, без надзирателя.</p>
+    </header>
 
-    <ol class="pathflow reveal">
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="drops"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 01 · штаб</p>
-          <h3>Дыхание и боккен</h3>
-          <p>Тотальная концентрация дыхания и деревянный клинок. Ученик не выходит за пределы штаба без сопровождения.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">息</span>
+    <ol class="hb-codex__grid">
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">01</span>
+        <h3>Уважай других</h3>
+        <p>Это основа каждого бойца. Без уважения к товарищам, старшим и гражданским ты не мечник, а просто человек с катаной.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="target"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 02 · Фуджикасане</p>
-          <h3>Финальный отбор</h3>
-          <p>Семь дней среди демонов на горе Фуджикасане. Выжил и доказал — корпус принимает тебя.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">選</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">02</span>
+        <h3>Делай то, что нужно</h3>
+        <p>Ради большего можно пойти на жертвы. Иногда отступить — значит защитить. Вода не спорит с камнем, она его обтекает.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="katana"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 03 · клинок</p>
-          <h3>Ничирин и наставник</h3>
-          <p>Клинок, меняющий цвет, и закрепление за цугуко или Столпом. Первый ранг — Мидзуното.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">刀</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">03</span>
+        <h3>Не подавай виду эмоциям</h3>
+        <p>Неважно, что у тебя на душе — страх, злость, горе или боль. Когда эмоции берут верх, мышление притупляется.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="wave"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 04 · корпус</p>
-          <h3>Мечник воды</h3>
-          <p>Зачистки, сборы Столпов, защита гражданских. Ранг растёт по точкам и делам, а не по годам.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">流</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">04</span>
+        <h3>Ищи выход</h3>
+        <p>Оказавшись в трудной ситуации, всегда ищи способ выбраться — так же, как вода ищет куда просочиться. Безвыходных ситуаций нет.</p>
+      </li>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">05</span>
+        <h3>Не подводи своё дыхание</h3>
+        <p>Ты носишь имя Воды. Каждый твой поступок отражается на всех, кто дышит водой рядом с тобой.</p>
+      </li>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">06</span>
+        <h3>Не говори гадостей за спиной</h3>
+        <p>Боевой товарищ всегда лучше, чем самая лучшая катана. Есть что сказать — скажи в лицо, честно и с уважением.</p>
+      </li>
+      <li class="hb-principle reveal hb-principle--wide">
+        <span class="hb-principle__n">07</span>
+        <h3>Имей цель</h3>
+        <p>Цель — как русло для реки. Без русла вода растекается и исчезает. С целью — становится потоком, способным снести горы. Без цели прогресса не будет.</p>
       </li>
     </ol>
 
-    <aside class="duty reveal">
-      <div class="duty__in">
-        <p class="duty__cap"><span class="k" aria-hidden="true">義</span>Долг каждого ранга</p>
-        <ul class="duty__list">
-          <li>Защищать гражданских и товарищей</li>
-          <li>Являться на сборы Столпов и зачистки</li>
-          <li>Соблюдать дресс-код и секретность корпуса</li>
-          <li>Не раскрывать тайны гражданским и не агитировать без согласия</li>
-        </ul>
-        <div class="duty__side">
-          <p class="duty__motto">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</p>
-          <div class="duty__links">
-            <a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Требования рангов →</a>
-            <a class="btn btn--water" href="https://water-breath-yufu.ru/codex/"><span>Кодекс воды →</span></a>
+    <div class="hb-codex__more">
+      <a class="btn btn--ghost" href="https://water-breath-yufu.ru/codex/">Кодекс целиком и три напоминания →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ПУТЬ: русло от ученика до мечника -->
+<section class="hb-section hb-path" id="path">
+  <div class="hb-wrap hb-path__grid">
+    <div class="hb-path__aside reveal">
+      <span class="hb-path__kanji" aria-hidden="true">道</span>
+      <h2 class="hb-path__title">Путь<br>истребителя</h2>
+      <p class="hb-path__note">Одно русло, четыре ступени. От ученика без клинка — до мечника, способного защитить.</p>
+      <div class="hb-path__btns">
+        <a class="btn btn--water" href="https://water-breath-yufu.ru/elevation/"><span>Требования рангов</span></a>
+        <a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Состав и иерархия →</a>
+      </div>
+    </div>
+
+    <div class="hb-river reveal">
+      <span class="hb-river__rail" aria-hidden="true">
+        <span class="timeline__fill hb-river__fill"></span>
+      </span>
+      <ol class="hb-river__stops">
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 01 · штаб</p>
+            <h3>Дыхание и боккен</h3>
+            <p>Тотальная концентрация дыхания и деревянный клинок. Ученик не выходит за пределы штаба без сопровождения.</p>
           </div>
-        </div>
-      </div>
-    </aside>
+          <span class="hb-stop__k" aria-hidden="true">息</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 02 · Фуджикасане</p>
+            <h3>Финальный отбор</h3>
+            <p>Семь дней среди демонов на горе. Выжил и доказал — корпус принимает тебя.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">選</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 03 · клинок</p>
+            <h3>Ничирин и наставник</h3>
+            <p>Клинок, меняющий цвет, и закрепление за инструктором или Столпом. Первый ранг — Мидзуното.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">刀</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 04 · корпус</p>
+            <h3>Мечник воды</h3>
+            <p>Зачистки, сборы Столпов, защита гражданских. Ранг растёт по делам и точкам, а не по годам.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">流</span>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="hb-wrap">
+    <ul class="hb-duty reveal">
+      <li><span class="hb-duty__k" aria-hidden="true">義</span>Защищать гражданских и товарищей</li>
+      <li><span class="hb-duty__k" aria-hidden="true">礼</span>Являться на сборы Столпов и зачистки</li>
+      <li><span class="hb-duty__k" aria-hidden="true">忍</span>Соблюдать дресс-код и секретность корпуса</li>
+      <li><span class="hb-duty__k" aria-hidden="true">黙</span>Не раскрывать тайны корпуса гражданским</li>
+    </ul>
   </div>
 </section>
 
-<!-- 03 ИЕРАРХИЯ — фракция истребителей, не демонов -->
-<section class="section section--dim" id="hierarchy">
-  <div class="wrap">
-    <div class="shead">
-      <span class="shead__kanji">階</span>
-      <div class="shead__top"><span class="shead__num">03</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Иерархия корпуса</span></span></h2>
-      <p class="shead__sub">Каждая ступень защищает тех, кто ниже. Структура истребителей, не лун.</p>
-    </div>
+<!-- 04 РАНГИ: лестница повышений -->
+<section class="hb-section hb-ranks" id="ranks"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">昇</span><p class="hb-head__num"><span>03</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ранги</span></p><h2 class="hb-head__title">Десять рангов <em>пути</em></h2><p class="hb-head__sub">Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.</p></header><ol class="hb-ranks__ladder"><li class="hb-rank reveal" style="--p:11%"><span class="hb-rank__i">01</span><p class="hb-rank__path"><span>Мидзуното</span><i aria-hidden="true">→</i><b>Мидзуное</b></p><span class="hb-rank__req">3&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:22%"><span class="hb-rank__i">02</span><p class="hb-rank__path"><span>Мидзуное</span><i aria-hidden="true">→</i><b>Каното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:33%"><span class="hb-rank__i">03</span><p class="hb-rank__path"><span>Каното</span><i aria-hidden="true">→</i><b>Каноэ</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:44%"><span class="hb-rank__i">04</span><p class="hb-rank__path"><span>Каноэ</span><i aria-hidden="true">→</i><b>Тсучиното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:56%"><span class="hb-rank__i">05</span><p class="hb-rank__path"><span>Тсучиното</span><i aria-hidden="true">→</i><b>Тсучиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:67%"><span class="hb-rank__i">06</span><p class="hb-rank__path"><span>Тсучиноэ</span><i aria-hidden="true">→</i><b>Хиното</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:78%"><span class="hb-rank__i">07</span><p class="hb-rank__path"><span>Хиното</span><i aria-hidden="true">→</i><b>Хиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:89%"><span class="hb-rank__i">08</span><p class="hb-rank__path"><span>Хиноэ</span><i aria-hidden="true">→</i><b>Киното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:100%"><span class="hb-rank__i">09</span><p class="hb-rank__path"><span>Киното</span><i aria-hidden="true">→</i><b>Киноэ</b></p><span class="hb-rank__req">6&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li></ol><div class="hb-ranks__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Требования к каждому рангу →</a></div></div></section>
 
-    <div class="timeline">
-      <div class="timeline__rail"><div class="timeline__fill"></div></div>
+<!-- 05 КАТА: десять форм -->
+<section class="hb-section hb-section--dim hb-kata" id="kata"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">型</span><p class="hb-head__num"><span>04</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ката</span></p><h2 class="hb-head__title">Десять форм <em>воды</em></h2><p class="hb-head__sub">От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.</p></header><div class="hb-kata__grid"><div class="hb-kata__preview reveal"><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/10-kata-poster.jpg" data-kata-video aria-label="Анимация: Десятая ката: Постоянный поток"><source data-src="assets/kata/10-kata.mp4" type="video/mp4"></video></figure><div class="hb-kata__cap"><span class="hb-kata__cap-n">Постоянный поток</span><span class="hb-kata__cap-jp">拾ノ型・生生流転</span></div></div><div class="hb-kata__list"><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">01</span><span class="hb-kata__chip-t">Рассекающий поверхность воды</span><span class="hb-kata__chip-jp" aria-hidden="true">壱ノ型・水面斬り</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">02</span><span class="hb-kata__chip-t">Водяное колесо</span><span class="hb-kata__chip-jp" aria-hidden="true">弐ノ型・水車</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">03</span><span class="hb-kata__chip-t">Танец стремительного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">参ノ型・流流舞い</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">04</span><span class="hb-kata__chip-t">Удар приливной волны</span><span class="hb-kata__chip-jp" aria-hidden="true">肆ノ型・打ち潮</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">05</span><span class="hb-kata__chip-t">Благословенный дождь после засухи</span><span class="hb-kata__chip-jp" aria-hidden="true">伍ノ型・干天の慈雨</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">06</span><span class="hb-kata__chip-t">Вихрь</span><span class="hb-kata__chip-jp" aria-hidden="true">陸ノ型・ねじれ渦</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">07</span><span class="hb-kata__chip-t">Изгиб поверхности воды</span><span class="hb-kata__chip-jp" aria-hidden="true">漆ノ型・雫波紋突き</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">08</span><span class="hb-kata__chip-t">Удар водопада</span><span class="hb-kata__chip-jp" aria-hidden="true">捌ノ型・滝壺</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">09</span><span class="hb-kata__chip-t">Всплеск водяного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">玖ノ型・水流飛沫</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">10</span><span class="hb-kata__chip-t">Постоянный поток</span><span class="hb-kata__chip-jp" aria-hidden="true">拾ノ型・生生流転</span></a></div></div><div class="hb-kata__more"><a class="btn btn--water" href="https://water-breath-yufu.ru/kata/"><span>Разобрать все формы →</span></a></div></div></section>
 
-      <div class="tnode tnode--major reveal">
-        <span class="tnode__dot ico" data-ico="crown"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Ояката-сама — Глава Организации</p><span class="tnode__idx">00</span></div>
-          <p class="tnode__sub">Семья Убуяшики — основатели корпуса</p>
-        </div>
-      </div>
+<div class="marquee" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div>
 
-      <div class="tnode tnode--major reveal">
-        <span class="tnode__dot ico" data-ico="shield"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Столпы — 9 сильнейших</p><span class="tnode__idx">01</span></div>
-          <p class="tnode__sub">Руководители дыханий. Столп Воды — Томиока Гию</p>
-          <div class="rankchips"><span><b>水</b> Вода</span><span><b>蝶</b> Насекомое</span><span><b>炎</b> Пламя</span><span>и др.</span></div>
-        </div>
-      </div>
+<!-- 06 СОСТАВ -->
+<section class="hb-section hb-groups" id="groups"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">隊</span><p class="hb-head__num"><span>05</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">состав</span></p><h2 class="hb-head__title">Состав <em>корпуса</em></h2><p class="hb-head__sub">Столп воды, его преемники, инструкторы, истребители и ученики — одна река.</p></header><div class="hb-groups__grid"><article class="hb-card hb-group reveal"><p class="hb-card__role">Глава дыхания</p><h3 class="hb-card__title">Столп Воды</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Томиока Гию</span><span class="hb-group__meta">Столп Воды · Действующий</span><p class="hb-group__desc">Спокойный и немногословный, но всегда готов защитить товарищей.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Преемники Столпа</p><h3 class="hb-card__title">Цугуко</h3><ul class="hb-group__list"><li class="hb-group__m is-free"><span class="hb-group__name">Вакантно</span><span class="hb-group__meta">Цугуко Воды · Место свободно</span><p class="hb-group__desc">Преемник Столпа — сильнейший среди инструкторов.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Младший командный состав</p><h3 class="hb-card__title">Инструкторы</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Урокодаки Саконджи</span><span class="hb-group__meta">Бывший Столп Воды · Наставник · Легенда</span><p class="hb-group__desc">Тренирует учеников у горы Сагири, учит тотальному дыханию.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Основа корпуса</p><h3 class="hb-card__title">Истребители</h3><ul class="hb-group__list"><li class="hb-group__m is-free"><span class="hb-group__name">Вакантно</span><span class="hb-group__meta">Истребитель Воды · Набор открыт</span><p class="hb-group__desc">Боец, прошедший Финальный отбор и получивший клинок ничирин.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Начинающие</p><h3 class="hb-card__title">Ученики</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Новобранец</span><span class="hb-group__meta">Ученик Воды · На обучении</span><p class="hb-group__desc">Изучает тотальное дыхание и базовые формы под руководством инструктора.</p></li></ul></article></div><div class="hb-groups__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Полный состав и иерархия →</a></div></div></section>
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="medal"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Цугуко — преемники</p><span class="tnode__idx">02</span></div>
-          <p class="tnode__sub">Наследники столпов, вторая сила дыхания</p>
-        </div>
-      </div>
+<!-- 07 ПОРЯДОК: поместье и устав -->
+<section class="hb-section hb-section--dim hb-order" id="order">
+  <div class="hb-wrap">
+    <header class="hb-head reveal">
+      <span class="hb-head__kanji" aria-hidden="true">規</span>
+      <p class="hb-head__num"><span>06</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">порядок</span></p>
+      <h2 class="hb-head__title">Правила, которые <em>берегут</em></h2>
+      <p class="hb-head__sub">Устав корпуса и отдельные правила территории Поместья Бабочки — целиком, в удобном для чтения виде.</p>
+    </header>
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="scroll"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Инструкторы</p><span class="tnode__idx">03</span></div>
-          <p class="tnode__sub">Младший командный состав, обучение взвода</p>
-        </div>
-      </div>
+    <div class="hb-order__grid">
+      <article class="hb-card hb-order__card reveal">
+        <span class="hb-card__k" aria-hidden="true">法</span>
+        <p class="hb-card__role">высший нормативный акт</p>
+        <h3 class="hb-card__title">Устав Организации</h3>
+        <p class="hb-card__text">Обязателен к исполнению каждым истребителем: права и обязанности, дисциплина, наказания и порядок на штабе и в бою.</p>
+        <ul class="hb-list">
+          <li>Дисциплина и субординация в строю</li>
+          <li>Запрет на оружие вне гальки</li>
+          <li>Секретность корпуса и отчётность</li>
+        </ul>
+        <a class="btn btn--ghost" href="https://water-breath-yufu.ru/law/">Читать устав →</a>
+      </article>
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="drops"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Истребители — Киноэ → Мидзуното</p><span class="tnode__idx">04</span></div>
-          <p class="tnode__sub">Основа корпуса. Ранги от Seito до Киноэ. Выполняют задания, защищают гражданских.</p>
-        </div>
-      </div>
-
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="shield"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Ученики</p><span class="tnode__idx">05</span></div>
-          <p class="tnode__sub">Начинающие без клинка. Обучаются тотальному дыханию и базовым формам.</p>
-        </div>
-      </div>
-
-      <p class="timeline__foot">При встрече Столпа или Убуяшики — колено и приветствие. Ученики без сопровождения за пределы штаба не выходят, в бой с демонами — только на Финальном отборе.</p>
-      <div class="duty__links" style="margin-top:24px"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Состав и иерархия →</a></div>
+      <article class="hb-card hb-order__card hb-order__card--butterfly reveal">
+        <span class="hb-card__k" aria-hidden="true">蝶</span>
+        <p class="hb-card__role">медицина корпуса</p>
+        <h3 class="hb-card__title">Поместье Кочо</h3>
+        <p class="hb-card__text">Территория лечения и милосердия. Здесь свои правила: тишина, сданное оружие и уважение к работе медиков.</p>
+        <ul class="hb-list">
+          <li>Уведомить о прибытии через ворона</li>
+          <li>Сдать клинок ничирин и кунаи</li>
+          <li>Не мешать медицинскому персоналу</li>
+        </ul>
+        <a class="btn btn--ghost" href="https://water-breath-yufu.ru/butterfly/">Правила поместья →</a>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- 04 КАТА — превью десяти форм -->
-<section class="section section--dim" id="kata">
-  <div class="wrap">
-    <div class="shead">
-      <span class="shead__kanji">型</span>
-      <div class="shead__top"><span class="shead__num">04</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Десять форм воды</span></span></h2>
-      <p class="shead__sub">От рассекающей поверхность до постоянного потока, что усиливается с каждым вращением.</p>
+<!-- 08 ПРИСЯГА -->
+<section class="hb-cta">
+  <div class="hb-cta__glow" aria-hidden="true"></div>
+  <div class="hb-cta__in reveal">
+    <p class="hb-cta__eyebrow">присяга воды</p>
+    <h2 class="hb-cta__title">Стань <em>как вода</em></h2>
+    <p class="hb-cta__text">Течение не остановить. Если ты готов встать между людьми и тьмой — в корпусе есть место. Начни с дыхания.</p>
+    <div class="hb-cta__btns">
+      <a class="btn btn--water" href="https://water-breath-yufu.ru/roster/"><span>Встать в строй</span></a>
+      <a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Путь и требования →</a>
     </div>
-
-    <section class="s"><div class="katateaser reveal"><div class="katateaser__preview"><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/10-kata-poster.jpg" data-kata-video aria-label="Анимация: Десятая ката: Постоянный поток"><source data-src="assets/kata/10-kata.mp4" type="video/mp4"></video><button class="kata-card__play" type="button" data-kata-toggle aria-label="Проиграть анимацию: Десятая ката: Постоянный поток"><span class="kata-card__play-ico" aria-hidden="true"></span></button><span class="kata-card__hint" aria-hidden="true">наведи — играет</span></figure><p class="katateaser__cap"><span class="katateaser__cap-n">Десятая ката: Постоянный поток</span><span>Наведи — анимация оживёт. На телефоне нажми ▶.</span></p></div><ol class="katateaser__list"><li><a class="kchip" href="kata/"><span class="kchip__n">01</span><span class="kchip__t">Рассекающий поверхность воды</span><span class="kchip__jp" aria-hidden="true">壱ノ型・水面斬り</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">02</span><span class="kchip__t">Водяное колесо</span><span class="kchip__jp" aria-hidden="true">弐ノ型・水車</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">03</span><span class="kchip__t">Танец стремительного потока</span><span class="kchip__jp" aria-hidden="true">参ノ型・流流舞い</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">04</span><span class="kchip__t">Удар приливной волны</span><span class="kchip__jp" aria-hidden="true">肆ノ型・打ち潮</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">05</span><span class="kchip__t">Благословенный дождь после засухи</span><span class="kchip__jp" aria-hidden="true">伍ノ型・干天の慈雨</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">06</span><span class="kchip__t">Вихрь</span><span class="kchip__jp" aria-hidden="true">陸ノ型・ねじれ渦</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">07</span><span class="kchip__t">Изгиб поверхности воды</span><span class="kchip__jp" aria-hidden="true">漆ノ型・雫波紋突き</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">08</span><span class="kchip__t">Удар водопада</span><span class="kchip__jp" aria-hidden="true">捌ノ型・滝壺</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">09</span><span class="kchip__t">Всплеск водяного потока</span><span class="kchip__jp" aria-hidden="true">玖ノ型・水流飛沫</span></a></li><li><a class="kchip" href="kata/"><span class="kchip__n">10</span><span class="kchip__t">Постоянный поток</span><span class="kchip__jp" aria-hidden="true">拾ノ型・生生流転</span></a></li></ol></div><div class="katateaser__more"><a class="btn btn--water" href="kata/"><span>Все десять форм →</span></a></div></section>
   </div>
 </section>
 </main>
@@ -3343,7 +4180,6 @@ body.embed .hero__crest { display: none; }
   "use strict";
 
   var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var finePointer = !!(window.matchMedia && window.matchMedia("(pointer: fine)").matches);
 
   /* ---------- 01. Год в подвале ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) {
@@ -3379,7 +4215,7 @@ body.embed .hero__crest { display: none; }
     var bar = document.querySelector(".progress");
     var nav = document.querySelector(".nav");
     var heroCue = document.querySelector(".hero__cue");
-    var rails = document.querySelectorAll(".timeline");
+    var rails = document.querySelectorAll(".timeline, .hb-river");
     function onScroll() {
       var y = window.scrollY || window.pageYOffset;
       var max = document.documentElement.scrollHeight - window.innerHeight;
@@ -3387,7 +4223,7 @@ body.embed .hero__crest { display: none; }
       if (nav) nav.classList.toggle("scrolled", y > 60);
       if (heroCue) heroCue.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.5));
       rails.forEach(function (tl) {
-        var fill = tl.querySelector(".timeline__fill");
+        var fill = tl.querySelector(".timeline__fill, .hb-river__fill");
         if (!fill) return;
         var r = tl.getBoundingClientRect();
         var vh = window.innerHeight;
@@ -3608,9 +4444,12 @@ body.embed .hero__crest { display: none; }
   });
 
   /* ---------- 09. Ката: ленивые видео ----------
-     Ролик грузится только когда блок подъехал к экрану. На компьютере превью
-     играет при наведении, на телефоне — по кнопке ▶. Одновременно играет
-     только одна анимация, уход со страницы / из окна — пауза.                */
+     Ролик грузится только когда блок подъехал к экрану. Мышь — превью играет
+     при наведении; тап/клик — играет или ставит на паузу. Кнопок и подписей
+     в плеере нет. Одновременно играет одна анимация, уход из окна — пауза.
+
+     Тип указателя берём из Pointer Events (event.pointerType), а не из
+     «(pointer: fine)»: медиазапрос врёт в части браузеров и в headless.      */
   (function () {
     var figures = document.querySelectorAll("[data-kata-media]");
     if (!figures.length) return;
@@ -3634,7 +4473,7 @@ body.embed .hero__crest { display: none; }
       try {
         var p = video.play();
         if (p && typeof p.catch === "function") p.catch(function () {});
-      } catch (e) { /* старые браузеры / тестовые окружения */ }
+      } catch (e) {}
       var f = video.closest("[data-kata-media]");
       if (f) f.classList.add("is-playing");
     }
@@ -3644,26 +4483,47 @@ body.embed .hero__crest { display: none; }
       if (f) f.classList.remove("is-playing");
       if (!video.paused) video.pause();
     }
+    function toggle(video) { if (video.paused) play(video); else pause(video); }
 
     figures.forEach(function (figure) {
       var video = figure.querySelector("video[data-kata-video]");
-      var toggle = figure.querySelector("[data-kata-toggle]");
       if (!video) return;
-      var zone = figure.closest("[data-kata-card], .katateaser__preview") || figure;
-      if (finePointer) {
-        zone.addEventListener("mouseenter", function () { play(video); });
-        zone.addEventListener("mouseleave", function () { pause(video); });
+      var zone = figure.closest("[data-kata-card], .hb-kata__preview") || figure;
+      var lastToggle = 0;
+      var lastTouchAt = 0;
+
+      // На части телефонов тап приходит только как pointerup/touchend, без click
+      // (например, если страница „переехала“ под пальцем). Поэтому ловим оба
+      // события, а от двойного переключения спасает окно в 400 мс.
+      function toggleOnce(e) {
+        if (e.target && e.target.closest && e.target.closest("a")) return;
+        var now = performance.now();
+        if (now - lastToggle < 400) return;
+        lastToggle = now;
+        toggle(video);
       }
-      if (toggle) {
-        toggle.addEventListener("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (video.paused) play(video); else pause(video);
-        });
-      }
-      figure.addEventListener("click", function (e) {
-        if (e.target.closest("button, a")) return;
-        if (video.paused) play(video); else pause(video);
+
+      // Наведение — только для настоящей мыши. После тача браузеры шлют
+      // совместимые «мышиные» события, поэтому касание ставит метку и
+      // hover-запуск в это окно игнорируется (иначе тап включал бы и выключал).
+      zone.addEventListener("pointerenter", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        play(video);
+      });
+      zone.addEventListener("pointerleave", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        pause(video);
+      });
+
+      zone.addEventListener("pointerup", function (e) {
+        if (e.pointerType === "mouse") return;   // мышь обрабатывает click ниже
+        lastTouchAt = performance.now();
+        toggleOnce(e);                            // палец: играем / пауза
+      });
+      zone.addEventListener("click", function (e) {
+        toggleOnce(e);                      // мышь и клавиатура
       });
     });
 
@@ -3693,11 +4553,14 @@ body.embed .hero__crest { display: none; }
   /* ---------- 10. Водный курсор ----------
      Свечение, кольцо и капля идут за мышью с разной задержкой (эффект воды).
      Клик — рябь и брызги, быстрое движение — капли-след.
-     На тач-устройствах и при «уменьшить движение» всё выключено.            */
+
+     Включается по первому движению НАСТОЯЩЕЙ мыши (pointerType === "mouse"):
+     на телефоне и планшете курсора просто не будет, и не важно, что
+     сообщает медиазапрос про «(pointer: fine)».                              */
   (function () {
     var cur = document.querySelector("[data-cursor]");
     if (!cur) return;
-    if (!finePointer || reduceMotion) { cur.parentNode && cur.parentNode.removeChild(cur); return; }
+    if (reduceMotion) { cur.remove(); return; }
 
     var fx = cur.querySelector("[data-cursor-fx]") || cur;
     var glow = cur.querySelector(".wcur__glow");
@@ -3709,9 +4572,10 @@ body.embed .hero__crest { display: none; }
     var rx = mx, ry = my;                  // кольцо
     var dx = mx, dy = my;                  // капля
     var lastX = mx, lastY = my, lastT = 0, trailAt = 0;
-    var running = true;
+    var active = false, bound = false;
 
-    var HOT = "a, button, summary, .ntab, .kata-card, .codex__card, .seal, input, textarea, select, [data-kata-toggle]";
+    var HOT = "a, button, summary, .ntab, .kata-card, .hb-card, .hb-vow, .hb-principle, " +
+              ".hb-kata__chip, .hb-rank, .hb-stop, .codex__card, input, textarea, select";
 
     function spawn(cls, x, y, vars, life) {
       var el = document.createElement("span");
@@ -3721,12 +4585,16 @@ body.embed .hero__crest { display: none; }
       if (vars) Object.keys(vars).forEach(function (k) { el.style.setProperty(k, vars[k]); });
       fx.appendChild(el);
       setTimeout(function () { el.remove(); }, life);
-      // страховка от накопления частиц
-      while (fx.childElementCount > 40) fx.firstElementChild.remove();
+      while (fx.childElementCount > 40) fx.firstElementChild.remove();   // страховка от накопления
     }
-    function ripple(x, y) {
-      spawn("wcur__ripple", x, y, null, 1000);
-      spawn("wcur__ripple", x, y, null, 1150);
+    function ripple(x, y, delay) {
+      var el = document.createElement("span");
+      el.className = "wcur__ripple";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      if (delay) el.style.animationDelay = delay + "ms";
+      fx.appendChild(el);
+      setTimeout(function () { el.remove(); }, 1200);
     }
     function splash(x, y) {
       for (var i = 0; i < 7; i++) {
@@ -3737,7 +4605,8 @@ body.embed .hero__crest { display: none; }
           "--dy": (Math.sin(a) * d - 8).toFixed(1) + "px"
         }, 800);
       }
-      ripple(x, y);
+      ripple(x, y, 110);
+      ripple(x, y, 0);
     }
     function trail(x, y, speed) {
       var now = performance.now();
@@ -3749,7 +4618,28 @@ body.embed .hero__crest { display: none; }
       }, 1000);
     }
 
-    window.addEventListener("pointermove", function (e) {
+    function loop() {
+      if (!active) return;
+      gx += (mx - gx) * 0.055;
+      gy += (my - gy) * 0.055;
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      dx += (mx - dx) * 0.42;
+      dy += (my - dy) * 0.42;
+      if (glow) glow.style.transform = "translate(" + gx + "px," + gy + "px)";
+      if (ring) ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+      if (dot) dot.style.transform = "translate(" + dx + "px," + dy + "px)";
+      requestAnimationFrame(loop);
+    }
+
+    function onMove(e) {
+      var type = e.pointerType;
+      if (type !== "mouse") {
+        // пустой pointerType бывает у старых браузеров: доверяем только
+        // устройству без тачскрина
+        if (type || "ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+      }
+      if (!bound) bind();
       var now = performance.now();
       var dt = Math.max(1, now - lastT);
       var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / dt;
@@ -3759,32 +4649,32 @@ body.embed .hero__crest { display: none; }
       var hot = !!(e.target && e.target.closest && e.target.closest(HOT));
       cur.classList.toggle("is-hot", hot);
       cur.classList.remove("is-out");
-    }, { passive: true });
-
-    window.addEventListener("pointerdown", function (e) {
-      cur.classList.add("is-down");
-      splash(e.clientX, e.clientY);
-    });
-    window.addEventListener("pointerup", function () { cur.classList.remove("is-down"); });
-    document.addEventListener("mouseleave", function () { cur.classList.add("is-out"); });
-    document.addEventListener("mouseenter", function () { cur.classList.remove("is-out"); });
-    window.addEventListener("blur", function () { running = false; });
-    window.addEventListener("focus", function () { running = true; });
-
-    (function loop() {
-      if (running) {
-        gx += (mx - gx) * 0.055;
-        gy += (my - gy) * 0.055;
-        rx += (mx - rx) * 0.16;
-        ry += (my - ry) * 0.16;
-        dx += (mx - dx) * 0.42;
-        dy += (my - dy) * 0.42;
-        if (glow) glow.style.transform = "translate(" + gx + "px," + gy + "px)";
-        if (ring) ring.style.transform = "translate(" + rx + "px," + ry + "px)";
-        if (dot) dot.style.transform = "translate(" + dx + "px," + dy + "px)";
-      }
+    }
+    function bind() {
+      bound = true; active = true;
+      window.addEventListener("pointerdown", function (e) {
+        if (e.pointerType && e.pointerType !== "mouse") return;
+        cur.classList.add("is-down");
+        splash(e.clientX, e.clientY);
+      });
+      window.addEventListener("pointerup", function () { cur.classList.remove("is-down"); });
+      document.addEventListener("mouseleave", function () { cur.classList.add("is-out"); });
+      document.addEventListener("mouseenter", function () { cur.classList.remove("is-out"); });
+      window.addEventListener("blur", function () { active = false; });
+      window.addEventListener("focus", function () { if (!active) { active = true; loop(); } });
       requestAnimationFrame(loop);
-    })();
+    }
+
+    function dropIfTouch(e) {
+      if (bound) return;                       // мышь уже включила курсор
+      var t = (e && e.pointerType) || "";
+      if (t && t === "mouse") return;
+      if (e && e.type === "touchstart") { cur.remove(); return; }
+      if (t) cur.remove();                      // pointerdown от пальца/стилуса
+    }
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", dropIfTouch, { passive: true, once: true });
+    window.addEventListener("touchstart", dropIfTouch, { passive: true, once: true });
   })();
 
   /* ---------- 11. Переход между страницами ----------
@@ -3823,7 +4713,7 @@ body.embed .hero__crest { display: none; }
       if (panel) panel.addEventListener("animationend", function (e) {
         if (e.animationName === "veilAway") done();
       });
-      setTimeout(done, reduceMotion ? 30 : 2200);
+      setTimeout(done, reduceMotion ? 30 : 2400);
 
       /* уход */
       function leave(href, title, sigil) {
@@ -3840,7 +4730,7 @@ body.embed .hero__crest { display: none; }
         void veil.offsetWidth;
         veil.classList.add("is-cover");
         document.body.classList.add("is-leaving");
-        setTimeout(function () { window.location.href = href; }, 560);
+        setTimeout(function () { window.location.href = href; }, 880);
       }
 
       document.addEventListener("click", function (e) {

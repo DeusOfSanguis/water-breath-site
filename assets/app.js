@@ -14,7 +14,6 @@
   "use strict";
 
   var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var finePointer = !!(window.matchMedia && window.matchMedia("(pointer: fine)").matches);
 
   /* ---------- 01. Год в подвале ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) {
@@ -50,7 +49,7 @@
     var bar = document.querySelector(".progress");
     var nav = document.querySelector(".nav");
     var heroCue = document.querySelector(".hero__cue");
-    var rails = document.querySelectorAll(".timeline");
+    var rails = document.querySelectorAll(".timeline, .hb-river");
     function onScroll() {
       var y = window.scrollY || window.pageYOffset;
       var max = document.documentElement.scrollHeight - window.innerHeight;
@@ -58,7 +57,7 @@
       if (nav) nav.classList.toggle("scrolled", y > 60);
       if (heroCue) heroCue.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.5));
       rails.forEach(function (tl) {
-        var fill = tl.querySelector(".timeline__fill");
+        var fill = tl.querySelector(".timeline__fill, .hb-river__fill");
         if (!fill) return;
         var r = tl.getBoundingClientRect();
         var vh = window.innerHeight;
@@ -279,9 +278,12 @@
   });
 
   /* ---------- 09. Ката: ленивые видео ----------
-     Ролик грузится только когда блок подъехал к экрану. На компьютере превью
-     играет при наведении, на телефоне — по кнопке ▶. Одновременно играет
-     только одна анимация, уход со страницы / из окна — пауза.                */
+     Ролик грузится только когда блок подъехал к экрану. Мышь — превью играет
+     при наведении; тап/клик — играет или ставит на паузу. Кнопок и подписей
+     в плеере нет. Одновременно играет одна анимация, уход из окна — пауза.
+
+     Тип указателя берём из Pointer Events (event.pointerType), а не из
+     «(pointer: fine)»: медиазапрос врёт в части браузеров и в headless.      */
   (function () {
     var figures = document.querySelectorAll("[data-kata-media]");
     if (!figures.length) return;
@@ -305,7 +307,7 @@
       try {
         var p = video.play();
         if (p && typeof p.catch === "function") p.catch(function () {});
-      } catch (e) { /* старые браузеры / тестовые окружения */ }
+      } catch (e) {}
       var f = video.closest("[data-kata-media]");
       if (f) f.classList.add("is-playing");
     }
@@ -315,26 +317,47 @@
       if (f) f.classList.remove("is-playing");
       if (!video.paused) video.pause();
     }
+    function toggle(video) { if (video.paused) play(video); else pause(video); }
 
     figures.forEach(function (figure) {
       var video = figure.querySelector("video[data-kata-video]");
-      var toggle = figure.querySelector("[data-kata-toggle]");
       if (!video) return;
-      var zone = figure.closest("[data-kata-card], .katateaser__preview") || figure;
-      if (finePointer) {
-        zone.addEventListener("mouseenter", function () { play(video); });
-        zone.addEventListener("mouseleave", function () { pause(video); });
+      var zone = figure.closest("[data-kata-card], .hb-kata__preview") || figure;
+      var lastToggle = 0;
+      var lastTouchAt = 0;
+
+      // На части телефонов тап приходит только как pointerup/touchend, без click
+      // (например, если страница „переехала“ под пальцем). Поэтому ловим оба
+      // события, а от двойного переключения спасает окно в 400 мс.
+      function toggleOnce(e) {
+        if (e.target && e.target.closest && e.target.closest("a")) return;
+        var now = performance.now();
+        if (now - lastToggle < 400) return;
+        lastToggle = now;
+        toggle(video);
       }
-      if (toggle) {
-        toggle.addEventListener("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (video.paused) play(video); else pause(video);
-        });
-      }
-      figure.addEventListener("click", function (e) {
-        if (e.target.closest("button, a")) return;
-        if (video.paused) play(video); else pause(video);
+
+      // Наведение — только для настоящей мыши. После тача браузеры шлют
+      // совместимые «мышиные» события, поэтому касание ставит метку и
+      // hover-запуск в это окно игнорируется (иначе тап включал бы и выключал).
+      zone.addEventListener("pointerenter", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        play(video);
+      });
+      zone.addEventListener("pointerleave", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        pause(video);
+      });
+
+      zone.addEventListener("pointerup", function (e) {
+        if (e.pointerType === "mouse") return;   // мышь обрабатывает click ниже
+        lastTouchAt = performance.now();
+        toggleOnce(e);                            // палец: играем / пауза
+      });
+      zone.addEventListener("click", function (e) {
+        toggleOnce(e);                      // мышь и клавиатура
       });
     });
 
@@ -364,11 +387,14 @@
   /* ---------- 10. Водный курсор ----------
      Свечение, кольцо и капля идут за мышью с разной задержкой (эффект воды).
      Клик — рябь и брызги, быстрое движение — капли-след.
-     На тач-устройствах и при «уменьшить движение» всё выключено.            */
+
+     Включается по первому движению НАСТОЯЩЕЙ мыши (pointerType === "mouse"):
+     на телефоне и планшете курсора просто не будет, и не важно, что
+     сообщает медиазапрос про «(pointer: fine)».                              */
   (function () {
     var cur = document.querySelector("[data-cursor]");
     if (!cur) return;
-    if (!finePointer || reduceMotion) { cur.parentNode && cur.parentNode.removeChild(cur); return; }
+    if (reduceMotion) { cur.remove(); return; }
 
     var fx = cur.querySelector("[data-cursor-fx]") || cur;
     var glow = cur.querySelector(".wcur__glow");
@@ -380,9 +406,10 @@
     var rx = mx, ry = my;                  // кольцо
     var dx = mx, dy = my;                  // капля
     var lastX = mx, lastY = my, lastT = 0, trailAt = 0;
-    var running = true;
+    var active = false, bound = false;
 
-    var HOT = "a, button, summary, .ntab, .kata-card, .codex__card, .seal, input, textarea, select, [data-kata-toggle]";
+    var HOT = "a, button, summary, .ntab, .kata-card, .hb-card, .hb-vow, .hb-principle, " +
+              ".hb-kata__chip, .hb-rank, .hb-stop, .codex__card, input, textarea, select";
 
     function spawn(cls, x, y, vars, life) {
       var el = document.createElement("span");
@@ -392,12 +419,16 @@
       if (vars) Object.keys(vars).forEach(function (k) { el.style.setProperty(k, vars[k]); });
       fx.appendChild(el);
       setTimeout(function () { el.remove(); }, life);
-      // страховка от накопления частиц
-      while (fx.childElementCount > 40) fx.firstElementChild.remove();
+      while (fx.childElementCount > 40) fx.firstElementChild.remove();   // страховка от накопления
     }
-    function ripple(x, y) {
-      spawn("wcur__ripple", x, y, null, 1000);
-      spawn("wcur__ripple", x, y, null, 1150);
+    function ripple(x, y, delay) {
+      var el = document.createElement("span");
+      el.className = "wcur__ripple";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      if (delay) el.style.animationDelay = delay + "ms";
+      fx.appendChild(el);
+      setTimeout(function () { el.remove(); }, 1200);
     }
     function splash(x, y) {
       for (var i = 0; i < 7; i++) {
@@ -408,7 +439,8 @@
           "--dy": (Math.sin(a) * d - 8).toFixed(1) + "px"
         }, 800);
       }
-      ripple(x, y);
+      ripple(x, y, 110);
+      ripple(x, y, 0);
     }
     function trail(x, y, speed) {
       var now = performance.now();
@@ -420,7 +452,28 @@
       }, 1000);
     }
 
-    window.addEventListener("pointermove", function (e) {
+    function loop() {
+      if (!active) return;
+      gx += (mx - gx) * 0.055;
+      gy += (my - gy) * 0.055;
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      dx += (mx - dx) * 0.42;
+      dy += (my - dy) * 0.42;
+      if (glow) glow.style.transform = "translate(" + gx + "px," + gy + "px)";
+      if (ring) ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+      if (dot) dot.style.transform = "translate(" + dx + "px," + dy + "px)";
+      requestAnimationFrame(loop);
+    }
+
+    function onMove(e) {
+      var type = e.pointerType;
+      if (type !== "mouse") {
+        // пустой pointerType бывает у старых браузеров: доверяем только
+        // устройству без тачскрина
+        if (type || "ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+      }
+      if (!bound) bind();
       var now = performance.now();
       var dt = Math.max(1, now - lastT);
       var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / dt;
@@ -430,32 +483,32 @@
       var hot = !!(e.target && e.target.closest && e.target.closest(HOT));
       cur.classList.toggle("is-hot", hot);
       cur.classList.remove("is-out");
-    }, { passive: true });
-
-    window.addEventListener("pointerdown", function (e) {
-      cur.classList.add("is-down");
-      splash(e.clientX, e.clientY);
-    });
-    window.addEventListener("pointerup", function () { cur.classList.remove("is-down"); });
-    document.addEventListener("mouseleave", function () { cur.classList.add("is-out"); });
-    document.addEventListener("mouseenter", function () { cur.classList.remove("is-out"); });
-    window.addEventListener("blur", function () { running = false; });
-    window.addEventListener("focus", function () { running = true; });
-
-    (function loop() {
-      if (running) {
-        gx += (mx - gx) * 0.055;
-        gy += (my - gy) * 0.055;
-        rx += (mx - rx) * 0.16;
-        ry += (my - ry) * 0.16;
-        dx += (mx - dx) * 0.42;
-        dy += (my - dy) * 0.42;
-        if (glow) glow.style.transform = "translate(" + gx + "px," + gy + "px)";
-        if (ring) ring.style.transform = "translate(" + rx + "px," + ry + "px)";
-        if (dot) dot.style.transform = "translate(" + dx + "px," + dy + "px)";
-      }
+    }
+    function bind() {
+      bound = true; active = true;
+      window.addEventListener("pointerdown", function (e) {
+        if (e.pointerType && e.pointerType !== "mouse") return;
+        cur.classList.add("is-down");
+        splash(e.clientX, e.clientY);
+      });
+      window.addEventListener("pointerup", function () { cur.classList.remove("is-down"); });
+      document.addEventListener("mouseleave", function () { cur.classList.add("is-out"); });
+      document.addEventListener("mouseenter", function () { cur.classList.remove("is-out"); });
+      window.addEventListener("blur", function () { active = false; });
+      window.addEventListener("focus", function () { if (!active) { active = true; loop(); } });
       requestAnimationFrame(loop);
-    })();
+    }
+
+    function dropIfTouch(e) {
+      if (bound) return;                       // мышь уже включила курсор
+      var t = (e && e.pointerType) || "";
+      if (t && t === "mouse") return;
+      if (e && e.type === "touchstart") { cur.remove(); return; }
+      if (t) cur.remove();                      // pointerdown от пальца/стилуса
+    }
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", dropIfTouch, { passive: true, once: true });
+    window.addEventListener("touchstart", dropIfTouch, { passive: true, once: true });
   })();
 
   /* ---------- 11. Переход между страницами ----------
@@ -494,7 +547,7 @@
       if (panel) panel.addEventListener("animationend", function (e) {
         if (e.animationName === "veilAway") done();
       });
-      setTimeout(done, reduceMotion ? 30 : 2200);
+      setTimeout(done, reduceMotion ? 30 : 2400);
 
       /* уход */
       function leave(href, title, sigil) {
@@ -511,7 +564,7 @@
         void veil.offsetWidth;
         veil.classList.add("is-cover");
         document.body.classList.add("is-leaving");
-        setTimeout(function () { window.location.href = href; }, 560);
+        setTimeout(function () { window.location.href = href; }, 880);
       }
 
       document.addEventListener("click", function (e) {
