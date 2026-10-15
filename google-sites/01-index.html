@@ -2747,10 +2747,12 @@ body.embed .hero__crest { display: none; }
 
 
 
-/* Kata grid */
-.kata-grid { display: grid; gap: 22px; }
-@media (min-width: 700px) { .kata-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1180px) { .kata-grid { grid-template-columns: repeat(3, 1fr); } }
+/* Kata grid — 1 в столбик */
+.kata-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
 .kata-card {
   position: relative;
   display: flex;
@@ -2761,7 +2763,7 @@ body.embed .hero__crest { display: none; }
   background:
     linear-gradient(180deg, rgb(var(--bone-rgb) / 0.03), transparent 40%),
     var(--card);
-  padding: 22px;
+  padding: 24px;
   transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
 }
 .kata-card::before {
@@ -2775,7 +2777,7 @@ body.embed .hero__crest { display: none; }
 }
 .kata-card:hover {
   border-color: rgb(var(--water-rgb) / 0.6);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 26px 60px -40px rgb(var(--water-rgb) / 1);
 }
 .kata-card:hover::before { opacity: 1; }
@@ -2795,28 +2797,49 @@ body.embed .hero__crest { display: none; }
   -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.5);
   letter-spacing: -0.02em;
 }
-.kata-card__jp {
-  font-size: 11px;
+.kata-card__jp,
+.article .s .kata-card__jp {
+  font-size: 12px;
   letter-spacing: 0.18em;
   color: var(--water);
   margin: 0;
   text-align: right;
 }
-.kata-card h3 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.25; }
-.kata-card p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: var(--bone); opacity: 0.85; }
+.kata-card h3,
+.article .s .kata-card h3 {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(17px, 2.2vw, 21px);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+.article .s .kata-card h3::before { content: none; }
+.kata-card p,
+.article .s .kata-card p {
+  margin: 0 0 10px;
+  max-width: none;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--bone);
+  opacity: 0.88;
+}
 .kata-card__tip {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center;
   margin: 0 0 4px !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--ash) !important;
   opacity: 1 !important;
 }
 .kata-card__tip-k {
   flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -2828,7 +2851,6 @@ body.embed .hero__crest { display: none; }
 .kata-card__media {
   position: relative;
   margin: 14px 0 0;
-  /* карточка тянет анимацию вниз, чтобы все плееры стояли на одном уровне */
   border-radius: 12px;
   overflow: hidden;
   background:
@@ -2840,7 +2862,6 @@ body.embed .hero__crest { display: none; }
   color: var(--ash);
   font-size: 13px;
   border: 1px solid rgb(var(--water-rgb) / 0.22);
-  margin: auto 0 0;
 }
 .kata-card__media img,
 .kata-card__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -2919,19 +2940,114 @@ body.embed .hero__crest { display: none; }
 .promo__req li { margin-bottom: 6px; }
 
 /* Roster */
-.roster__group { margin-bottom: 48px; }
-.roster__cap { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--water); margin-bottom: 16px; }
-.roster__grid { display: grid; gap: 16px; }
-@media (min-width: 768px) { .roster__grid { grid-template-columns: 1fr 1fr; } }
-.roster__card {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--card);
-  padding: 20px;
+.roster { display: grid; gap: 28px; }
+.roster__group {
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgb(var(--bone-rgb) / 0.08);
 }
-.roster__card h4 { margin: 0; font-family: var(--font-display); font-weight: 700; }
-.roster__card .role { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--water); margin-top: 4px; }
-.roster__card p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--ash); }
+.roster__group:last-child { padding-bottom: 0; border-bottom: 0; }
+.roster__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-bottom: 14px;
+}
+.roster__head-main {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+.roster__title,
+.article .s .roster__title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(16px, 2vw, 19px);
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+.article .s .roster__title::before { content: none; }
+.roster__role {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.roster__count {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--water-rgb) / 0.24);
+  background: rgb(var(--water-rgb) / 0.06);
+}
+.roster__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+.roster__grid--dense {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+}
+.roster__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-left: 2px solid rgb(var(--water-rgb) / 0.55);
+  border-radius: 10px;
+  background: rgb(var(--void-rgb) / 0.45);
+  padding: 12px 14px;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.roster__card:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  border-left-color: var(--water);
+  background: rgb(var(--water-rgb) / 0.06);
+}
+.roster__card.is-free {
+  border-style: dashed;
+  border-left-style: solid;
+  opacity: 0.85;
+}
+.roster__card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.roster__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.3;
+  color: var(--bone);
+}
+.roster__tag {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.roster__desc,
+.article .s .roster__desc {
+  margin: 6px 0 0;
+  max-width: none;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ash);
+}
 
 /* ---------- HUD истребителей — единый акцент воды ---------- */
 .nav__drop {
@@ -3397,151 +3513,140 @@ body.embed .hero__crest { display: none; }
 .hb-kata__more,
 .hb-groups__more { margin-top: 34px; }
 
-/* ---------- 03 путь: русло ---------- */
-.hb-path__grid { display: grid; gap: 40px; }
-@media (min-width: 980px) {
-  .hb-path__grid { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px; align-items: start; }
+/* ---------- 03 путь истребителя ---------- */
+.hb-path__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
 }
-.hb-path__aside { position: relative; }
-.hb-path__kanji {
-  position: absolute;
-  top: -46px;
-  left: -6px;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: clamp(90px, 16vw, 150px);
-  line-height: 0.9;
-  color: rgb(var(--water-rgb) / 0.08);
-  pointer-events: none;
-  user-select: none;
+@media (min-width: 780px) {
+  .hb-path__steps { grid-template-columns: repeat(2, 1fr); gap: 18px; }
 }
-.hb-path__title {
+.hb-step {
   position: relative;
-  margin: 0 0 16px;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(30px, 5vw, 46px);
-  line-height: 1.04;
-  text-transform: uppercase;
-}
-.hb-path__note { margin: 0 0 26px; font-size: 15px; line-height: 1.75; color: var(--ash); }
-.hb-path__btns { display: flex; flex-wrap: wrap; gap: 12px; }
-
-.hb-river { position: relative; padding-left: 44px; }
-.hb-river__rail {
-  position: absolute;
-  left: 13px;
-  top: 8px;
-  bottom: 8px;
-  width: 2px;
-  border-radius: 2px;
-  background: rgb(var(--bone-rgb) / 0.1);
-  overflow: hidden;
-}
-.hb-river__rail::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(180deg, rgb(var(--water-rgb) / 0.5) 0 6px, transparent 6px 14px);
-  background-size: 100% 14px;
-  opacity: 0.55;
-}
-.hb-river__fill {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--water-deep), var(--water), var(--glow));
-  transform: scaleY(0);
-  transform-origin: top;
-}
-.hb-river__stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
-.hb-stop { position: relative; }
-.hb-stop__dot {
-  position: absolute;
-  left: -37px;
-  top: 26px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgb(var(--water-rgb) / 0.7);
-  background: var(--void);
-  box-shadow: 0 0 0 4px rgb(var(--water-rgb) / 0.08);
-}
-.hb-stop__dot::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  background: var(--water);
-}
-.hb-stop__card {
-  position: relative;
-  padding: 22px 24px;
-  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: linear-gradient(160deg, rgb(var(--coal-rgb)), rgb(var(--void-rgb) / 0.6));
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgb(var(--deep-rgb) / 0.2), transparent 60%),
+    var(--coal);
   transition: border-color 0.35s ease, transform 0.35s ease;
 }
-.hb-stop:hover .hb-stop__card { border-color: rgb(var(--water-rgb) / 0.45); transform: translateX(4px); }
-.hb-stop__cap {
-  margin: 0 0 8px;
-  font-size: 10px;
+.hb-step:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  transform: translateY(-3px);
+}
+.hb-step__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.hb-step__num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.25);
+  -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.55);
+}
+.hb-step__badge {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--water);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--water-rgb) / 0.3);
+  background: rgb(var(--water-rgb) / 0.08);
+}
+.hb-step__title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--bone);
+}
+.hb-step__text {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ash);
+}
+.hb-step__tags {
+  list-style: none;
+  margin: auto 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid rgb(var(--bone-rgb) / 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+.hb-step__tags li {
+  font-size: 11.5px;
+  color: rgb(var(--bone-rgb) / 0.8);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgb(var(--void-rgb) / 0.55);
+  border: 1px solid rgb(var(--bone-rgb) / 0.08);
+}
+.hb-path__bar {
+  margin-top: 24px;
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(var(--water-rgb) / 0.25);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgb(var(--deep-rgb) / 0.25), transparent 65%),
+    rgb(var(--void-rgb) / 0.55);
+  display: grid;
+  gap: 20px;
+}
+.hb-path__bar-cap {
+  margin: 0 0 12px;
+  font-size: 11px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--water);
 }
-.hb-stop__card h3 {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-}
-.hb-stop__card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ash); }
-.hb-stop__k {
-  position: absolute;
-  right: 16px;
-  bottom: 8px;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 54px;
-  line-height: 1;
-  color: rgb(var(--water-rgb) / 0.08);
-  pointer-events: none;
-  user-select: none;
-}
-
-.hb-duty {
+.hb-path__approvals {
   list-style: none;
-  display: grid;
-  gap: 12px;
-  margin: 44px 0 0;
+  margin: 0;
   padding: 0;
-}
-@media (min-width: 700px) { .hb-duty { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1100px) { .hb-duty { grid-template-columns: repeat(4, 1fr); } }
-.hb-duty li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: rgb(var(--void-rgb) / 0.45);
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgb(var(--bone-rgb) / 0.85);
-}
-.hb-duty__k {
-  flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
   display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid rgb(var(--water-rgb) / 0.4);
-  color: var(--water);
+  gap: 10px;
+}
+@media (min-width: 700px) {
+  .hb-path__approvals { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1100px) {
+  .hb-path__approvals { grid-template-columns: repeat(4, 1fr); }
+}
+.hb-path__approvals li {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgb(var(--coal-rgb) / 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hb-path__approvals b {
   font-family: var(--font-display);
   font-size: 13px;
+  color: var(--bone);
 }
+.hb-path__approvals span {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ash);
+}
+.hb-path__btns { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* ---------- 04 ранги: лестница ---------- */
 .hb-ranks__ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
@@ -3643,14 +3748,18 @@ body.embed .hero__crest { display: none; }
 @media (max-width: 520px) { .hb-kata__chip-jp { display: none; } }
 
 /* ---------- 06 состав: карточки групп ---------- */
-.hb-groups__grid { display: grid; gap: 16px; }
+.hb-groups__grid {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
 @media (min-width: 700px) { .hb-groups__grid { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 1100px) { .hb-groups__grid { grid-template-columns: repeat(3, 1fr); } }
 .hb-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 26px 24px;
+  padding: 24px 22px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background:
@@ -3660,7 +3769,7 @@ body.embed .hero__crest { display: none; }
 }
 .hb-card:hover {
   border-color: rgb(var(--water-rgb) / 0.45);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   box-shadow: 0 30px 70px -52px rgb(var(--water-rgb) / 1);
 }
 .hb-card__k {
@@ -3675,45 +3784,99 @@ body.embed .hero__crest { display: none; }
   pointer-events: none;
 }
 .hb-card__role {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-size: 10px;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--water);
 }
 .hb-card__title {
-  margin: 0 0 14px;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 20px;
+  font-size: 19px;
   line-height: 1.2;
 }
 .hb-card__text { margin: 0 0 16px; font-size: 14px; line-height: 1.7; color: var(--ash); }
 .hb-card .btn { align-self: flex-start; margin-top: auto; }
 
-.hb-group__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.hb-group__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.hb-group__count {
+  flex: 0 0 auto;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--water-rgb) / 0.3);
+  background: rgb(var(--water-rgb) / 0.08);
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--water);
+}
+.hb-group--wide,
+.hb-group:has(.hb-group__m:nth-child(4)) {
+  grid-column: 1 / -1;
+}
+.hb-group__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.hb-group--wide .hb-group__list,
+.hb-group:has(.hb-group__m:nth-child(4)) .hb-group__list {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
 .hb-group__m {
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 10px 13px;
+  border-radius: 10px;
   border: 1px solid var(--line);
+  border-left: 2px solid rgb(var(--water-rgb) / 0.55);
   background: rgb(var(--void-rgb) / 0.45);
 }
-.hb-group__m.is-free { border-style: dashed; }
+.hb-group__m.is-free {
+  border-style: dashed;
+  border-left-style: solid;
+}
+.hb-group__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
 .hb-group__name {
-  display: block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--bone);
 }
 .hb-group__meta {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--water);
 }
-.hb-group__desc { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: var(--ash); }
+.hb-group__desc {
+  margin: 5px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ash);
+}
 
 /* ---------- 07 порядок: устав и поместье ---------- */
 .hb-order__grid { display: grid; gap: 16px; }
@@ -3919,7 +4082,7 @@ body.embed .hero__crest { display: none; }
 <body id="top" class="page-index embed" data-sigil="水">
 <div class="veil" data-veil aria-hidden="true"><div class="veil__panel"><svg class="veil__wave veil__wave--in" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C120,20 240,20 360,64 C480,108 600,108 720,64 C840,20 960,20 1080,64 C1200,108 1320,108 1440,64 L1440,120 L0,120 Z"/></svg><div class="veil__fill"><span class="veil__kanji" data-veil-kanji>水</span><span class="veil__label" data-veil-label>Дыхание воды</span><span class="veil__bar"><i></i></span></div><svg class="veil__wave veil__wave--out" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,56 C120,100 240,100 360,56 C480,12 600,12 720,56 C840,100 960,100 1080,56 C1200,12 1320,12 1440,56 L1440,0 L0,0 Z"/></svg></div></div>
 <section class="hero hero--inner"><div class="hero__media"><img class="bg" src="assets/img/water-moon.jpg" alt="" fetchpriority="high"></div><div class="hero__shade"></div><div class="hero__kanji"><span class="v">水</span><span class="line"></span><span class="t">Дыхание воды</span></div><div class="hero__crest" aria-hidden="true"><span>水</span></div><div class="hero__in"><p class="hero__eyebrow">水&nbsp;&nbsp;Дыхание воды</p><h1 class="hero__title"><span class="hero__plain"><span>Дыхание воды</span></span></h1></div><a class="hero__cue" href="#content"><span>Читать свиток</span><span>﹀</span></a></section><div class="marquee" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div><main id="content">
-<!-- ГЛАВНАЯ — Дыхание Воды. Новая версия: манифест → кодекс → путь → ранги → ката → состав → поместье → присяга -->
+<!-- ГЛАВНАЯ — Дыхание Воды: манифест → кодекс → путь → ранги → ката → состав → порядок → присяга -->
 
 <!-- 01 ВОДА: манифест и четыре завета -->
 <section class="hb-section hb-manifest" id="faction">
@@ -3931,8 +4094,8 @@ body.embed .hero__crest { display: none; }
     </aside>
 
     <div class="hb-manifest__body reveal">
-      <p class="hb-manifest__lead">Дыхание Воды — одно из пяти основных дыханий, рождённых от Дыхания Солнца. Десять форм, текучих как река: от рассекающей поверхность до постоянного потока.</p>
-      <p class="hb-manifest__text">Мы не демоны и не охотники за славой. Мы — те, кто встаёт между людьми и тьмой, чтобы никто больше не потерял близкого. Вода не спорит с камнем — она его обтекает; истребитель воды не ломает судьбу силой, он ищет путь и проходит его.</p>
+      <p class="hb-manifest__lead">Дыхание Воды — одно из пяти основных дыханий, берущих начало от Дыхания Солнца. В его основе лежат десять форм: от базового горизонтального разреза до непрерывного атакующего потока.</p>
+      <p class="hb-manifest__text">Школа Воды строится на выдержке, точной работе клинком и взаимной выручке. В бою мечник Воды опирается на холодный расчёт: держит строй, подстраивается под темп противника, гасит чужие выпады и прикрывает товарищей.</p>
 
       <p class="hb-manifest__cap"><span class="k" aria-hidden="true">四</span>Четыре завета воды</p>
       <ul class="hb-vows">
@@ -3941,7 +4104,7 @@ body.embed .hero__crest { display: none; }
           <span class="hb-vow__icon ico" data-ico="drops"></span>
           <div class="hb-vow__body">
             <h3>Адаптивность</h3>
-            <p>Вода принимает форму сосуда. Истребитель подстраивается под любого врага.</p>
+            <p>Вода принимает форму сосуда. Истребитель меняет стойку и темп боя под любого противника.</p>
           </div>
         </li>
         <li class="hb-vow">
@@ -3949,7 +4112,7 @@ body.embed .hero__crest { display: none; }
           <span class="hb-vow__icon ico" data-ico="shield"></span>
           <div class="hb-vow__body">
             <h3>Спокойствие</h3>
-            <p>Поверхность спокойна даже в бурю. Эмоции не берут верх в бою.</p>
+            <p>Холодная голова в любой схватке. Потеря самообладания ведёт к ошибкам в стойке и дыхании.</p>
           </div>
         </li>
         <li class="hb-vow">
@@ -3957,7 +4120,7 @@ body.embed .hero__crest { display: none; }
           <span class="hb-vow__icon ico" data-ico="target"></span>
           <div class="hb-vow__body">
             <h3>Текучесть</h3>
-            <p>Как вода ищет щель, так и мечник ищет путь к победе.</p>
+            <p>Защита переходит в атаку без пауз — каждое движение продолжает предыдущее.</p>
           </div>
         </li>
         <li class="hb-vow">
@@ -3965,7 +4128,7 @@ body.embed .hero__crest { display: none; }
           <span class="hb-vow__icon ico" data-ico="scroll"></span>
           <div class="hb-vow__body">
             <h3>Защита</h3>
-            <p>Сила дана для защиты гражданских и товарищей, а не для хвастовства.</p>
+            <p>Главная задача мечника Корпуса — оберегать мирных людей и прикрывать свой отряд.</p>
           </div>
         </li>
       </ul>
@@ -3982,44 +4145,44 @@ body.embed .hero__crest { display: none; }
       <span class="hb-head__kanji" aria-hidden="true">律</span>
       <p class="hb-head__num"><span>02</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">кодекс</span></p>
       <h2 class="hb-head__title">Семь принципов <em>воды</em></h2>
-      <p class="hb-head__sub">Не закон, а путь. Кодекс — это то, что ты выбираешь сам, каждый день, без надзирателя.</p>
+      <p class="hb-head__sub">Внутренние ориентиры мечников Воды. За нарушение кодекса не дают выговоров, но именно по нему судят о бойце в строю.</p>
     </header>
 
     <ol class="hb-codex__grid">
       <li class="hb-principle reveal">
         <span class="hb-principle__n">01</span>
         <h3>Уважай других</h3>
-        <p>Это основа каждого бойца. Без уважения к товарищам, старшим и гражданским ты не мечник, а просто человек с катаной.</p>
+        <p>Основа дисциплины в Корпусе. Уважение к товарищам, старшим по званию и гражданским обязательно для каждого мечника.</p>
       </li>
       <li class="hb-principle reveal">
         <span class="hb-principle__n">02</span>
         <h3>Делай то, что нужно</h3>
-        <p>Ради большего можно пойти на жертвы. Иногда отступить — значит защитить. Вода не спорит с камнем, она его обтекает.</p>
+        <p>Ради общей задачи иногда приходится уступить или вовремя отойти, чтобы сохранить жизни отряда.</p>
       </li>
       <li class="hb-principle reveal">
         <span class="hb-principle__n">03</span>
         <h3>Не подавай виду эмоциям</h3>
-        <p>Неважно, что у тебя на душе — страх, злость, горе или боль. Когда эмоции берут верх, мышление притупляется.</p>
+        <p>Страх, злость и паника мешают концентрации. Во время боя рассудок должен оставаться чистым.</p>
       </li>
       <li class="hb-principle reveal">
         <span class="hb-principle__n">04</span>
         <h3>Ищи выход</h3>
-        <p>Оказавшись в трудной ситуации, всегда ищи способ выбраться — так же, как вода ищет куда просочиться. Безвыходных ситуаций нет.</p>
+        <p>Даже в тяжёлом бою оценивай обстановку и ищи слабое место в защите врага или путь для перегруппировки.</p>
       </li>
       <li class="hb-principle reveal">
         <span class="hb-principle__n">05</span>
         <h3>Не подводи своё дыхание</h3>
-        <p>Ты носишь имя Воды. Каждый твой поступок отражается на всех, кто дышит водой рядом с тобой.</p>
+        <p>Ты представляешь Дыхание Воды. По твоим поступкам в штабе и на вылазках судят обо всём составе.</p>
       </li>
       <li class="hb-principle reveal">
         <span class="hb-principle__n">06</span>
         <h3>Не говори гадостей за спиной</h3>
-        <p>Боевой товарищ всегда лучше, чем самая лучшая катана. Есть что сказать — скажи в лицо, честно и с уважением.</p>
+        <p>Надёжный товарищ в строю важнее любого клинка. Все разногласия решаются открыто и по делу.</p>
       </li>
       <li class="hb-principle reveal hb-principle--wide">
         <span class="hb-principle__n">07</span>
         <h3>Имей цель</h3>
-        <p>Цель — как русло для реки. Без русла вода растекается и исчезает. С целью — становится потоком, способным снести горы. Без цели прогресса не будет.</p>
+        <p>Тренировки и вылазки дают результат только тогда, когда ты понимаешь, к какому рангу и уровню мастерства идёшь.</p>
       </li>
     </ol>
 
@@ -4029,91 +4192,109 @@ body.embed .hero__crest { display: none; }
   </div>
 </section>
 
-<!-- 03 ПУТЬ: русло от ученика до мечника -->
-<section class="hb-section hb-path" id="path">
-  <div class="hb-wrap hb-path__grid">
-    <div class="hb-path__aside reveal">
-      <span class="hb-path__kanji" aria-hidden="true">道</span>
-      <h2 class="hb-path__title">Путь<br>истребителя</h2>
-      <p class="hb-path__note">Одно русло, четыре ступени. От ученика без клинка — до мечника, способного защитить.</p>
+<!-- 03 ПУТЬ ИСТРЕБИТЕЛЯ -->
+<section class="hb-section hb-section--dim hb-path" id="path">
+  <div class="hb-wrap">
+    <header class="hb-head reveal">
+      <span class="hb-head__kanji" aria-hidden="true">道</span>
+      <p class="hb-head__num"><span>03</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">служба</span></p>
+      <h2 class="hb-head__title">Путь <em>истребителя</em></h2>
+      <p class="hb-head__sub">Как устроено продвижение в Дыхании Воды: от вступления в ученики до старших рангов и командных должностей.</p>
+    </header>
+
+    <ol class="hb-path__steps">
+      <li class="hb-step reveal">
+        <div class="hb-step__top">
+          <span class="hb-step__num">01</span>
+          <span class="hb-step__badge">Ученик · Seito</span>
+        </div>
+        <h3 class="hb-step__title">Подготовка в штабе</h3>
+        <p class="hb-step__text">Новичок поступает под начало инструкторов Воды без клинка Ничирин. Изучает Устав, тренирует дыхание и отрабатывает базовые стойки с боккеном на гальке. Покидать штаб без сопровождения и вступать в бой с демонами ученикам запрещено.</p>
+        <ul class="hb-step__tags">
+          <li>Устав Корпуса</li>
+          <li>Тренировки на гальке</li>
+          <li>Работа с боккеном</li>
+        </ul>
+      </li>
+
+      <li class="hb-step reveal">
+        <div class="hb-step__top">
+          <span class="hb-step__num">02</span>
+          <span class="hb-step__badge">Фуджикасане · Мидзуното</span>
+        </div>
+        <h3 class="hb-step__title">Финальный отбор и клинок</h3>
+        <p class="hb-step__text">По готовности инструктор допускает ученика к Финальному отбору на горе Фуджикасане. После сдачи испытания боец получает форму Корпуса, клинок Ничирин и первый боевой ранг — Мидзуното.</p>
+        <ul class="hb-step__tags">
+          <li>Сдача отбора</li>
+          <li>Клинок Ничирин</li>
+          <li>Зачисление в строй</li>
+        </ul>
+      </li>
+
+      <li class="hb-step reveal">
+        <div class="hb-step__top">
+          <span class="hb-step__num">03</span>
+          <span class="hb-step__badge">Мидзуное → Киноэ</span>
+        </div>
+        <h3 class="hb-step__title">Боевая служба и ранги</h3>
+        <p class="hb-step__text">Основной состав участвует в захватах обычных и важных точек, охотится на демонов, посещает тренировки Воды и лопает панкуны в Поместье Бабочки. Начиная со средних рангов добавляются поручения от инструкторов, Цугуко и Столпов.</p>
+        <ul class="hb-step__tags">
+          <li>Захваты точек</li>
+          <li>Охота на демонов</li>
+          <li>Панкуны и поручения</li>
+        </ul>
+      </li>
+
+      <li class="hb-step reveal">
+        <div class="hb-step__top">
+          <span class="hb-step__num">04</span>
+          <span class="hb-step__badge">Инструктор · Цугуко</span>
+        </div>
+        <h3 class="hb-step__title">Командный состав</h3>
+        <p class="hb-step__text">Опытные мечники переходят в инструкторы: обучают новичков, читают лекции по ПМП, проводят разведки и организуют захваты точек. Сильнейшие бойцы по решению Столпа Воды назначаются Цугуко — его прямыми преемниками.</p>
+        <ul class="hb-step__tags">
+          <li>Обучение состава</li>
+          <li>Лекции ПМП</li>
+          <li>Преемник Столпа</li>
+        </ul>
+      </li>
+    </ol>
+
+    <div class="hb-path__bar reveal">
+      <div class="hb-path__bar-info">
+        <p class="hb-path__bar-cap">Кто одобряет повышение по рангам</p>
+        <ul class="hb-path__approvals">
+          <li><b>До Тсучиноэ</b><span>Инструктор или Цугуко Воды</span></li>
+          <li><b>С Тсучиноэ</b><span>Столп Воды</span></li>
+          <li><b>С Хиноэ</b><span>Два Столпа Корпуса</span></li>
+          <li><b>На Киноэ</b><span>Глава Организации + бой со Столпом Воды</span></li>
+        </ul>
+      </div>
       <div class="hb-path__btns">
-        <a class="btn btn--water" href="https://water-breath-yufu.ru/elevation/"><span>Требования рангов</span></a>
+        <a class="btn btn--water" href="https://water-breath-yufu.ru/elevation/"><span>Все требования рангов</span></a>
         <a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Состав и иерархия →</a>
       </div>
     </div>
-
-    <div class="hb-river reveal">
-      <span class="hb-river__rail" aria-hidden="true">
-        <span class="timeline__fill hb-river__fill"></span>
-      </span>
-      <ol class="hb-river__stops">
-        <li class="hb-stop">
-          <span class="hb-stop__dot" aria-hidden="true"></span>
-          <div class="hb-stop__card">
-            <p class="hb-stop__cap">Ступень 01 · штаб</p>
-            <h3>Дыхание и боккен</h3>
-            <p>Тотальная концентрация дыхания и деревянный клинок. Ученик не выходит за пределы штаба без сопровождения.</p>
-          </div>
-          <span class="hb-stop__k" aria-hidden="true">息</span>
-        </li>
-        <li class="hb-stop">
-          <span class="hb-stop__dot" aria-hidden="true"></span>
-          <div class="hb-stop__card">
-            <p class="hb-stop__cap">Ступень 02 · Фуджикасане</p>
-            <h3>Финальный отбор</h3>
-            <p>Семь дней среди демонов на горе. Выжил и доказал — корпус принимает тебя.</p>
-          </div>
-          <span class="hb-stop__k" aria-hidden="true">選</span>
-        </li>
-        <li class="hb-stop">
-          <span class="hb-stop__dot" aria-hidden="true"></span>
-          <div class="hb-stop__card">
-            <p class="hb-stop__cap">Ступень 03 · клинок</p>
-            <h3>Ничирин и наставник</h3>
-            <p>Клинок, меняющий цвет, и закрепление за инструктором или Столпом. Первый ранг — Мидзуното.</p>
-          </div>
-          <span class="hb-stop__k" aria-hidden="true">刀</span>
-        </li>
-        <li class="hb-stop">
-          <span class="hb-stop__dot" aria-hidden="true"></span>
-          <div class="hb-stop__card">
-            <p class="hb-stop__cap">Ступень 04 · корпус</p>
-            <h3>Мечник воды</h3>
-            <p>Зачистки, сборы Столпов, защита гражданских. Ранг растёт по делам и точкам, а не по годам.</p>
-          </div>
-          <span class="hb-stop__k" aria-hidden="true">流</span>
-        </li>
-      </ol>
-    </div>
-  </div>
-
-  <div class="hb-wrap">
-    <ul class="hb-duty reveal">
-      <li><span class="hb-duty__k" aria-hidden="true">義</span>Защищать гражданских и товарищей</li>
-      <li><span class="hb-duty__k" aria-hidden="true">礼</span>Являться на сборы Столпов и зачистки</li>
-      <li><span class="hb-duty__k" aria-hidden="true">忍</span>Соблюдать дресс-код и секретность корпуса</li>
-      <li><span class="hb-duty__k" aria-hidden="true">黙</span>Не раскрывать тайны корпуса гражданским</li>
-    </ul>
   </div>
 </section>
 
 <!-- 04 РАНГИ: лестница повышений -->
-<section class="hb-section hb-ranks" id="ranks"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">昇</span><p class="hb-head__num"><span>03</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ранги</span></p><h2 class="hb-head__title">Десять рангов <em>пути</em></h2><p class="hb-head__sub">Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.</p></header><ol class="hb-ranks__ladder"><li class="hb-rank reveal" style="--p:11%"><span class="hb-rank__i">01</span><p class="hb-rank__path"><span>Мидзуното</span><i aria-hidden="true">→</i><b>Мидзуное</b></p><span class="hb-rank__req">3&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:22%"><span class="hb-rank__i">02</span><p class="hb-rank__path"><span>Мидзуное</span><i aria-hidden="true">→</i><b>Каното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:33%"><span class="hb-rank__i">03</span><p class="hb-rank__path"><span>Каното</span><i aria-hidden="true">→</i><b>Каноэ</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:44%"><span class="hb-rank__i">04</span><p class="hb-rank__path"><span>Каноэ</span><i aria-hidden="true">→</i><b>Тсучиното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:56%"><span class="hb-rank__i">05</span><p class="hb-rank__path"><span>Тсучиното</span><i aria-hidden="true">→</i><b>Тсучиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:67%"><span class="hb-rank__i">06</span><p class="hb-rank__path"><span>Тсучиноэ</span><i aria-hidden="true">→</i><b>Хиното</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:78%"><span class="hb-rank__i">07</span><p class="hb-rank__path"><span>Хиното</span><i aria-hidden="true">→</i><b>Хиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:89%"><span class="hb-rank__i">08</span><p class="hb-rank__path"><span>Хиноэ</span><i aria-hidden="true">→</i><b>Киното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:100%"><span class="hb-rank__i">09</span><p class="hb-rank__path"><span>Киното</span><i aria-hidden="true">→</i><b>Киноэ</b></p><span class="hb-rank__req">6&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li></ol><div class="hb-ranks__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Требования к каждому рангу →</a></div></div></section>
+<section class="hb-section hb-ranks" id="ranks"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">昇</span><p class="hb-head__num"><span>04</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ранги</span></p><h2 class="hb-head__title">Десять рангов <em>пути</em></h2><p class="hb-head__sub">Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.</p></header><ol class="hb-ranks__ladder"><li class="hb-rank reveal" style="--p:11%"><span class="hb-rank__i">01</span><p class="hb-rank__path"><span>Мидзуното</span><i aria-hidden="true">→</i><b>Мидзуное</b></p><span class="hb-rank__req">3&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:22%"><span class="hb-rank__i">02</span><p class="hb-rank__path"><span>Мидзуное</span><i aria-hidden="true">→</i><b>Каното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:33%"><span class="hb-rank__i">03</span><p class="hb-rank__path"><span>Каното</span><i aria-hidden="true">→</i><b>Каноэ</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:44%"><span class="hb-rank__i">04</span><p class="hb-rank__path"><span>Каноэ</span><i aria-hidden="true">→</i><b>Тсучиното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:56%"><span class="hb-rank__i">05</span><p class="hb-rank__path"><span>Тсучиното</span><i aria-hidden="true">→</i><b>Тсучиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:67%"><span class="hb-rank__i">06</span><p class="hb-rank__path"><span>Тсучиноэ</span><i aria-hidden="true">→</i><b>Хиното</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:78%"><span class="hb-rank__i">07</span><p class="hb-rank__path"><span>Хиното</span><i aria-hidden="true">→</i><b>Хиноэ</b></p><span class="hb-rank__req">5&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:89%"><span class="hb-rank__i">08</span><p class="hb-rank__path"><span>Хиноэ</span><i aria-hidden="true">→</i><b>Киното</b></p><span class="hb-rank__req">4&nbsp;требования</span><span class="hb-rank__bar" aria-hidden="true"></span></li><li class="hb-rank reveal" style="--p:100%"><span class="hb-rank__i">09</span><p class="hb-rank__path"><span>Киното</span><i aria-hidden="true">→</i><b>Киноэ</b></p><span class="hb-rank__req">6&nbsp;требований</span><span class="hb-rank__bar" aria-hidden="true"></span></li></ol><div class="hb-ranks__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Требования к каждому рангу →</a></div></div></section>
 
 <!-- 05 КАТА: десять форм -->
-<section class="hb-section hb-section--dim hb-kata" id="kata"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">型</span><p class="hb-head__num"><span>04</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ката</span></p><h2 class="hb-head__title">Десять форм <em>воды</em></h2><p class="hb-head__sub">От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.</p></header><div class="hb-kata__grid"><div class="hb-kata__preview reveal"><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/10-kata-poster.jpg" data-kata-video aria-label="Анимация: Десятая ката: Постоянный поток"><source data-src="assets/kata/10-kata.mp4" type="video/mp4"></video></figure><div class="hb-kata__cap"><span class="hb-kata__cap-n">Постоянный поток</span><span class="hb-kata__cap-jp">拾ノ型・生生流転</span></div></div><div class="hb-kata__list"><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">01</span><span class="hb-kata__chip-t">Рассекающий поверхность воды</span><span class="hb-kata__chip-jp" aria-hidden="true">壱ノ型・水面斬り</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">02</span><span class="hb-kata__chip-t">Водяное колесо</span><span class="hb-kata__chip-jp" aria-hidden="true">弐ノ型・水車</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">03</span><span class="hb-kata__chip-t">Танец стремительного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">参ノ型・流流舞い</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">04</span><span class="hb-kata__chip-t">Удар приливной волны</span><span class="hb-kata__chip-jp" aria-hidden="true">肆ノ型・打ち潮</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">05</span><span class="hb-kata__chip-t">Благословенный дождь после засухи</span><span class="hb-kata__chip-jp" aria-hidden="true">伍ノ型・干天の慈雨</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">06</span><span class="hb-kata__chip-t">Вихрь</span><span class="hb-kata__chip-jp" aria-hidden="true">陸ノ型・ねじれ渦</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">07</span><span class="hb-kata__chip-t">Изгиб поверхности воды</span><span class="hb-kata__chip-jp" aria-hidden="true">漆ノ型・雫波紋突き</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">08</span><span class="hb-kata__chip-t">Удар водопада</span><span class="hb-kata__chip-jp" aria-hidden="true">捌ノ型・滝壺</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">09</span><span class="hb-kata__chip-t">Всплеск водяного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">玖ノ型・水流飛沫</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">10</span><span class="hb-kata__chip-t">Постоянный поток</span><span class="hb-kata__chip-jp" aria-hidden="true">拾ノ型・生生流転</span></a></div></div><div class="hb-kata__more"><a class="btn btn--water" href="https://water-breath-yufu.ru/kata/"><span>Разобрать все формы →</span></a></div></div></section>
+<section class="hb-section hb-section--dim hb-kata" id="kata"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">型</span><p class="hb-head__num"><span>05</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">ката</span></p><h2 class="hb-head__title">Десять форм <em>воды</em></h2><p class="hb-head__sub">От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.</p></header><div class="hb-kata__grid"><div class="hb-kata__preview reveal"><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/10-kata-poster.jpg" data-kata-video aria-label="Анимация: Десятая ката: Постоянный поток"><source data-src="assets/kata/10-kata.mp4" type="video/mp4"></video></figure><div class="hb-kata__cap"><span class="hb-kata__cap-n">Постоянный поток</span><span class="hb-kata__cap-jp">拾ノ型・生生流転</span></div></div><div class="hb-kata__list"><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">01</span><span class="hb-kata__chip-t">Рассекающий поверхность воды</span><span class="hb-kata__chip-jp" aria-hidden="true">壱ノ型・水面斬り</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">02</span><span class="hb-kata__chip-t">Водяное колесо</span><span class="hb-kata__chip-jp" aria-hidden="true">弐ノ型・水車</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">03</span><span class="hb-kata__chip-t">Танец стремительного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">参ノ型・流流舞い</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">04</span><span class="hb-kata__chip-t">Удар приливной волны</span><span class="hb-kata__chip-jp" aria-hidden="true">肆ノ型・打ち潮</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">05</span><span class="hb-kata__chip-t">Благословенный дождь после засухи</span><span class="hb-kata__chip-jp" aria-hidden="true">伍ノ型・干天の慈雨</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">06</span><span class="hb-kata__chip-t">Вихрь</span><span class="hb-kata__chip-jp" aria-hidden="true">陸ノ型・ねじれ渦</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">07</span><span class="hb-kata__chip-t">Изгиб поверхности воды</span><span class="hb-kata__chip-jp" aria-hidden="true">漆ノ型・雫波紋突き</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">08</span><span class="hb-kata__chip-t">Удар водопада</span><span class="hb-kata__chip-jp" aria-hidden="true">捌ノ型・滝壺</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">09</span><span class="hb-kata__chip-t">Всплеск водяного потока</span><span class="hb-kata__chip-jp" aria-hidden="true">玖ノ型・水流飛沫</span></a><a class="hb-kata__chip" href="https://water-breath-yufu.ru/kata/"><span class="hb-kata__chip-n">10</span><span class="hb-kata__chip-t">Постоянный поток</span><span class="hb-kata__chip-jp" aria-hidden="true">拾ノ型・生生流転</span></a></div></div><div class="hb-kata__more"><a class="btn btn--water" href="https://water-breath-yufu.ru/kata/"><span>Разобрать все формы →</span></a></div></div></section>
 
 <div class="marquee" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div>
 
 <!-- 06 СОСТАВ -->
-<section class="hb-section hb-groups" id="groups"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">隊</span><p class="hb-head__num"><span>05</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">состав</span></p><h2 class="hb-head__title">Состав <em>корпуса</em></h2><p class="hb-head__sub">Столп воды, его преемники, инструкторы, истребители и ученики — одна река.</p></header><div class="hb-groups__grid"><article class="hb-card hb-group reveal"><p class="hb-card__role">Глава дыхания</p><h3 class="hb-card__title">Столп Воды</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Томиока Гию</span><span class="hb-group__meta">Столп Воды · Действующий</span><p class="hb-group__desc">Спокойный и немногословный, но всегда готов защитить товарищей.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Преемники Столпа</p><h3 class="hb-card__title">Цугуко</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Алекс</span><span class="hb-group__meta">Цугуко Воды · суета</span><p class="hb-group__desc">ГГ тайтла</p></li><li class="hb-group__m"><span class="hb-group__name">Я</span><span class="hb-group__meta">еблан</span><p class="hb-group__desc"></p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Младший командный состав</p><h3 class="hb-card__title">Инструкторы</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Урокодаки Саконджи</span><span class="hb-group__meta">Бывший Столп Воды · Наставник · Легенда</span><p class="hb-group__desc">Тренирует учеников у горы Сагири, учит тотальному дыханию.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Основа корпуса</p><h3 class="hb-card__title">Истребители</h3><ul class="hb-group__list"><li class="hb-group__m is-free"><span class="hb-group__name">Вакантно</span><span class="hb-group__meta">Истребитель Воды · Набор открыт</span><p class="hb-group__desc">Боец, прошедший Финальный отбор и получивший клинок ничирин.</p></li></ul></article><article class="hb-card hb-group reveal"><p class="hb-card__role">Начинающие</p><h3 class="hb-card__title">Ученики</h3><ul class="hb-group__list"><li class="hb-group__m"><span class="hb-group__name">Новобранец</span><span class="hb-group__meta">Ученик Воды · На обучении</span><p class="hb-group__desc">Изучает тотальное дыхание и базовые формы под руководством инструктора.</p></li></ul></article></div><div class="hb-groups__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Полный состав и иерархия →</a></div></div></section>
+<section class="hb-section hb-groups" id="groups"><div class="hb-wrap"><header class="hb-head reveal"><span class="hb-head__kanji" aria-hidden="true">隊</span><p class="hb-head__num"><span>06</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">состав</span></p><h2 class="hb-head__title">Состав <em>корпуса</em></h2><p class="hb-head__sub">Столп Воды, Цугуко, инструкторы, истребители и ученики дыхания.</p></header><div class="hb-groups__grid"><article class="hb-card hb-group reveal"><div class="hb-group__head"><div><p class="hb-card__role">Глава дыхания</p><h3 class="hb-card__title">Столп Воды</h3></div><span class="hb-group__count">1</span></div><ul class="hb-group__list"><li class="hb-group__m"><div class="hb-group__top"><span class="hb-group__name">Томиока Гию</span><span class="hb-group__meta">Столп Воды</span></div><p class="hb-group__desc">Спокойный и немногословный, но всегда готов защитить товарищей.</p></li></ul></article><article class="hb-card hb-group reveal"><div class="hb-group__head"><div><p class="hb-card__role">Преемники Столпа</p><h3 class="hb-card__title">Цугуко</h3></div><span class="hb-group__count">2</span></div><ul class="hb-group__list"><li class="hb-group__m"><div class="hb-group__top"><span class="hb-group__name">Алекс</span><span class="hb-group__meta">Цугуко Воды</span></div><p class="hb-group__desc">ГГ тайтла</p></li><li class="hb-group__m hb-group__m--compact"><div class="hb-group__top"><span class="hb-group__name">Я</span><span class="hb-group__meta">еблан</span></div></li></ul></article><article class="hb-card hb-group reveal"><div class="hb-group__head"><div><p class="hb-card__role">Младший командный состав</p><h3 class="hb-card__title">Инструкторы</h3></div><span class="hb-group__count">1</span></div><ul class="hb-group__list"><li class="hb-group__m"><div class="hb-group__top"><span class="hb-group__name">Урокодаки Саконджи</span><span class="hb-group__meta">Бывший Столп Воды · Наставник</span></div><p class="hb-group__desc">Тренирует учеников у горы Сагири, учит тотальному дыханию.</p></li></ul></article><article class="hb-card hb-group reveal"><div class="hb-group__head"><div><p class="hb-card__role">Основа корпуса</p><h3 class="hb-card__title">Истребители</h3></div><span class="hb-group__count">1</span></div><ul class="hb-group__list"><li class="hb-group__m is-free"><div class="hb-group__top"><span class="hb-group__name">Вакантно</span><span class="hb-group__meta">Истребитель Воды</span></div><p class="hb-group__desc">Боец, прошедший Финальный отбор и получивший клинок ничирин.</p></li></ul></article><article class="hb-card hb-group reveal"><div class="hb-group__head"><div><p class="hb-card__role">Начинающие</p><h3 class="hb-card__title">Ученики</h3></div><span class="hb-group__count">1</span></div><ul class="hb-group__list"><li class="hb-group__m"><div class="hb-group__top"><span class="hb-group__name">Новобранец</span><span class="hb-group__meta">Ученик Воды</span></div><p class="hb-group__desc">Изучает тотальное дыхание и базовые формы под руководством инструктора.</p></li></ul></article></div><div class="hb-groups__more"><a class="btn btn--ghost" href="https://water-breath-yufu.ru/roster/">Полный состав и иерархия →</a></div></div></section>
 
 <!-- 07 ПОРЯДОК: поместье и устав -->
 <section class="hb-section hb-section--dim hb-order" id="order">
   <div class="hb-wrap">
     <header class="hb-head reveal">
       <span class="hb-head__kanji" aria-hidden="true">規</span>
-      <p class="hb-head__num"><span>06</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">порядок</span></p>
+      <p class="hb-head__num"><span>07</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">порядок</span></p>
       <h2 class="hb-head__title">Правила, которые <em>берегут</em></h2>
       <p class="hb-head__sub">Устав корпуса и отдельные правила территории Поместья Бабочки — целиком, в удобном для чтения виде.</p>
     </header>
@@ -4154,7 +4335,7 @@ body.embed .hero__crest { display: none; }
   <div class="hb-cta__in reveal">
     <p class="hb-cta__eyebrow">присяга воды</p>
     <h2 class="hb-cta__title">Стань <em>как вода</em></h2>
-    <p class="hb-cta__text">Течение не остановить. Если ты готов встать между людьми и тьмой — в корпусе есть место. Начни с дыхания.</p>
+    <p class="hb-cta__text">Готов вступить в ряды Дыхания Воды — изучи Устав, найди инструктора своего дыхания и начни подготовку к отбору.</p>
     <div class="hb-cta__btns">
       <a class="btn btn--water" href="https://water-breath-yufu.ru/roster/"><span>Встать в строй</span></a>
       <a class="btn btn--ghost" href="https://water-breath-yufu.ru/elevation/">Путь и требования →</a>
