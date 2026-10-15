@@ -189,7 +189,7 @@
     <div class="tab-page hidden" id="tab-kata">
       <div class="card">
         <h2>Ката — 10 форм</h2>
-        <p class="hint">Место для гифок готово — путь вида assets/kata/1-kata.mp4 или gif. Пока оставь заглушки, потом заменишь на конвертнутые.</p>
+        <p class="hint">Анимации лежат в <b>assets/kata/</b> в формате mp4 (основной) + картинка-постер. Имя по номеру формы: <b>01-kata.mp4</b>, <b>01-kata-poster.jpg</b>. Ролик подгружается только когда карточка подъехала к экрану.</p>
         <div id="kata-list"></div>
         <button class="ghost" id="add-kata">+ Добавить форму</button>
       </div>
@@ -547,14 +547,16 @@ function renderKata() {
       <label>Название</label><input type="text" data-path="forms.${i}.name" value="${escapeAttr(k.name || "")}">
       <label>Описание</label><textarea data-path="forms.${i}.description">${escapeHtml(k.description || "")}</textarea>
       <label>Совет</label><input type="text" data-path="forms.${i}.tips" value="${escapeAttr(k.tips || "")}">
-      <label>GIF / MP4 путь</label><input type="text" data-path="forms.${i}.gif" value="${escapeAttr(k.gif || "")}" placeholder="assets/kata/1-kata.mp4">
+      <div class="row"><div><label>Видео MP4 (основное)</label><input type="text" data-path="forms.${i}.video" value="${escapeAttr(k.video || k.gif || "")}" placeholder="assets/kata/01-kata.mp4"></div><div><label>Картинка-постер</label><input type="text" data-path="forms.${i}.poster" value="${escapeAttr(k.poster || "")}" placeholder="assets/kata/01-kata-poster.jpg"></div></div>
+      <label>Видео WEBM (необязательно, если mp4 нет)</label><input type="text" data-path="forms.${i}.webm" value="${escapeAttr(k.webm || "")}" placeholder="assets/kata/01-kata.webm">
       <div class="item-toolbar"><button class="ghost mini" data-act="kata-up" data-i="${i}">↑</button><button class="ghost mini" data-act="kata-down" data-i="${i}">↓</button><button class="ghost mini" data-act="kata-del" data-i="${i}">Удалить</button></div>`;
     root.appendChild(det);
   });
 }
 $("#add-kata").addEventListener("click", () => {
   const id = (state.models.kata.forms.length + 1);
-  state.models.kata.forms.push({ id: id, name: "Новая ката", name_jp: "", description: "", tips: "", gif: `assets/kata/${id}-kata.mp4` });
+  const nn = String(id).padStart(2, "0");
+  state.models.kata.forms.push({ id: id, name: "Новая ката", name_jp: "", description: "", tips: "", video: `assets/kata/${nn}-kata.mp4`, poster: `assets/kata/${nn}-kata-poster.jpg` });
   renderKata(); markDirty();
 });
 
