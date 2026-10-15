@@ -125,7 +125,7 @@ def render_fragment(fragment, data, prefix="", asset_base=None, kind="site"):
     out = out.replace("{{marquee}}", render_marquee(data, False))
     out = out.replace("{{marquee:reverse}}", render_marquee(data, True))
     out = out.replace("{{roster}}", render_roster(data))
-    out = out.replace("{{kata}}", render_kata(data))
+    out = out.replace("{{kata}}", render_kata(data, prefix=prefix, asset_base=asset_base))
     out = out.replace("{{promotions}}", render_promotions(data))
     out = out.replace("{{ranking-top}}", render_ranking_top(data))
     return out
@@ -153,6 +153,9 @@ def render_nav(data, current_page):
             + (' aria-current="page"' if on else "")
             + f'><i>{html.escape(_sigil(p))}</i><span>{html.escape(p["nav"])}</span></a>'
         )
+    seals.append(
+        f'<a class="seal" href="{up}water-site-test/"><i>材</i><span>Материалы</span></a>'
+    )
     return (
         '<header class="nav">'
         '<div class="nav__in">'
@@ -175,6 +178,7 @@ def render_mmenu(data, current_page):
         if not p.get("nav"):
             continue
         entries.append((p["slug"], p["title"], p["nav"], up + page_path(p), _sigil(p)))
+    entries.append(("materials", "Материалы", "Тестовый сайт", up + "water-site-test/", "材"))
     for i, (slug, title, short, href, sig) in enumerate(entries):
         on = " on" if slug == current_page["slug"] else ""
         cards.append(
@@ -308,7 +312,7 @@ def render_roster(data):
         out.append('</div></div>')
     return '<section class="s">' + "".join(out) + '</section>'
 
-def render_kata(data):
+def render_kata(data, prefix="", asset_base=None):
     kata = (data.get("lists") or {}).get("kata") or {}
     forms = kata.get("forms") or []
     if not forms:
@@ -321,8 +325,13 @@ def render_kata(data):
         desc = html.escape(f.get("description",""))
         tips = html.escape(f.get("tips",""))
         gif = f.get("gif","")
-        if gif:
-            media = f'<div class="kata-card__media"><img src="{gif}" alt="{name}" loading="lazy"><span style="display:none">gif</span></div>' if os.path.exists(os.path.join(ROOT, gif)) or gif.startswith("http") else f'<div class="kata-card__media"><span>Место для гифки {fid} — скоро</span></div>'
+        video = f.get("video","")
+        if video and (video.startswith("http") or os.path.exists(os.path.join(ROOT, video))):
+            vsrc = (asset_base.rstrip("/") + "/" + video) if asset_base and not video.startswith("http") else (prefix + video if not video.startswith("http") else video)
+            media = f'<div class="kata-card__media"><video src="{vsrc}" muted loop playsinline controls preload="metadata" aria-label="{name}"></video></div>'
+        elif gif and (gif.startswith("http") or os.path.exists(os.path.join(ROOT, gif))):
+            gsrc = (asset_base.rstrip("/") + "/" + gif) if asset_base and not gif.startswith("http") else (prefix + gif if not gif.startswith("http") else gif)
+            media = f'<div class="kata-card__media"><img src="{gsrc}" alt="{name}" loading="lazy"></div>'
         else:
             media = f'<div class="kata-card__media"><span>Место для гифки {fid} — скоро</span></div>'
         cards.append(
@@ -392,6 +401,7 @@ def render_footer(data, current_page):
         if not p.get("nav"):
             continue
         links.append(f'<a href="{up}{page_path(p)}">{html.escape(p["nav"])}</a>')
+    links.append(f'<a href="{up}water-site-test/">Материалы</a>')
     return (
         '<footer class="footer">'
         '<div class="footer__glow"></div>'
@@ -497,6 +507,7 @@ def write_cheatsheet(data):
 PROTECTED = {
     ".git", ".gitignore", ".nojekyll", "CNAME", "README.md", "LICENSE",
     ".github", "admin", "build.py", "content", "scripts", "google-sites", "assets",
+    "water-site-test",
     "Новая папка (3)",
     "Повышение инструкторцугуко.txt",
     "Повышение истребителей.txt",
