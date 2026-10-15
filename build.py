@@ -325,7 +325,7 @@ def render_kata(data, prefix="", asset_base=None):
         if video and (video.startswith("http") or os.path.exists(os.path.join(ROOT, video))):
             vsrc = (asset_base.rstrip("/") + "/" + video) if asset_base and not video.startswith("http") else (prefix + video if not video.startswith("http") else video)
             psrc = (asset_base.rstrip("/") + "/assets/kata/kata-poster.svg") if asset_base else (prefix + "assets/kata/kata-poster.svg")
-            media = f'<div class="kata-card__media"><video src="{vsrc}" muted loop playsinline preload="none" poster="{psrc}" aria-label="{name}"></video></div>'
+            media = f'<div class="kata-card__media"><video src="{vsrc}" muted loop playsinline preload="metadata" poster="{psrc}" aria-label="{name}"></video></div>'
         elif gif and (gif.startswith("http") or os.path.exists(os.path.join(ROOT, gif))):
             gsrc = (asset_base.rstrip("/") + "/" + gif) if asset_base and not gif.startswith("http") else (prefix + gif if not gif.startswith("http") else gif)
             media = f'<div class="kata-card__media"><img src="{gsrc}" alt="{name}" loading="lazy"></div>'
@@ -562,6 +562,7 @@ def build(asset_base=None):
         up = rel_prefix(page)
         main_cls = ' id="content"' if is_index else f' id="content" class="article" data-kanji="{sig}"'
         body = (
+            '<div class="water-cursor" aria-hidden="true"></div>\n'
             '<div class="progress"></div>\n'
             + (render_spine() if is_index else "")
             + render_nav(data, page)

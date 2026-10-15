@@ -260,4 +260,27 @@
     });
   })();
 
+
+  /* ---------- Водный курсор: следует за мышью ---------- */
+  (function () {
+    var c = document.querySelector('.water-cursor');
+    if (!c) return;
+    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) { c.style.display = 'none'; return; }
+    var x = -100, y = -100, sx = -100, sy = -100;
+    document.addEventListener('mousemove', function (e) {
+      x = e.clientX; y = e.clientY;
+      var t = e.target;
+      var hover = !!(t && t.closest && t.closest('a, button, summary, .kata-card'));
+      c.style.width = hover ? '40px' : '28px';
+      c.style.height = hover ? '40px' : '28px';
+      c.style.margin = hover ? '-20px 0 0 -20px' : '-14px 0 0 -14px';
+    }, { passive: true });
+    (function loop() {
+      sx += (x - sx) * 0.18;
+      sy += (y - sy) * 0.18;
+      c.style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
+      requestAnimationFrame(loop);
+    })();
+  })();
+
 })();

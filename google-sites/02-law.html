@@ -2589,6 +2589,7 @@ body.embed .hero__crest { display: none; }
   border: 1px dashed var(--line);
 }
 .kata-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.kata-card__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Promotion timeline */
 .promo { display: grid; gap: 16px; }
@@ -2706,6 +2707,36 @@ body.embed .hero__crest { display: none; }
   font-size: 20px;
   color: var(--water);
 }
+
+
+/* ---------- Плавные переходы между страницами (View Transitions) ---------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
+
+/* ---------- Водный курсор ---------- */
+.water-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgb(var(--water-rgb) / 0.55), rgb(var(--glow-rgb) / 0.15) 60%, transparent 72%);
+  box-shadow: 0 0 24px rgb(var(--water-rgb) / 0.45);
+  transform: translate(-100px, -100px);
+  transition: transform 0.08s linear, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  opacity: 0.9;
+}
+@media (prefers-reduced-motion: reduce) { .water-cursor { display: none; } }
 
 </style>
 </head>
@@ -3070,6 +3101,29 @@ body.embed .hero__crest { display: none; }
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) document.querySelectorAll('#kataGrid video').forEach(function (v) { v.pause(); });
     });
+  })();
+
+
+  /* ---------- Водный курсор: следует за мышью ---------- */
+  (function () {
+    var c = document.querySelector('.water-cursor');
+    if (!c) return;
+    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) { c.style.display = 'none'; return; }
+    var x = -100, y = -100, sx = -100, sy = -100;
+    document.addEventListener('mousemove', function (e) {
+      x = e.clientX; y = e.clientY;
+      var t = e.target;
+      var hover = !!(t && t.closest && t.closest('a, button, summary, .kata-card'));
+      c.style.width = hover ? '40px' : '28px';
+      c.style.height = hover ? '40px' : '28px';
+      c.style.margin = hover ? '-20px 0 0 -20px' : '-14px 0 0 -14px';
+    }, { passive: true });
+    (function loop() {
+      sx += (x - sx) * 0.18;
+      sy += (y - sy) * 0.18;
+      c.style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
+      requestAnimationFrame(loop);
+    })();
   })();
 
 })();
