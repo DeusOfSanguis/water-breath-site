@@ -70,8 +70,10 @@ SPINE = [
     ("faction", "01", "Вода"),
     ("codex7", "02", "Кодекс"),
     ("path", "03", "Путь"),
-    ("kata", "04", "Ката"),
-    ("groups", "05", "Состав"),
+    ("ranks", "04", "Ранги"),
+    ("kata", "05", "Ката"),
+    ("groups", "06", "Состав"),
+    ("order", "07", "Порядок"),
 ]
 
 def load():
@@ -399,17 +401,36 @@ def render_roster(data):
         return '<section class="s"><p>Состав скоро появится.</p></section>'
     out = []
     for g in groups:
-        name = html.escape(g.get("name",""))
-        role = html.escape(g.get("role",""))
-        out.append(f'<div class="roster__group"><p class="roster__cap">{role} — {name}</p><div class="roster__grid">')
-        for m in g.get("members") or []:
-            mn = html.escape(m.get("name",""))
-            mt = html.escape(m.get("title",""))
-            ms = html.escape(m.get("status",""))
-            md = html.escape(m.get("description",""))
-            out.append(f'<div class="roster__card"><h4>{mn}</h4><p class="role">{mt} · {ms}</p><p>{md}</p></div>')
+        name = html.escape(str(g.get("name", "")).strip())
+        role = html.escape(str(g.get("role", "")).strip())
+        members = g.get("members") or []
+        count = len(members)
+        role_html = f'<span class="roster__role">{role}</span>' if role else ""
+        dense_cls = " roster__grid--dense" if count >= 4 else ""
+        out.append(
+            '<div class="roster__group">'
+            '<div class="roster__head">'
+            f'<div class="roster__head-main"><h3 class="roster__title">{name}</h3>{role_html}</div>'
+            f'<span class="roster__count">{count}&nbsp;{plural(count, ("участник", "участника", "участников"))}</span>'
+            '</div>'
+            f'<div class="roster__grid{dense_cls}">'
+        )
+        for m in members:
+            mn = html.escape(str(m.get("name", "")).strip())
+            mt = html.escape(str(m.get("title", "")).strip())
+            md = html.escape(str(m.get("description", "")).strip())
+            free = "вакантно" in mn.lower() or "набор" in mt.lower()
+            cls = "roster__card" + (" is-free" if free else "") + (" roster__card--compact" if not md else "")
+            tag_html = f'<span class="roster__tag">{mt}</span>' if mt else ""
+            desc_html = f'<p class="roster__desc">{md}</p>' if md else ""
+            out.append(
+                f'<div class="{cls}">'
+                f'<div class="roster__card-top"><h4 class="roster__name">{mn}</h4>{tag_html}</div>'
+                f'{desc_html}'
+                '</div>'
+            )
         out.append('</div></div>')
-    return '<section class="s">' + "".join(out) + '</section>'
+    return '<section class="s"><div class="roster">' + "".join(out) + '</div></section>'
 
 def kata_media(f, prefix="", asset_base=None):
     """Возвращает <video> для формы ката.
@@ -522,7 +543,7 @@ def render_kata_teaser(data, prefix="", asset_base=None, kind="site"):
         )
 
     head = hb_head(
-        "04", "型", 'Десять форм <em>воды</em>',
+        "05", "型", 'Десять форм <em>воды</em>',
         'От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.',
         "ката",
     )
@@ -568,7 +589,7 @@ def render_ranks(data, prefix="", kind="site"):
             "</li>"
         )
     head = hb_head(
-        "03", "昇", 'Десять рангов <em>пути</em>',
+        "04", "昇", 'Десять рангов <em>пути</em>',
         'Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.',
         "ранги",
     )
@@ -592,30 +613,37 @@ def render_groups(data, prefix="", kind="site"):
         return ""
     cards = []
     for g in groups:
+        raw_members = g.get("members") or []
         members = []
-        for m in g.get("members") or []:
-            name = html.escape(str(m.get("name", "")))
-            title = html.escape(str(m.get("title", "")))
-            status = html.escape(str(m.get("status", "")))
-            desc = html.escape(str(m.get("description", "")))
-            free = "Вакантно" in str(m.get("name", "")) or "свободно" in str(m.get("status", "")).lower()
+        for m in raw_members:
+            name = html.escape(str(m.get("name", "")).strip())
+            title = html.escape(str(m.get("title", "")).strip())
+            desc = html.escape(str(m.get("description", "")).strip())
+            free = "вакантно" in name.lower() or "набор" in title.lower()
+            meta_html = f'<span class="hb-group__meta">{title}</span>' if title else ""
+            desc_html = f'<p class="hb-group__desc">{desc}</p>' if desc else ""
             members.append(
-                f'<li class="hb-group__m{" is-free" if free else ""}">'
-                f'<span class="hb-group__name">{name}</span>'
-                f'<span class="hb-group__meta">{title}{" · " + status if status else ""}</span>'
-                f'<p class="hb-group__desc">{desc}</p>'
+                f'<li class="hb-group__m{" is-free" if free else ""}{" hb-group__m--compact" if not desc else ""}">'
+                f'<div class="hb-group__top"><span class="hb-group__name">{name}</span>{meta_html}</div>'
+                f'{desc_html}'
                 "</li>"
             )
+        count = len(raw_members)
+        wide_cls = " hb-group--wide" if count >= 4 else ""
+        role = html.escape(str(g.get("role", "")).strip())
+        role_html = f'<p class="hb-card__role">{role}</p>' if role else ""
         cards.append(
-            '<article class="hb-card hb-group reveal">'
-            f'<p class="hb-card__role">{html.escape(str(g.get("role", "")))}</p>'
-            f'<h3 class="hb-card__title">{html.escape(str(g.get("name", "")))}</h3>'
+            f'<article class="hb-card hb-group{wide_cls} reveal">'
+            '<div class="hb-group__head">'
+            f'<div>{role_html}<h3 class="hb-card__title">{html.escape(str(g.get("name", "")).strip())}</h3></div>'
+            f'<span class="hb-group__count">{count}</span>'
+            '</div>'
             '<ul class="hb-group__list">' + "".join(members) + "</ul>"
             "</article>"
         )
     head = hb_head(
-        "05", "隊", 'Состав <em>корпуса</em>',
-        'Столп воды, его преемники, инструкторы, истребители и ученики — одна река.',
+        "06", "隊", 'Состав <em>корпуса</em>',
+        'Столп Воды, Цугуко, инструкторы, истребители и ученики дыхания.',
         "состав",
     )
     return (
