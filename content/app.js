@@ -1,7 +1,6 @@
 /* =====================================================================
-   ПАКТ КРОВИ — скрипты сайта (без библиотек, чистый JavaScript).
-   Файл копируется сборкой в assets/app.js. Править тут ничего не надо.
-   Каждый блок сам проверяет, есть ли нужные элементы на странице.
+   ДЫХАНИЕ ВОДЫ — скрипты сайта (без библиотек, чистый JavaScript).
+   Файл копируется сборкой в assets/app.js.
    ===================================================================== */
 (function () {
   "use strict";
@@ -50,15 +49,7 @@
       var max = document.documentElement.scrollHeight - window.innerHeight;
       if (bar && max > 0) bar.style.transform = "scaleX(" + Math.min(1, y / max) + ")";
       if (nav) nav.classList.toggle("scrolled", y > 60);
-      // лёгкий параллакс героя
-      if (heroIn && y < window.innerHeight * 1.2) {
-        heroIn.style.transform = "translateY(" + y * 0.25 + "px)";
-        heroIn.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.7));
-      }
       if (heroCue) heroCue.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.5));
-      if (heroMedia && y < window.innerHeight) {
-        heroMedia.style.transform = "translateY(" + y * 0.18 + "px) scale(" + (1 + y / window.innerHeight * 0.08) + ")";
-      }
       // заливка линии иерархии по мере прокрутки
       rails.forEach(function (tl) {
         var fill = tl.querySelector(".timeline__fill");
@@ -232,43 +223,6 @@
     document.body.style.overflow = "";
   });
 
-  /* ---------- Переход между свитками: кровавая штора, не рябь ---------- */
-  document.addEventListener("click", function (e) {
-    var a = e.target && e.target.closest ? e.target.closest("a") : null;
-    if (!a || e.defaultPrevented) return;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    if (a.target && a.target !== "_self") return;
-    var href = a.getAttribute("href");
-    if (!href || href.charAt(0) === "#" || href.indexOf("mailto:") === 0 || href.indexOf("javascript:") === 0) return;
-    var url;
-    try { url = new URL(a.href, location.href); } catch (err) { return; }
-    if (url.origin !== location.origin) return;
-    if (url.pathname === location.pathname && url.search === location.search) return;
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    e.preventDefault();
-    document.body.classList.add("leaving");
-    setTimeout(function () { location.href = a.href; }, 540);
-  });
-  window.addEventListener("pageshow", function () {
-    document.body.classList.remove("leaving");
-  });
+  /* ---------- Плавные переходы отключены: обычная навигация ---------- */
 
-  /* ---------- Свой курсор (только для мыши) ---------- */
-  (function () {
-    if (!window.matchMedia || !window.matchMedia("(pointer: fine)").matches) return;
-    var c = document.querySelector(".cursor");
-    if (!c) return;
-    c.classList.add("on");
-    var x = -100, y = -100, sx = -100, sy = -100;
-    document.addEventListener("mousemove", function (e) {
-      x = e.clientX; y = e.clientY;
-      var t = e.target;
-      c.classList.toggle("hover", !!(t && t.closest && t.closest("a, button, summary")));
-    }, { passive: true });
-    (function loop() {
-      sx += (x - sx) * 0.25; sy += (y - sy) * 0.25;
-      c.style.transform = "translate(" + sx + "px," + sy + "px)";
-      requestAnimationFrame(loop);
-    })();
-  })();
 })();

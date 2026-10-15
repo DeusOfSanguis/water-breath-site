@@ -567,10 +567,7 @@ def build(asset_base=None):
         up = rel_prefix(page)
         main_cls = ' id="content"' if is_index else f' id="content" class="article" data-kanji="{sig}"'
         body = (
-            '<div class="cursor" aria-hidden="true">'
-            '<div class="cursor__ring"></div><div class="cursor__dot"></div></div>\n'
             '<div class="progress"></div>\n'
-            + (render_preloader() if is_index else "")
             + (render_spine() if is_index else "")
             + render_nav(data, page)
             + render_mmenu(data, page)
