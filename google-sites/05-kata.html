@@ -11,7 +11,7 @@
 <meta property="og:image" content="https://water-breath-yufu.ru/assets/img/water-moon.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%A7%3C/text%3E%3C/svg%3E">
 
-<script>try{if(sessionStorage.getItem('wb-visited')){document.documentElement.classList.add('bp-seen');}else{sessionStorage.setItem('wb-visited','1');}}catch(e){}</script>
+<script>try{var de=document.documentElement;if(sessionStorage.getItem('wb-visited')){de.classList.add('bp-seen');}else{sessionStorage.setItem('wb-visited','1');}if(sessionStorage.getItem('wb-nav')){de.classList.add('veil-cover');try{sessionStorage.removeItem('wb-nav');}catch(e2){}}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;800;900&family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap">
@@ -63,9 +63,17 @@
   --ink: rgb(var(--ink-rgb));
   --line: rgb(var(--bone-rgb) / 0.14);
 
-  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
-  --font-serif: "Cormorant", Georgia, "Times New Roman", serif;
-  --font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* иероглифы 水 · 型 · 隊 · 律: Unbounded и Manrope их не содержат */
+  --font-cjk: "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", Meiryo,
+              "Noto Sans JP", "Noto Sans CJK JP", "MS PGothic", "MS Gothic",
+              "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+
+  /* в конце каждой связки — японские/китайские шрифты: латиница и кириллица
+     берутся из Unbounded/Manrope, а иероглифы 水 · 型 · 隊 падают в CJK-шрифт
+     и никогда не превращаются в пустые квадраты */
+  --font-display: "Unbounded", "Arial Black", system-ui, var(--font-cjk), sans-serif;
+  --font-serif: "Cormorant", Georgia, "Times New Roman", var(--font-cjk), serif;
+  --font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, var(--font-cjk), sans-serif;
 
   --container: 1300px;
   --narrow: 760px;
@@ -1488,7 +1496,7 @@ figure.img img {
 /* =====================================================================
    EMBED-версия (для Google Sites) — без меню и эффектов
    ===================================================================== */
-body.embed .nav, body.embed .mmenu, body.embed .cursor,
+body.embed .nav, body.embed .mmenu, body.embed .wcur, body.embed .veil,
 body.embed .progress, body.embed .preloader, body.embed .hero__kanji,
 body.embed .footer { display: none; }
 body.embed .hero { min-height: 52svh; }
@@ -1506,7 +1514,6 @@ body.embed .tabs__btns { display: none; }
   html { scroll-behavior: auto; }
   .marquee__track, .hero__cue span:last-child,
   .creed__seal, .preloader__kanji { animation: none; }
-  .veil, body.leaving .veil { animation: none; }
   .preloader, .preloader__kanji, .preloader__bar, .preloader__foot { transition: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
   .hero__title .ch { animation: none; transform: none; }
@@ -1557,6 +1564,8 @@ body:not(.ready) .hero__crest { opacity: 0; }
 body.ready .hero__eyebrow { animation: fadeUp 0.8s 0.12s both; }
 body.ready .hero__quote { animation: fadeUp 0.9s 1.45s both; }
 body.ready .hero__btns { animation: fadeUp 0.7s 1.75s both; }
+body:not(.ready) .hero__stats { opacity: 0; }
+body.ready .hero__stats { animation: fadeUp 0.8s 1.95s both; }
 body.ready .hero__kanji,
 body.ready .hero__cue,
 body.ready .hero__crest { animation: fadeIn 1s 1.15s both; }
@@ -1721,65 +1730,144 @@ body.ready .hero__crest { animation: fadeIn 1s 1.15s both; }
 }
 .nav__burger:hover .nav__burger-k { background: rgb(var(--ink-rgb) / 0.18); color: var(--ink); }
 .nav__burger-t { font-size: 11px; letter-spacing: 0.18em; }
-.nav__seals {
+.ntabs {
+  position: relative;
   min-width: 0;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 20px), transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 20px), transparent);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--bone-rgb) / 0.1);
+  background:
+    linear-gradient(180deg, rgb(var(--bone-rgb) / 0.05), rgb(var(--void-rgb) / 0.5));
+  box-shadow: inset 0 1px 0 rgb(var(--bone-rgb) / 0.06), 0 10px 30px -22px rgb(var(--water-rgb) / 0.9);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 18px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 18px), transparent);
 }
-.nav__seals-track {
+.ntabs__track {
+  position: relative;
   display: flex;
-  gap: 8px;
+  gap: 2px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
-  padding: 2px 2px;
+  padding: 0;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
-.seal { scroll-snap-align: center; }
-.nav__seals-track::-webkit-scrollbar { display: none; }
-.seal {
+.ntabs__track::-webkit-scrollbar { display: none; }
+
+/* капля-подсветка: едет за активной вкладкой */
+.ntabs__ink {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 160% at 20% 0%, rgb(var(--glow-rgb) / 0.55), transparent 60%),
+    linear-gradient(180deg, rgb(var(--water-rgb) / 0.32), rgb(var(--water-rgb) / 0.14));
+  border: 1px solid rgb(var(--water-rgb) / 0.55);
+  box-shadow: 0 0 26px -10px rgb(var(--water-rgb) / 0.95), inset 0 1px 0 rgb(var(--bone-rgb) / 0.18);
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.4, 1), width 0.45s cubic-bezier(0.34, 1.4, 0.4, 1),
+              height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  will-change: transform, width;
+}
+.ntabs__ink.is-ready { opacity: 1; }
+.ntabs__ink.is-jump { transition: none; }
+
+/* капля над вкладкой при наведении */
+.ntabs__drop {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 12px 2px rgb(var(--water-rgb) / 0.75);
+  transform: scale(0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.4, 1), opacity 0.25s ease;
+}
+.ntabs.is-hovering .ntabs__drop { opacity: 1; transform: scale(1) translateY(1px); }
+
+/* тонкая волна-уровень под полосой */
+.ntabs__wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(var(--water-rgb) / 0.75), transparent);
+  background-size: 200% 100%;
+  opacity: 0.55;
+  animation: ntabsWave 6s linear infinite;
+}
+@keyframes ntabsWave { from { background-position: 0 0; } to { background-position: -200% 0; } }
+
+.ntab {
+  scroll-snap-align: center;
+  position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 4px;
+  gap: 7px;
+  padding: 5px 12px 5px 6px;
   border-radius: 999px;
-  border: 1px solid rgb(var(--bone-rgb) / 0.14);
-  background: rgb(var(--void-rgb) / 0.42);
   color: var(--ash);
   text-decoration: none;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s;
+  transition: color 0.3s ease;
 }
-.seal i {
-  width: 26px;
-  height: 26px;
+.ntab__k {
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  border: 1px solid rgb(var(--water-rgb) / 0.4);
+  border: 1px solid rgb(var(--water-rgb) / 0.32);
   font-style: normal;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--water);
-  letter-spacing: 0;
+  background: rgb(var(--void-rgb) / 0.5);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.44s cubic-bezier(0.34, 1.4, 0.4, 1);
 }
-.seal:hover { color: var(--bone); border-color: rgb(var(--water-rgb) / 0.55); }
-.seal--on {
-  color: var(--bone);
+.ntab__t { position: relative; top: 0.5px; }
+.ntab:hover { color: var(--bone); }
+.ntab:hover .ntab__k { border-color: rgb(var(--water-rgb) / 0.7); transform: translateY(-1px) scale(1.06); }
+.ntab.is-on { color: var(--bone); }
+.ntab.is-on .ntab__k {
+  background: var(--water);
   border-color: var(--water);
-  background: rgb(var(--water-rgb) / 0.18);
-  box-shadow: 0 0 22px -8px rgb(var(--water-rgb) / 0.9);
+  color: var(--ink);
+  box-shadow: 0 0 16px -4px rgb(var(--water-rgb) / 0.9);
 }
-.seal--on i { background: var(--water); color: var(--ink); border-color: var(--water); }
+.ntab:focus-visible { outline: 1px solid var(--water); outline-offset: 2px; }
 @media (max-width: 560px) {
-  .nav__logo > span:last-child,
+  .ntabs { padding: 2px; }
+  .ntab { padding: 4px 8px 4px 4px; font-size: 10px; letter-spacing: 0.08em; }
+  .ntab__k { width: 21px; height: 21px; font-size: 11px; }
+}
+@media (max-width: 430px) {
+  .ntab__t { display: none; }
+  .ntab { padding: 4px; }
+}
+@media (max-width: 620px) {
+  .nav__word,
   .nav__burger-t { display: none; }
   .nav__burger { padding: 6px; }
+  .nav__logo { gap: 8px; }
 }
 
 /* ---------- кодекс (переключение разделов) ---------- */
@@ -1940,29 +2028,145 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
   box-shadow: 0 0 16px -4px rgb(var(--water-rgb) / 0.85);
 }
 
-/* ---------- штора воды между страницами ---------- */
+/* ---------- штора-волна между страницами ----------
+   Классы состояния:
+   .is-cover  — вода поднялась и накрыла экран (уходим со страницы);
+   .is-away   — вода ушла вверх (новая страница открылась);
+   html.veil-cover — состояние НА ПРИХОДЕ: штора уже накрыта ещё до первой
+   отрисовки (ставится инлайн-скриптом в <head>) и уезжает вверх сама,
+   даже если JS не выполнился.
+
+   Движение медленное и мягкое: длинный плавный ход (почти секунда),
+   текст и полоска проявляются со задержкой, содержимое страницы за шторой
+   тихо уплывает в размытие — без рывков и резких вспышек.                 */
 .veil {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 200;
+  overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(120% 80% at 50% 50%, rgb(var(--deep-rgb) / 0.5), transparent 70%),
-    linear-gradient(180deg, rgb(var(--void-rgb)), rgb(var(--abyss-rgb)) 60%, rgb(var(--void-rgb)));
-  transform: scaleY(0);
-  transform-origin: top;
 }
-.veil::after {
-  content: "水";
+.veil.is-cover { pointer-events: auto; }
+
+.veil__panel {
   position: absolute;
-  left: 50%;
-  top: 46%;
-  transform: translate(-50%, -50%);
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(100% + 320px);
+  transform: translateY(112%);
+  transition: transform 0.95s cubic-bezier(0.5, 0.02, 0.22, 1);
+  will-change: transform;
+}
+.veil.is-cover .veil__panel { transform: translateY(-190px); }
+.veil.is-away .veil__panel { transform: translateY(-100%); }
+
+.veil__wave { position: absolute; left: 0; width: 100%; height: 140px; display: block; }
+.veil__wave path { fill: rgb(var(--abyss-rgb)); }
+.veil__wave--in { top: 0; }
+.veil__wave--out { bottom: 0; }
+.veil__fill {
+  position: absolute;
+  left: 0; right: 0;
+  top: 140px; bottom: 140px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  align-content: center;
+  background:
+    radial-gradient(130% 75% at 50% 44%, rgb(var(--deep-rgb) / 0.5), transparent 74%),
+    linear-gradient(180deg, rgb(var(--abyss-rgb)), rgb(var(--void-rgb)) 55%, rgb(var(--abyss-rgb)));
+}
+.veil__fill > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.veil.is-cover .veil__fill > * { opacity: 1; transform: none; }
+.veil.is-cover .veil__fill > .veil__kanji { transition-delay: 0.1s; }
+.veil.is-cover .veil__fill > .veil__label { transition-delay: 0.2s; }
+.veil.is-cover .veil__fill > .veil__bar { transition-delay: 0.3s; }
+
+.veil__kanji {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: min(28vw, 220px);
-  color: rgb(var(--water-rgb) / 0.45);
-  opacity: 0;
+  font-size: min(22vw, 190px);
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.3);
+  text-shadow: 0 0 80px rgb(var(--water-rgb) / 0.35);
+  animation: veilFloat 6s ease-in-out infinite;
+}
+@keyframes veilFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.012); }
+}
+.veil__label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(13px, 2.2vw, 22px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-align: center;
+  padding: 0 18px;
+}
+.veil__bar {
+  margin-top: 8px;
+  width: min(240px, 54vw);
+  height: 2px;
+  border-radius: 2px;
+  background: rgb(var(--bone-rgb) / 0.14);
+  overflow: hidden;
+}
+.veil__bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--water-deep), var(--water), var(--glow));
+}
+.veil.is-cover .veil__bar i { animation: veilBar 0.9s 0.28s cubic-bezier(0.32, 0.72, 0.24, 1) forwards; }
+@keyframes veilBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* уход: страница за шторой мягко уходит в глубину.
+   Только opacity и transform — их считает видеокарта, поэтому переход
+   не дёргается и на слабых машинах (никаких filter: blur на весь экран). */
+body.is-leaving .hero,
+body.is-leaving main,
+body.is-leaving .marquee,
+body.is-leaving .footer,
+body.is-leaving .spine {
+  opacity: 0.55;
+  transform: scale(0.988);
+  transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.5, 0.02, 0.22, 1);
+  will-change: opacity, transform;
+}
+
+/* приход: штора накрыта до первой отрисовки и уезжает вверх сама */
+html.veil-cover .veil__panel {
+  transform: translateY(-190px);
+  transition: none;
+  animation: veilAway 1.15s 0.38s both cubic-bezier(0.32, 0.72, 0.24, 1);
+}
+@keyframes veilAway {
+  from { transform: translateY(-190px); }
+  to { transform: translateY(-100%); }
+}
+html.veil-cover .veil__kanji { animation: none; }
+html.veil-cover .veil__fill > * { opacity: 1; transform: none; transition: opacity 0.5s ease; }
+html.veil-cover .veil__bar i { animation: veilBar 0.7s cubic-bezier(0.32, 0.72, 0.24, 1) forwards; }
+
+/* когда всё закончилось — убираем штору совсем */
+html.veil-done .veil { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .veil { display: none !important; }
+  body.is-leaving .hero,
+  body.is-leaving main,
+  body.is-leaving .marquee,
+  body.is-leaving .footer,
+  body.is-leaving .spine { opacity: 1; transform: none; }
 }
 
 /* ---------- внутренний герой ---------- */
@@ -2347,8 +2551,7 @@ body.embed .hero__crest { display: none; }
   .tabs__panel.active .rolehead,
   .tabs__panel.active .rolehead .k,
   .tabs__panel.active .permit__col,
-  .tabs__panel.active .permit li,
-  body.leaving .veil { animation: none; }
+  .tabs__panel.active .permit li { animation: none; }
 }
 
 .tnode__dot.ico { font-size: 0; color: inherit; }
@@ -2545,51 +2748,159 @@ body.embed .hero__crest { display: none; }
 
 
 /* Kata grid */
-.kata-grid { display: grid; gap: 24px; }
-@media (min-width: 768px) { .kata-grid { grid-template-columns: 1fr 1fr; } }
+.kata-grid { display: grid; gap: 22px; }
+@media (min-width: 700px) { .kata-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1180px) { .kata-grid { grid-template-columns: repeat(3, 1fr); } }
 .kata-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: var(--card);
-  padding: 24px;
-  transition: border-color 0.3s, transform 0.3s;
+  background:
+    linear-gradient(180deg, rgb(var(--bone-rgb) / 0.03), transparent 40%),
+    var(--card);
+  padding: 22px;
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
 }
-.kata-card:hover { border-color: var(--water); transform: translateY(-2px); }
-.kata-card__num {
+.kata-card::before {
+  content: "";
   position: absolute;
-  right: -10px; top: -20px;
+  inset: -1px -1px auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(var(--water-rgb) / 0.8), transparent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.kata-card:hover {
+  border-color: rgb(var(--water-rgb) / 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 26px 60px -40px rgb(var(--water-rgb) / 1);
+}
+.kata-card:hover::before { opacity: 1; }
+.kata-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.kata-card__num {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 100px;
+  font-size: 34px;
   line-height: 1;
-  color: var(--water);
-  opacity: 0.08;
+  color: rgb(var(--water-rgb) / 0.22);
+  -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.5);
+  letter-spacing: -0.02em;
 }
 .kata-card__jp {
   font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.18em;
   color: var(--water);
-  margin-bottom: 8px;
+  margin: 0;
+  text-align: right;
 }
-.kata-card h3 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+.kata-card h3 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.25; }
 .kata-card p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: var(--bone); opacity: 0.85; }
+.kata-card__tip {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0 0 4px !important;
+  font-size: 12px !important;
+  color: var(--ash) !important;
+  opacity: 1 !important;
+}
+.kata-card__tip-k {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.4);
+  color: var(--water);
+  font-size: 10px;
+  font-family: var(--font-display);
+}
 .kata-card__media {
-  margin-top: 16px;
+  position: relative;
+  margin: 14px 0 0;
+  /* карточка тянет анимацию вниз, чтобы все плееры стояли на одном уровне */
   border-radius: 12px;
   overflow: hidden;
-  background: var(--void);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgb(var(--deep-rgb) / 0.5), transparent 70%),
+    var(--void);
   aspect-ratio: 16/9;
   display: grid;
   place-items: center;
   color: var(--ash);
   font-size: 13px;
-  border: 1px dashed var(--line);
+  border: 1px solid rgb(var(--water-rgb) / 0.22);
+  margin: auto 0 0;
 }
-.kata-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.kata-card__media img,
 .kata-card__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kata-card__media video { background: #04101c; }
+.kata-card__media--soon { border-style: dashed; border-color: var(--line); }
+/* без кнопок и подписей в плеере — только лёгкая подсветка, когда играет */
+.kata-card__media.is-playing {
+  border-color: rgb(var(--water-rgb) / 0.5);
+  box-shadow: 0 0 34px -18px rgb(var(--water-rgb) / 1);
+}
+.kata-card__media { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  .kata-card, .kata-card:hover { transform: none; }
+}
+
+/* ---------- превью ката на главной ---------- */
+.katateaser { display: grid; gap: 22px; }
+@media (min-width: 900px) { .katateaser { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; } }
+.katateaser__preview .kata-card__media { margin: 0; }
+.katateaser__cap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  justify-content: space-between;
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--ash);
+}
+.katateaser__cap-n { color: var(--bone); font-weight: 600; }
+.katateaser__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+@media (min-width: 900px) { .katateaser__list { grid-template-columns: 1fr; } }
+.kchip {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgb(var(--void-rgb) / 0.42);
+  text-decoration: none;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.kchip:hover {
+  border-color: rgb(var(--water-rgb) / 0.55);
+  background: rgb(var(--water-rgb) / 0.08);
+  transform: translateX(4px);
+}
+.kchip__n {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--water);
+  text-align: center;
+}
+.kchip__t { font-size: 14px; line-height: 1.3; }
+.kchip__jp { font-size: 11px; color: var(--ash); white-space: nowrap; }
+@media (max-width: 520px) { .kchip__jp { display: none; } }
+.katateaser__more { margin-top: 22px; }
+
 
 /* Promotion timeline */
 .promo { display: grid; gap: 16px; }
@@ -2627,20 +2938,6 @@ body.embed .hero__crest { display: none; }
   background: rgb(var(--water-rgb) / 0.15);
   border-color: rgb(var(--water-rgb) / 0.4);
   box-shadow: 0 0 20px -5px rgb(var(--water-rgb) / 0.5);
-}
-.seal i {
-  border-color: rgb(var(--water-rgb) / 0.4);
-  color: var(--water);
-}
-.seal--on {
-  background: rgb(var(--water-rgb) / 0.15);
-  border-color: var(--water);
-  box-shadow: 0 0 20px -8px rgb(var(--water-rgb) / 0.8);
-}
-.seal--on i {
-  background: var(--water);
-  color: var(--ink);
-  border-color: var(--water);
 }
 .hero__eyebrow::before, .hero__eyebrow::after {
   background: rgb(var(--water-rgb) / 0.6);
@@ -2709,49 +3006,926 @@ body.embed .hero__crest { display: none; }
 }
 
 
-/* ---------- Плавные переходы между страницами (View Transitions) ---------- */
-@view-transition {
-  navigation: auto;
-}
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.35s;
-  animation-timing-function: ease;
-}
 
 
-/* ---------- Водный курсор ---------- */
-.water-cursor {
+/* ---------- Водный курсор ----------
+   Три слоя: свечение (тянется медленно), кольцо (средне) и капля-ядро
+   (почти точно за мышью). Клик — рябь кругами, движение — брызги.
+   На тач-устройствах и при prefers-reduced-motion курсор полностью убирается.
+   ------------------------------------------------------------------ */
+.wcur {
   position: fixed;
-  top: 0; left: 0;
-  width: 28px; height: 28px;
-  margin: -14px 0 0 -14px;
-  border-radius: 50%;
+  inset: 0;
+  z-index: 9998;
   pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: screen;
-  background: radial-gradient(circle, rgb(var(--water-rgb) / 0.55), rgb(var(--glow-rgb) / 0.15) 60%, transparent 72%);
-  box-shadow: 0 0 24px rgb(var(--water-rgb) / 0.45);
-  transform: translate(-100px, -100px);
-  transition: transform 0.08s linear, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-  opacity: 0.9;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  /* без mix-blend-mode и filter: на слабых машинах они заставляют
+     перерисовывать весь экран каждый кадр. Тот же вид даёт мягкий
+     радиальный градиент — он рисуется только внутри своих границ. */
 }
-@media (prefers-reduced-motion: reduce) { .water-cursor { display: none; } }
+.wcur.is-out { opacity: 0; }
+.wcur__glow,
+.wcur__ring,
+.wcur__dot,
+.wcur__fx { position: absolute; left: 0; top: 0; }
+
+.wcur__glow {
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgb(var(--water-rgb) / 0.20) 0%,
+    rgb(var(--glow-rgb) / 0.10) 34%,
+    rgb(var(--glow-rgb) / 0.05) 56%,
+    transparent 72%);
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+.wcur__ring {
+  will-change: transform;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--glow-rgb) / 0.6);
+  box-shadow: 0 0 18px -4px rgb(var(--water-rgb) / 0.9), inset 0 0 12px -4px rgb(var(--glow-rgb) / 0.8);
+  transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+}
+.wcur__dot {
+  will-change: transform;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 12px 1px rgb(var(--water-rgb) / 0.9);
+  transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease;
+}
+.wcur.is-hot .wcur__ring {
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-color: rgb(var(--glow-rgb) / 0.9);
+}
+.wcur.is-hot .wcur__dot { width: 4px; height: 4px; margin: -2px 0 0 -2px; }
+.wcur.is-hot .wcur__glow { opacity: 1; }
+.wcur.is-down .wcur__ring { border-width: 2px; }
+
+.wcur__ripple {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--glow-rgb) / 0.75);
+  animation: wcurRipple 0.85s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.wcur__ripple:nth-child(2) { animation-delay: 0.11s; }
+@keyframes wcurRipple {
+  from { transform: scale(0.4); opacity: 0.9; }
+  to { transform: scale(9); opacity: 0; }
+}
+.wcur__drop {
+  position: absolute;
+  width: 4px;
+  height: 6px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: rgb(var(--foam-rgb) / 0.75);
+  animation: wcurDrop 0.95s ease-out forwards;
+}
+@keyframes wcurDrop {
+  from { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  to { transform: translate(var(--dx, 0px), var(--dy, 14px)) scale(0.2); opacity: 0; }
+}
+.wcur__spray {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: var(--glow);
+  animation: wcurSpray 0.7s ease-out forwards;
+}
+@keyframes wcurSpray {
+  from { transform: translate(0, 0) scale(1); opacity: 1; }
+  to { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) { .wcur { display: none; } }
+
+/* =====================================================================
+   ГЛАВНАЯ — НОВАЯ ВЕРСИЯ
+   Манифест → кодекс → путь → ранги → ката → состав → порядок → присяга.
+   Всё построено на тех же токенах темы: глубокая вода, бирюзовый акцент,
+   тонкие водные линии и печати-иероглифы. Классы с префиксом .hb —
+   только для главной, внутренние страницы не затронуты.
+   ===================================================================== */
+
+.hb-wrap {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (min-width: 768px) { .hb-wrap { padding: 0 40px; } }
+
+.hb-section {
+  position: relative;
+  padding: 84px 0;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hb-section { padding: 120px 0; } }
+.hb-section--dim {
+  background:
+    radial-gradient(90% 60% at 50% 0%, rgb(var(--deep-rgb) / 0.16), transparent 65%),
+    rgb(var(--abyss-rgb) / 0.4);
+  border-top: 1px solid rgb(var(--water-rgb) / 0.12);
+  border-bottom: 1px solid rgb(var(--water-rgb) / 0.12);
+}
+
+/* ---------- заголовок секции ---------- */
+.hb-head { position: relative; margin-bottom: 44px; }
+@media (min-width: 768px) { .hb-head { margin-bottom: 62px; } }
+.hb-head__kanji {
+  position: absolute;
+  top: -34px;
+  right: -6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(96px, 18vw, 168px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.07);
+  pointer-events: none;
+  user-select: none;
+}
+@media (min-width: 900px) { .hb-head__kanji { right: 0; top: -52px; } }
+.hb-head__num {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+.hb-head__num > span:first-child { color: var(--water); }
+.hb-head__num i {
+  width: 44px;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(var(--water-rgb) / 0.8), transparent);
+}
+.hb-head__title {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(28px, 5.4vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.hb-head__title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--water);
+}
+.hb-head__sub {
+  max-width: 62ch;
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ash);
+}
+
+/* ---------- 01 манифест ---------- */
+.hb-manifest__grid { display: grid; gap: 34px; }
+@media (min-width: 900px) {
+  .hb-manifest__grid { grid-template-columns: 260px minmax(0, 1fr); gap: 56px; align-items: start; }
+}
+.hb-manifest__side {
+  position: relative;
+  padding: 26px 22px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(var(--water-rgb) / 0.28);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(var(--kelp-rgb) / 0.3), transparent 70%),
+    linear-gradient(160deg, rgb(var(--coal-rgb)), rgb(var(--abyss-rgb)));
+  text-align: center;
+}
+.hb-manifest__kanji {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(76px, 14vw, 118px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.85);
+  text-shadow: 0 0 60px rgb(var(--water-rgb) / 0.45);
+}
+.hb-manifest__stamp {
+  margin: 14px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ash);
+  line-height: 1.9;
+}
+.hb-manifest__motto {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgb(var(--bone-rgb) / 0.1);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--foam);
+}
+.hb-manifest__lead {
+  margin: 0 0 18px;
+  font-size: clamp(17px, 2.4vw, 21px);
+  line-height: 1.6;
+  color: var(--bone);
+}
+.hb-manifest__lead::first-letter {
+  float: left;
+  margin: 4px 12px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 58px;
+  line-height: 0.8;
+  color: var(--water);
+}
+.hb-manifest__text {
+  margin: 0 0 30px;
+  max-width: 74ch;
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgb(var(--bone-rgb) / 0.82);
+}
+.hb-manifest__cap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-manifest__cap .k {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.45);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* заветы */
+.hb-vows { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 720px) { .hb-vows { grid-template-columns: 1fr 1fr; } }
+.hb-vow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px 32px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: start;
+  padding: 20px 20px 20px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgb(var(--bone-rgb) / 0.03), transparent 60%), rgb(var(--void-rgb) / 0.5);
+  transition: border-color 0.35s ease, transform 0.35s ease, background 0.35s ease;
+}
+.hb-vow:hover {
+  border-color: rgb(var(--water-rgb) / 0.5);
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgb(var(--water-rgb) / 0.08), transparent 60%), rgb(var(--void-rgb) / 0.5);
+}
+.hb-vow__num {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.1;
+  color: rgb(var(--water-rgb) / 0.55);
+}
+.hb-vow__icon { grid-column: 2; width: 30px; height: 30px; color: var(--water); }
+.hb-vow__icon::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 26px;
+  background: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat;
+  mask: var(--m) center / contain no-repeat;
+}
+.hb-vow__body { grid-column: 3; }
+.hb-vow h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+.hb-vow p { margin: 0; font-size: 14px; line-height: 1.65; color: var(--ash); }
+
+/* ---------- 02 кодекс: семь принципов ---------- */
+.hb-codex__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 700px) { .hb-codex__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .hb-codex__grid { grid-template-columns: repeat(3, 1fr); } }
+.hb-principle {
+  position: relative;
+  overflow: hidden;
+  padding: 26px 24px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgb(var(--deep-rgb) / 0.22), transparent 60%),
+    var(--coal);
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+.hb-principle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(var(--water-rgb) / 0.7), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-principle:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -46px rgb(var(--water-rgb) / 1);
+}
+.hb-principle:hover::after { transform: scaleX(1); }
+.hb-principle__n {
+  display: block;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.22);
+  -webkit-text-stroke: 1px rgb(var(--water-rgb) / 0.5);
+}
+.hb-principle h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.3;
+}
+.hb-principle p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ash); }
+@media (min-width: 700px) { .hb-principle--wide { grid-column: span 2; } }
+@media (min-width: 1100px) { .hb-principle--wide { grid-column: span 3; } }
+.hb-codex__more,
+.hb-ranks__more,
+.hb-kata__more,
+.hb-groups__more { margin-top: 34px; }
+
+/* ---------- 03 путь: русло ---------- */
+.hb-path__grid { display: grid; gap: 40px; }
+@media (min-width: 980px) {
+  .hb-path__grid { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 64px; align-items: start; }
+}
+.hb-path__aside { position: relative; }
+.hb-path__kanji {
+  position: absolute;
+  top: -46px;
+  left: -6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(90px, 16vw, 150px);
+  line-height: 0.9;
+  color: rgb(var(--water-rgb) / 0.08);
+  pointer-events: none;
+  user-select: none;
+}
+.hb-path__title {
+  position: relative;
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.04;
+  text-transform: uppercase;
+}
+.hb-path__note { margin: 0 0 26px; font-size: 15px; line-height: 1.75; color: var(--ash); }
+.hb-path__btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.hb-river { position: relative; padding-left: 44px; }
+.hb-river__rail {
+  position: absolute;
+  left: 13px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgb(var(--bone-rgb) / 0.1);
+  overflow: hidden;
+}
+.hb-river__rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(180deg, rgb(var(--water-rgb) / 0.5) 0 6px, transparent 6px 14px);
+  background-size: 100% 14px;
+  opacity: 0.55;
+}
+.hb-river__fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--water-deep), var(--water), var(--glow));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.hb-river__stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.hb-stop { position: relative; }
+.hb-stop__dot {
+  position: absolute;
+  left: -37px;
+  top: 26px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.7);
+  background: var(--void);
+  box-shadow: 0 0 0 4px rgb(var(--water-rgb) / 0.08);
+}
+.hb-stop__dot::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--water);
+}
+.hb-stop__card {
+  position: relative;
+  padding: 22px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgb(var(--coal-rgb)), rgb(var(--void-rgb) / 0.6));
+  transition: border-color 0.35s ease, transform 0.35s ease;
+}
+.hb-stop:hover .hb-stop__card { border-color: rgb(var(--water-rgb) / 0.45); transform: translateX(4px); }
+.hb-stop__cap {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-stop__card h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+.hb-stop__card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ash); }
+.hb-stop__k {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 54px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.08);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hb-duty {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 44px 0 0;
+  padding: 0;
+}
+@media (min-width: 700px) { .hb-duty { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .hb-duty { grid-template-columns: repeat(4, 1fr); } }
+.hb-duty li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.45);
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--bone-rgb) / 0.85);
+}
+.hb-duty__k {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--water-rgb) / 0.4);
+  color: var(--water);
+  font-family: var(--font-display);
+  font-size: 13px;
+}
+
+/* ---------- 04 ранги: лестница ---------- */
+.hb-ranks__ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hb-rank {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.42);
+  overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.hb-rank:hover { border-color: rgb(var(--water-rgb) / 0.45); transform: translateX(5px); }
+.hb-rank__bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--p, 0%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--water-deep), var(--water));
+  opacity: 0.75;
+}
+.hb-rank__i {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--water);
+}
+.hb-rank__path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+}
+.hb-rank__path span { color: var(--ash); }
+.hb-rank__path i { color: rgb(var(--water-rgb) / 0.7); font-style: normal; }
+.hb-rank__path b { font-weight: 700; color: var(--bone); }
+.hb-rank__req {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mist);
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .hb-rank { grid-template-columns: 32px minmax(0, 1fr); }
+  .hb-rank__req { grid-column: 2; }
+}
+
+/* ---------- 05 ката: превью и список форм ---------- */
+.hb-kata__grid { display: grid; gap: 24px; }
+@media (min-width: 940px) { .hb-kata__grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 32px; align-items: start; } }
+.hb-kata__preview .kata-card__media { margin: 0; }
+.hb-kata__cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--ash);
+}
+.hb-kata__cap-n { color: var(--bone); font-weight: 600; }
+.hb-kata__cap-jp { letter-spacing: 0.1em; color: var(--water); }
+.hb-kata__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hb-kata__chip {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.42);
+  text-decoration: none;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.hb-kata__chip:hover {
+  border-color: rgb(var(--water-rgb) / 0.55);
+  background: rgb(var(--water-rgb) / 0.08);
+  transform: translateX(4px);
+}
+.hb-kata__chip-n {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--water);
+  text-align: center;
+}
+.hb-kata__chip-t { font-size: 14px; line-height: 1.3; }
+.hb-kata__chip-jp { font-size: 11px; color: var(--ash); white-space: nowrap; }
+@media (max-width: 520px) { .hb-kata__chip-jp { display: none; } }
+
+/* ---------- 06 состав: карточки групп ---------- */
+.hb-groups__grid { display: grid; gap: 16px; }
+@media (min-width: 700px) { .hb-groups__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .hb-groups__grid { grid-template-columns: repeat(3, 1fr); } }
+.hb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgb(var(--deep-rgb) / 0.18), transparent 62%),
+    var(--coal);
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+.hb-card:hover {
+  border-color: rgb(var(--water-rgb) / 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px -52px rgb(var(--water-rgb) / 1);
+}
+.hb-card__k {
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 46px;
+  line-height: 1;
+  color: rgb(var(--water-rgb) / 0.12);
+  pointer-events: none;
+}
+.hb-card__role {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-card__title {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
+}
+.hb-card__text { margin: 0 0 16px; font-size: 14px; line-height: 1.7; color: var(--ash); }
+.hb-card .btn { align-self: flex-start; margin-top: auto; }
+
+.hb-group__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.hb-group__m {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(var(--void-rgb) / 0.45);
+}
+.hb-group__m.is-free { border-style: dashed; }
+.hb-group__name {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+}
+.hb-group__meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-group__desc { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: var(--ash); }
+
+/* ---------- 07 порядок: устав и поместье ---------- */
+.hb-order__grid { display: grid; gap: 16px; }
+@media (min-width: 860px) { .hb-order__grid { grid-template-columns: 1fr 1fr; gap: 22px; } }
+.hb-order__card--butterfly .hb-card__k { color: rgb(var(--foam-rgb) / 0.16); }
+.hb-list { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 8px; }
+.hb-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgb(var(--bone-rgb) / 0.8);
+}
+.hb-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: rgb(var(--water-rgb) / 0.7);
+}
+
+/* ---------- 08 присяга ---------- */
+.hb-cta {
+  position: relative;
+  padding: 96px 0 110px;
+  text-align: center;
+  overflow: hidden;
+  border-top: 1px solid rgb(var(--water-rgb) / 0.14);
+}
+@media (min-width: 768px) { .hb-cta { padding: 130px 0 150px; } }
+.hb-cta__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 120% at 50% 120%, rgb(var(--deep-rgb) / 0.5), transparent 70%),
+    radial-gradient(50% 80% at 50% 0%, rgb(var(--kelp-rgb) / 0.25), transparent 70%);
+  pointer-events: none;
+}
+.hb-cta__in { position: relative; max-width: 780px; margin: 0 auto; padding: 0 20px; }
+.hb-cta__eyebrow {
+  margin: 0 0 16px;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--water);
+}
+.hb-cta__title {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(38px, 8vw, 84px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.hb-cta__title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--water);
+  text-shadow: 0 0 70px rgb(var(--water-rgb) / 0.5);
+}
+.hb-cta__text {
+  max-width: 56ch;
+  margin: 0 auto 32px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgb(var(--bone-rgb) / 0.82);
+}
+.hb-cta__btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+/* ---------- герой главной: кнопки, статистика, волны ---------- */
+.hero--index .hero__in { padding-bottom: 150px; }
+.hero__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 30px;
+}
+.hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 40px;
+  margin: 38px 0 0;
+  padding: 22px 0 0;
+  list-style: none;
+  border-top: 1px solid rgb(var(--bone-rgb) / 0.12);
+}
+.hero__stats li { display: flex; align-items: baseline; gap: 9px; }
+.hero__stats b {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--water);
+}
+.hero__stats span {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+/* большой 水 — водяной знак за заголовком главной */
+.hero__crest--index {
+  display: block;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  top: 41%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.hero__crest--index .hero__crest-k {
+  display: block;
+  color: rgb(var(--water-rgb) / 0.07);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(200px, 34vw, 430px);
+  line-height: 0.8;
+}
+.hero__crest--index .hero__crest-t { display: none; }
+.hero__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 130px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1; /* над фотографией, но под текстом и стрелкой */
+}
+.hero__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  display: block;
+}
+.hero__wave--back { animation: heroWave 22s linear infinite; }
+.hero__wave--back path { fill: rgb(var(--abyss-rgb) / 0.55); }
+.hero__wave--front {
+  height: 78%;
+  animation: heroWave 15s linear infinite reverse;
+}
+.hero__wave--front path { fill: rgb(var(--void-rgb) / 0.85); }
+@keyframes heroWave { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.hero__cue-t { font-size: 10px; }
+
+@media (max-width: 900px) {
+  .hero--index .hero__in { padding-bottom: 130px; }
+  .hero__crest--index { top: 36%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__wave--back,
+  .hero__wave--front { animation: none; }
+}
+
+/* =====================================================================
+   ИЕРОГЛИФЫ — где именно нужен CJK-шрифт
+   Сама связка --font-cjk объявлена в :root выше и уже подставлена в конец
+   --font-display / --font-serif / --font-sans. Здесь — элементы, у которых
+   иероглиф это не текст, а знак: печати разделов, номера заветов, штампы.
+   ===================================================================== */
+.nav__drop,
+.nav__burger-k,
+.ntab__k,
+.codex__k,
+.preloader__kanji,
+.veil__kanji,
+.hero__kanji .v,
+.hero__crest span,
+.hero__crest-k,
+.shead__kanji,
+.creed__k,
+.creed__seal,
+.hb-head__kanji,
+.hb-manifest__kanji,
+.hb-path__kanji,
+.hb-vow__num,
+.hb-stop__k,
+.hb-duty__k,
+.hb-card__k,
+.kata-card__tip-k,
+.hb-manifest__cap .k,
+.traits__cap .k,
+.duty__cap .k,
+.mmenu__brand i,
+.spine a i,
+.footer__bot p + p,
+.marquee__dot {
+  font-family: var(--font-cjk);
+}
 
 </style>
 </head>
 <body id="top" class="page-kata embed" data-sigil="型">
-<div class="veil" aria-hidden="true"></div>
+<div class="veil" data-veil aria-hidden="true"><div class="veil__panel"><svg class="veil__wave veil__wave--in" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C120,20 240,20 360,64 C480,108 600,108 720,64 C840,20 960,20 1080,64 C1200,108 1320,108 1440,64 L1440,120 L0,120 Z"/></svg><div class="veil__fill"><span class="veil__kanji" data-veil-kanji>型</span><span class="veil__label" data-veil-label>Дыхание воды</span><span class="veil__bar"><i></i></span></div><svg class="veil__wave veil__wave--out" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,56 C120,100 240,100 360,56 C480,12 600,12 720,56 C840,100 960,100 1080,56 C1200,12 1320,12 1440,56 L1440,0 L0,0 Z"/></svg></div></div>
 <section class="hero hero--inner"><div class="hero__media"><img class="bg" src="assets/img/water-moon.jpg" alt="" fetchpriority="high"></div><div class="hero__shade"></div><div class="hero__kanji"><span class="v">型</span><span class="line"></span><span class="t">Ката</span></div><div class="hero__crest" aria-hidden="true"><span>型</span></div><div class="hero__in"><p class="hero__eyebrow">型&nbsp;&nbsp;Дыхание воды</p><h1 class="hero__title"><span class="hero__plain"><span>Десять форм воды</span></span></h1></div><a class="hero__cue" href="#content"><span>Читать свиток</span><span>﹀</span></a></section><div class="marquee" aria-hidden="true"><div class="marquee__track"><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div><div class="marquee__row"><span class="marquee__item"><span class="marquee__q">«Вода принимает любую форму. Стань как вода.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Не позволяй другим решать, почему ты не можешь простить себя.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Чувствуй ярость. Могучая, чистая ярость от того, что не смог защитить.»</span><span class="marquee__a">— Урокодаки Саконджи · Бывший Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Стань сильнее, пока не сможешь защитить то, что дорого.»</span><span class="marquee__a">— Томиока Гию · Столп Воды</span><span class="marquee__dot"></span></span><span class="marquee__item"><span class="marquee__q">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</span><span class="marquee__a">— Кодекс Воды</span><span class="marquee__dot"></span></span></div></div></div><main id="content" class="article">
 <section class="s">
-  <p class="lead">Дыхание Воды состоит из 10 форм. От первой — рассекающей поверхность, до десятой — постоянного потока, что усиливается с каждым вращением.</p>
-  <p>Место для гифок готово — как только ты скинешь конвертнутые mp4/webm, я вставлю их сюда с автоплеем без звука, как в оригинале.</p>
-  <p class="note">Гифки 1-10 ката сейчас весят 40 МБ. Рекомендую конвертнуть: <code>ffmpeg -i 1\ ката.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" 1-kata.mp4</code> — будет в 5-10 раз легче.</p>
+  <p class="lead">Дыхание Воды состоит из 10 форм. От первой — рассекающей поверхность воды, до десятой — постоянного потока, что усиливается с каждым вращением.</p>
 </section>
 
 <hr>
 
-<section class="s"><div class="kata-grid" id="kataGrid"><div class="kata-card"><span class="kata-card__num">01</span><p class="kata-card__jp">壱ノ型・水面斬り</p><h3>Первая ката: Рассекающий поверхность воды</h3><p>Мощный горизонтальный удар, концентрирующий всю силу в одной линии. Базовая форма дыхания воды.</p><p style="color:var(--ash);font-size:12px">💡 Используй как финишер, целься в шею.</p><div class="kata-card__media"><video src="assets/kata/1-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Первая ката: Рассекающий поверхность воды"></video></div></div><div class="kata-card"><span class="kata-card__num">02</span><p class="kata-card__jp">弐ノ型・水車</p><h3>Вторая ката: Водяное колесо</h3><p>Вертикальное вращение тела с клинком, создающее круговой разрез.</p><p style="color:var(--ash);font-size:12px">💡 Хороша против нескольких противников.</p><div class="kata-card__media"><video src="assets/kata/2-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Вторая ката: Водяное колесо"></video></div></div><div class="kata-card"><span class="kata-card__num">03</span><p class="kata-card__jp">参ノ型・流流舞い</p><h3>Третья ката: Танец стремительного потока</h3><p>Стремительное движение как течение реки, быстрые шаги и рубящие удары.</p><p style="color:var(--ash);font-size:12px">💡 Используй для сближения.</p><div class="kata-card__media"><video src="assets/kata/3-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Третья ката: Танец стремительного потока"></video></div></div><div class="kata-card"><span class="kata-card__num">04</span><p class="kata-card__jp">肆ノ型・打ち潮</p><h3>Четвертая ката: Удар приливной волны</h3><p>Множественные удары волной, наносятся в быстрой последовательности.</p><p style="color:var(--ash);font-size:12px">💡 Держи ритм, не торопись.</p><div class="kata-card__media"><video src="assets/kata/4-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Четвертая ката: Удар приливной волны"></video></div></div><div class="kata-card"><span class="kata-card__num">05</span><p class="kata-card__jp">伍ノ型・干天の慈雨</p><h3>Пятая ката: Благословенный дождь после засухи</h3><p>Милосердный удар — быстрая и безболезненная смерть для противника. Удар милосердия.</p><p style="color:var(--ash);font-size:12px">💡 Применяется к уже побеждённому демону.</p><div class="kata-card__media"><video src="assets/kata/5-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Пятая ката: Благословенный дождь после засухи"></video></div></div><div class="kata-card"><span class="kata-card__num">06</span><p class="kata-card__jp">陸ノ型・ねじれ渦</p><h3>Шестая ката: Вихрь</h3><p>Мощное вращение всего тела, создающее вихрь воды, затягивающий всё вокруг.</p><p style="color:var(--ash);font-size:12px">💡 Используй в окружении.</p><div class="kata-card__media"><video src="assets/kata/6-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Шестая ката: Вихрь"></video></div></div><div class="kata-card"><span class="kata-card__num">07</span><p class="kata-card__jp">漆ノ型・雫波紋突き</p><h3>Седьмая ката: Изгиб поверхности воды</h3><p>Самый быстрый выпад — точный укол как капля, создающая рябь.</p><p style="color:var(--ash);font-size:12px">💡 Требует идеальной концентрации.</p><div class="kata-card__media"><video src="assets/kata/7-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Седьмая ката: Изгиб поверхности воды"></video></div></div><div class="kata-card"><span class="kata-card__num">08</span><p class="kata-card__jp">捌ノ型・滝壺</p><h3>Восьмая ката: Удар водопада</h3><p>Мощный рубящий удар сверху вниз, как падающий водопад.</p><p style="color:var(--ash);font-size:12px">💡 Прыжок + удар сверху.</p><div class="kata-card__media"><video src="assets/kata/8-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Восьмая ката: Удар водопада"></video></div></div><div class="kata-card"><span class="kata-card__num">09</span><p class="kata-card__jp">玖ノ型・水流飛沫</p><h3>Девятая ката: Всплеск водяного потока</h3><p>Хаотичные шаги, сбивающие прицел врага, и резкие удары с разных углов.</p><p style="color:var(--ash);font-size:12px">💡 Запутай противника движением.</p><div class="kata-card__media"><video src="assets/kata/9-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Девятая ката: Всплеск водяного потока"></video></div></div><div class="kata-card"><span class="kata-card__num">10</span><p class="kata-card__jp">拾ノ型・生生流転</p><h3>Десятая ката: Постоянный поток</h3><p>Непрерывная серия усиливающихся ударов, текущая как река, становящаяся сильнее с каждым вращением.</p><p style="color:var(--ash);font-size:12px">💡 Финальная форма — чем дольше держишь, тем сильнее.</p><div class="kata-card__media"><video src="assets/kata/10-kata.webm" muted loop playsinline preload="metadata" poster="assets/kata/kata-poster.svg" aria-label="Десятая ката: Постоянный поток"></video></div></div></div></section>
+<section class="s"><div class="kata-grid" id="kataGrid"><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">01</span><p class="kata-card__jp">壱ノ型・水面斬り</p></div><h3>Первая ката: Рассекающий поверхность воды</h3><p>Мощный горизонтальный удар, концентрирующий всю силу в одной линии. Базовая форма дыхания воды.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Используй как финишер, целься в шею.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/01-kata-poster.jpg" data-kata-video aria-label="Анимация: Первая ката: Рассекающий поверхность воды"><source data-src="assets/kata/01-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">02</span><p class="kata-card__jp">弐ノ型・水車</p></div><h3>Вторая ката: Водяное колесо</h3><p>Вертикальное вращение тела с клинком, создающее круговой разрез.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Хороша против нескольких противников.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/02-kata-poster.jpg" data-kata-video aria-label="Анимация: Вторая ката: Водяное колесо"><source data-src="assets/kata/02-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">03</span><p class="kata-card__jp">参ノ型・流流舞い</p></div><h3>Третья ката: Танец стремительного потока</h3><p>Стремительное движение как течение реки, быстрые шаги и рубящие удары.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Используй для сближения.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/03-kata-poster.jpg" data-kata-video aria-label="Анимация: Третья ката: Танец стремительного потока"><source data-src="assets/kata/03-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">04</span><p class="kata-card__jp">肆ノ型・打ち潮</p></div><h3>Четвертая ката: Удар приливной волны</h3><p>Множественные удары волной, наносятся в быстрой последовательности.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Держи ритм, не торопись.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/04-kata-poster.jpg" data-kata-video aria-label="Анимация: Четвертая ката: Удар приливной волны"><source data-src="assets/kata/04-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">05</span><p class="kata-card__jp">伍ノ型・干天の慈雨</p></div><h3>Пятая ката: Благословенный дождь после засухи</h3><p>Милосердный удар — быстрая и безболезненная смерть для противника. Удар милосердия.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Применяется к уже побеждённому демону.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/05-kata-poster.jpg" data-kata-video aria-label="Анимация: Пятая ката: Благословенный дождь после засухи"><source data-src="assets/kata/05-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">06</span><p class="kata-card__jp">陸ノ型・ねじれ渦</p></div><h3>Шестая ката: Вихрь</h3><p>Мощное вращение всего тела, создающее вихрь воды, затягивающий всё вокруг.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Используй в окружении.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/06-kata-poster.jpg" data-kata-video aria-label="Анимация: Шестая ката: Вихрь"><source data-src="assets/kata/06-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">07</span><p class="kata-card__jp">漆ノ型・雫波紋突き</p></div><h3>Седьмая ката: Изгиб поверхности воды</h3><p>Самый быстрый выпад — точный укол как капля, создающая рябь.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Требует идеальной концентрации.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/07-kata-poster.jpg" data-kata-video aria-label="Анимация: Седьмая ката: Изгиб поверхности воды"><source data-src="assets/kata/07-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">08</span><p class="kata-card__jp">捌ノ型・滝壺</p></div><h3>Восьмая ката: Удар водопада</h3><p>Мощный рубящий удар сверху вниз, как падающий водопад.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Прыжок + удар сверху.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/08-kata-poster.jpg" data-kata-video aria-label="Анимация: Восьмая ката: Удар водопада"><source data-src="assets/kata/08-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">09</span><p class="kata-card__jp">玖ノ型・水流飛沫</p></div><h3>Девятая ката: Всплеск водяного потока</h3><p>Хаотичные шаги, сбивающие прицел врага, и резкие удары с разных углов.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Запутай противника движением.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/09-kata-poster.jpg" data-kata-video aria-label="Анимация: Девятая ката: Всплеск водяного потока"><source data-src="assets/kata/09-kata.mp4" type="video/mp4"></video></figure></article><article class="kata-card reveal" data-kata-card><div class="kata-card__top"><span class="kata-card__num">10</span><p class="kata-card__jp">拾ノ型・生生流転</p></div><h3>Десятая ката: Постоянный поток</h3><p>Непрерывная серия усиливающихся ударов, текущая как река, становящаяся сильнее с каждым вращением.</p><p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>Финальная форма — чем дольше держишь, тем сильнее.</p><figure class="kata-card__media" data-kata-media><video muted loop playsinline preload="none" poster="assets/kata/10-kata-poster.jpg" data-kata-video aria-label="Анимация: Десятая ката: Постоянный поток"><source data-src="assets/kata/10-kata.mp4" type="video/mp4"></video></figure></article></div></section>
 
 <hr>
 
@@ -2771,18 +3945,26 @@ body.embed .hero__crest { display: none; }
 /* =====================================================================
    ДЫХАНИЕ ВОДЫ — скрипты сайта (без библиотек, чистый JavaScript).
    Файл копируется сборкой в assets/app.js.
+
+   Разделы:
+     01 год в подвале            07 вкладки-разделы в шапке
+     02 экран загрузки           08 шкала главной
+     03 прогресс и шапка         09 ката: ленивое видео
+     04 мобильный кодекс         10 водный курсор
+     05 появление блоков         11 переходы между страницами (шторa-волна)
+     06 аккордеон, печати
    ===================================================================== */
 (function () {
   "use strict";
 
-  /* ---------- Год в подвале ---------- */
+  var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* ---------- 01. Год в подвале ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
   });
 
-  /* ---------- Экран загрузки (только главная и только раз за сеанс) ----------
-     Если человек уже открывал какую-то страницу сайта, экран пропускается:
-     при переходе с другой страницы остаётся только шторка, без второй анимации. */
+  /* ---------- 02. Экран загрузки (только раз за сеанс) ---------- */
   (function () {
     var pre = document.querySelector(".preloader");
     if (!pre) return;
@@ -2806,23 +3988,20 @@ body.embed .hero__crest { display: none; }
     requestAnimationFrame(tick);
   })();
 
-  /* ---------- Полоса прогресса + шапка при прокрутке + линия иерархии ---------- */
+  /* ---------- 03. Полоса прогресса + шапка + линия иерархии ---------- */
   (function () {
     var bar = document.querySelector(".progress");
     var nav = document.querySelector(".nav");
-    var heroIn = document.querySelector(".hero__in");
     var heroCue = document.querySelector(".hero__cue");
-    var heroMedia = document.querySelector(".hero__media");
-    var rails = document.querySelectorAll(".timeline");
+    var rails = document.querySelectorAll(".timeline, .hb-river");
     function onScroll() {
       var y = window.scrollY || window.pageYOffset;
       var max = document.documentElement.scrollHeight - window.innerHeight;
       if (bar && max > 0) bar.style.transform = "scaleX(" + Math.min(1, y / max) + ")";
       if (nav) nav.classList.toggle("scrolled", y > 60);
       if (heroCue) heroCue.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.5));
-      // заливка линии иерархии по мере прокрутки
       rails.forEach(function (tl) {
-        var fill = tl.querySelector(".timeline__fill");
+        var fill = tl.querySelector(".timeline__fill, .hb-river__fill");
         if (!fill) return;
         var r = tl.getBoundingClientRect();
         var vh = window.innerHeight;
@@ -2837,7 +4016,7 @@ body.embed .hero__crest { display: none; }
     onScroll();
   })();
 
-  /* ---------- Мобильное меню ---------- */
+  /* ---------- 04. Мобильный кодекс ---------- */
   (function () {
     var openBtn = document.querySelector("[data-menu-open]");
     var menu = document.querySelector(".mmenu");
@@ -2850,7 +4029,7 @@ body.embed .hero__crest { display: none; }
     menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", close); });
   })();
 
-  /* ---------- Появление блоков при прокрутке ---------- */
+  /* ---------- 05. Появление блоков при прокрутке ---------- */
   (function () {
     var els = document.querySelectorAll(".reveal, .shead");
     if (!els.length || !("IntersectionObserver" in window)) {
@@ -2865,14 +4044,13 @@ body.embed .hero__crest { display: none; }
     els.forEach(function (el) { io.observe(el); });
   })();
 
-  /* ---------- Аккордеон: высота, и открыта только одна вкладка ---------- */
+  /* ---------- 06a. Аккордеон: открыта одна вкладка ---------- */
   (function () {
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.querySelectorAll("[data-acc]").forEach(function (group) {
       group.querySelectorAll("details").forEach(function (d) {
         var body = d.querySelector(".acc__body");
         var head = d.querySelector("summary");
-        if (!body || !head || reduce) {
+        if (!body || !head || reduceMotion) {
           d.addEventListener("toggle", function () {
             if (d.open) group.querySelectorAll("details").forEach(function (o) { if (o !== d) o.open = false; });
           });
@@ -2909,15 +4087,15 @@ body.embed .hero__crest { display: none; }
             if (o !== d && o.open) shut(o);
           });
           d._seq = (d._seq || 0) + 1;
-          var id = d._seq;
+          var sid = d._seq;
           d.open = true;
           body.style.height = "0px";
           requestAnimationFrame(function () {
-            if (d._seq !== id) return;
+            if (d._seq !== sid) return;
             body.style.height = body.scrollHeight + "px";
           });
           function opened(ev) {
-            if (ev.propertyName !== "height" || d._seq !== id) return;
+            if (ev.propertyName !== "height" || d._seq !== sid) return;
             body.style.height = "auto";
             body.removeEventListener("transitionend", opened);
           }
@@ -2927,7 +4105,7 @@ body.embed .hero__crest { display: none; }
     });
   })();
 
-  /* ---------- Вкладки привилегий ---------- */
+  /* ---------- 06b. Вкладки привилегий (внутри страниц) ---------- */
   (function () {
     document.querySelectorAll("[data-tabs]").forEach(function (box) {
       var btns = box.querySelectorAll("[data-tab]");
@@ -2944,20 +4122,70 @@ body.embed .hero__crest { display: none; }
     });
   })();
 
-  /* ---------- Готовность героя (буквы встают после прелоадера) ---------- */
+  /* ---------- 06c. Готовность героя ---------- */
   if (!document.querySelector(".preloader")) document.body.classList.add("ready");
 
-  /* ---------- Печати разделов: активная в центре ленты ---------- */
+  /* ---------- 07. Вкладки-разделы в шапке ----------
+     Капля-подсветка едет за активной вкладкой; при наведении над вкладкой
+     всплывает капелька; лента сама подкручивается так, чтобы активная
+     вкладка была видна.                                                     */
   (function () {
-    var box = document.querySelector("[data-seals]");
-    var on = box && box.querySelector(".seal--on");
-    if (!box || !on) return;
-    var track = box.querySelector(".nav__seals-track") || box;
-    var left = on.offsetLeft - (track.clientWidth - on.offsetWidth) / 2;
-    track.scrollLeft = Math.max(0, left);
+    var bar = document.querySelector("[data-seals]");
+    if (!bar) return;
+    var track = bar.querySelector("[data-tabs-track]");
+    var ink = bar.querySelector("[data-tabs-ink]");
+    var drop = bar.querySelector("[data-tabs-drop]");
+    var tabs = Array.prototype.slice.call(track ? track.querySelectorAll(".ntab") : []);
+    if (!track || !ink || !tabs.length) return;
+
+    function center(el) {
+      var left = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
+      track.scrollLeft = Math.max(0, left);
+    }
+    function move(el, instant) {
+      ink.style.width = el.offsetWidth + "px";
+      ink.style.height = el.offsetHeight + "px";
+      ink.style.transform = "translate(" + el.offsetLeft + "px," + el.offsetTop + "px)";
+      if (instant) {
+        ink.classList.add("is-jump");
+        void ink.offsetWidth;
+        requestAnimationFrame(function () { ink.classList.remove("is-jump"); });
+      }
+      ink.classList.add("is-ready");
+      if (drop) drop.style.left = el.offsetLeft + el.offsetWidth / 2 + "px";
+    }
+    var active = bar.querySelector(".ntab.is-on") || tabs[0];
+    // первый показ — без анимации, чтобы капля не уезжала из нуля
+    move(active, true);
+    center(active);
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("mouseenter", function () {
+        bar.classList.add("is-hovering");
+        if (drop) drop.style.left = tab.offsetLeft + tab.offsetWidth / 2 + "px";
+      });
+      tab.addEventListener("focus", function () { bar.classList.add("is-hovering"); });
+      tab.addEventListener("blur", function () { bar.classList.remove("is-hovering"); });
+      tab.addEventListener("click", function () { move(tab); center(tab); });
+    });
+    bar.addEventListener("mouseleave", function () { bar.classList.remove("is-hovering"); });
+
+    var reflowTimer = null;
+    function reflow() {
+      clearTimeout(reflowTimer);
+      reflowTimer = setTimeout(function () {
+        active = bar.querySelector(".ntab.is-on") || active;
+        move(active, true);
+        center(active);
+      }, 120);
+    }
+    window.addEventListener("resize", reflow);
+    window.addEventListener("orientationchange", reflow);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(reflow).catch(function () {});
+    window.addEventListener("load", reflow);
   })();
 
-  /* ---------- Шкала главной ---------- */
+  /* ---------- 08. Шкала главной ---------- */
   (function () {
     var links = document.querySelectorAll(".spine a[data-spy]");
     if (!links.length || !("IntersectionObserver" in window)) return;
@@ -2993,64 +4221,329 @@ body.embed .hero__crest { display: none; }
     document.body.style.overflow = "";
   });
 
-  /* ---------- Плавные переходы отключены: обычная навигация ---------- */
+  /* ---------- 09. Ката: ленивые видео ----------
+     Ролик грузится только когда блок подъехал к экрану. Мышь — превью играет
+     при наведении; тап/клик — играет или ставит на паузу. Кнопок и подписей
+     в плеере нет. Одновременно играет одна анимация, уход из окна — пауза.
 
-  /* ---------- Ката: видео как в тестовом сайте ---------- */
+     Тип указателя берём из Pointer Events (event.pointerType), а не из
+     «(pointer: fine)»: медиазапрос врёт в части браузеров и в headless.      */
   (function () {
-    var cards = document.querySelectorAll('.kata-card');
-    if (!cards.length) return;
-    function playVideo(video) {
-      if (!video || !video.paused) return;
-      video.muted = true;
-      var p = video.play();
-      if (p && typeof p.catch === 'function') p.catch(function () {});
+    var figures = document.querySelectorAll("[data-kata-media]");
+    if (!figures.length) return;
+
+    function activate(video) {
+      if (!video || video.dataset.loaded === "1") return;
+      var sources = video.querySelectorAll("source[data-src]");
+      if (!sources.length) return;
+      sources.forEach(function (s) {
+        s.src = s.getAttribute("data-src");
+        s.removeAttribute("data-src");
+      });
+      video.dataset.loaded = "1";
+      try { video.load(); } catch (e) {}
     }
-    cards.forEach(function (card) {
-      var video = card.querySelector('video');
+    function play(video) {
       if (!video) return;
-      card.addEventListener('mouseenter', function () { playVideo(video); });
-      card.addEventListener('mouseleave', function () { video.pause(); });
-      card.addEventListener('click', function () {
-        if (video.paused) playVideo(video); else video.pause();
+      activate(video);
+      document.querySelectorAll("[data-kata-video]").forEach(function (v) { if (v !== video) pause(v); });
+      video.muted = true;
+      try {
+        var p = video.play();
+        if (p && typeof p.catch === "function") p.catch(function () {});
+      } catch (e) {}
+      var f = video.closest("[data-kata-media]");
+      if (f) f.classList.add("is-playing");
+    }
+    function pause(video) {
+      if (!video) return;
+      var f = video.closest("[data-kata-media]");
+      if (f) f.classList.remove("is-playing");
+      if (!video.paused) video.pause();
+    }
+    function toggle(video) { if (video.paused) play(video); else pause(video); }
+
+    figures.forEach(function (figure) {
+      var video = figure.querySelector("video[data-kata-video]");
+      if (!video) return;
+      var zone = figure.closest("[data-kata-card], .hb-kata__preview") || figure;
+      var lastToggle = 0;
+      var lastTouchAt = 0;
+
+      // На части телефонов тап приходит только как pointerup/touchend, без click
+      // (например, если страница „переехала“ под пальцем). Поэтому ловим оба
+      // события, а от двойного переключения спасает окно в 400 мс.
+      function toggleOnce(e) {
+        if (e.target && e.target.closest && e.target.closest("a")) return;
+        var now = performance.now();
+        if (now - lastToggle < 400) return;
+        lastToggle = now;
+        toggle(video);
+      }
+
+      // Наведение — только для настоящей мыши. После тача браузеры шлют
+      // совместимые «мышиные» события, поэтому касание ставит метку и
+      // hover-запуск в это окно игнорируется (иначе тап включал бы и выключал).
+      zone.addEventListener("pointerenter", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        play(video);
+      });
+      zone.addEventListener("pointerleave", function (e) {
+        if (e.pointerType !== "mouse") return;
+        if (performance.now() - lastTouchAt < 700) return;
+        pause(video);
+      });
+
+      zone.addEventListener("pointerup", function (e) {
+        if (e.pointerType === "mouse") return;   // мышь обрабатывает click ниже
+        lastTouchAt = performance.now();
+        toggleOnce(e);                            // палец: играем / пауза
+      });
+      zone.addEventListener("click", function (e) {
+        toggleOnce(e);                      // мышь и клавиатура
       });
     });
-    if ('IntersectionObserver' in window) {
+
+    if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          var video = entry.target.querySelector('video');
+          var video = entry.target.querySelector("video[data-kata-video]");
           if (!video) return;
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.2 && !document.hidden) playVideo(video);
-          else video.pause();
+          if (entry.isIntersecting) {
+            if (entry.intersectionRatio >= 0.35) activate(video);
+            else if (entry.intersectionRatio === 0) pause(video);
+          } else {
+            pause(video);
+          }
         });
-      }, { threshold: [0, 0.2, 0.5], rootMargin: '0px 0px -60px 0px' });
-      cards.forEach(function (card) { io.observe(card); });
+      }, { threshold: [0, 0.35], rootMargin: "300px 0px" });
+      figures.forEach(function (figure) { io.observe(figure); });
+    } else {
+      document.querySelectorAll("video[data-kata-video]").forEach(activate);
     }
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) document.querySelectorAll('#kataGrid video').forEach(function (v) { v.pause(); });
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) document.querySelectorAll("[data-kata-video]").forEach(pause);
     });
   })();
 
+  /* ---------- 10. Водный курсор ----------
+     Свечение, кольцо и капля идут за мышью с разной задержкой (эффект воды).
+     Клик — рябь и брызги, быстрое движение — капли-след.
 
-  /* ---------- Водный курсор: следует за мышью ---------- */
+     Включается по первому движению НАСТОЯЩЕЙ мыши (pointerType === "mouse"):
+     на телефоне и планшете курсора просто не будет, и не важно, что
+     сообщает медиазапрос про «(pointer: fine)».                              */
   (function () {
-    var c = document.querySelector('.water-cursor');
-    if (!c) return;
-    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) { c.style.display = 'none'; return; }
-    var x = -100, y = -100, sx = -100, sy = -100;
-    document.addEventListener('mousemove', function (e) {
-      x = e.clientX; y = e.clientY;
-      var t = e.target;
-      var hover = !!(t && t.closest && t.closest('a, button, summary, .kata-card'));
-      c.style.width = hover ? '40px' : '28px';
-      c.style.height = hover ? '40px' : '28px';
-      c.style.margin = hover ? '-20px 0 0 -20px' : '-14px 0 0 -14px';
-    }, { passive: true });
-    (function loop() {
-      sx += (x - sx) * 0.18;
-      sy += (y - sy) * 0.18;
-      c.style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
+    var cur = document.querySelector("[data-cursor]");
+    if (!cur) return;
+    if (reduceMotion) { cur.remove(); return; }
+
+    var fx = cur.querySelector("[data-cursor-fx]") || cur;
+    var glow = cur.querySelector(".wcur__glow");
+    var ring = cur.querySelector(".wcur__ring");
+    var dot = cur.querySelector(".wcur__dot");
+
+    var mx = -200, my = -200;              // цель
+    var gx = mx, gy = my;                  // свечение (самое ленивое)
+    var rx = mx, ry = my;                  // кольцо
+    var dx = mx, dy = my;                  // капля
+    var lastX = mx, lastY = my, lastT = 0, trailAt = 0;
+    var active = false, bound = false;
+
+    var HOT = "a, button, summary, .ntab, .kata-card, .hb-card, .hb-vow, .hb-principle, " +
+              ".hb-kata__chip, .hb-rank, .hb-stop, .codex__card, input, textarea, select";
+
+    function spawn(cls, x, y, vars, life) {
+      var el = document.createElement("span");
+      el.className = cls;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      if (vars) Object.keys(vars).forEach(function (k) { el.style.setProperty(k, vars[k]); });
+      fx.appendChild(el);
+      setTimeout(function () { el.remove(); }, life);
+      while (fx.childElementCount > 40) fx.firstElementChild.remove();   // страховка от накопления
+    }
+    function ripple(x, y, delay) {
+      var el = document.createElement("span");
+      el.className = "wcur__ripple";
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      if (delay) el.style.animationDelay = delay + "ms";
+      fx.appendChild(el);
+      setTimeout(function () { el.remove(); }, 1200);
+    }
+    function splash(x, y) {
+      for (var i = 0; i < 7; i++) {
+        var a = (Math.PI * 2 * i) / 7 + Math.random() * 0.5;
+        var d = 26 + Math.random() * 34;
+        spawn("wcur__spray", x, y, {
+          "--dx": (Math.cos(a) * d).toFixed(1) + "px",
+          "--dy": (Math.sin(a) * d - 8).toFixed(1) + "px"
+        }, 800);
+      }
+      ripple(x, y, 110);
+      ripple(x, y, 0);
+    }
+    function trail(x, y, speed) {
+      var now = performance.now();
+      if (speed < 0.9 || now - trailAt < 70) return;
+      trailAt = now;
+      spawn("wcur__drop", x + (Math.random() * 14 - 7), y + (Math.random() * 10 - 5), {
+        "--dx": (Math.random() * 16 - 8).toFixed(1) + "px",
+        "--dy": (10 + Math.random() * 16).toFixed(1) + "px"
+      }, 1000);
+    }
+
+    function loop() {
+      if (!active) return;
+      gx += (mx - gx) * 0.055;
+      gy += (my - gy) * 0.055;
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+      dx += (mx - dx) * 0.42;
+      dy += (my - dy) * 0.42;
+      if (glow) glow.style.transform = "translate(" + gx + "px," + gy + "px)";
+      if (ring) ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+      if (dot) dot.style.transform = "translate(" + dx + "px," + dy + "px)";
       requestAnimationFrame(loop);
-    })();
+    }
+
+    function onMove(e) {
+      var type = e.pointerType;
+      if (type !== "mouse") {
+        // пустой pointerType бывает у старых браузеров: доверяем только
+        // устройству без тачскрина
+        if (type || "ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+      }
+      if (!bound) bind();
+      var now = performance.now();
+      var dt = Math.max(1, now - lastT);
+      var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / dt;
+      lastX = e.clientX; lastY = e.clientY; lastT = now;
+      mx = e.clientX; my = e.clientY;
+      trail(e.clientX, e.clientY, speed);
+      var hot = !!(e.target && e.target.closest && e.target.closest(HOT));
+      cur.classList.toggle("is-hot", hot);
+      cur.classList.remove("is-out");
+    }
+    function bind() {
+      bound = true; active = true;
+      window.addEventListener("pointerdown", function (e) {
+        if (e.pointerType && e.pointerType !== "mouse") return;
+        cur.classList.add("is-down");
+        splash(e.clientX, e.clientY);
+      });
+      window.addEventListener("pointerup", function () { cur.classList.remove("is-down"); });
+      document.addEventListener("mouseleave", function () { cur.classList.add("is-out"); });
+      document.addEventListener("mouseenter", function () { cur.classList.remove("is-out"); });
+      window.addEventListener("blur", function () { active = false; });
+      window.addEventListener("focus", function () { if (!active) { active = true; loop(); } });
+      requestAnimationFrame(loop);
+    }
+
+    function dropIfTouch(e) {
+      if (bound) return;                       // мышь уже включила курсор
+      var t = (e && e.pointerType) || "";
+      if (t && t === "mouse") return;
+      if (e && e.type === "touchstart") { cur.remove(); return; }
+      if (t) cur.remove();                      // pointerdown от пальца/стилуса
+    }
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", dropIfTouch, { passive: true, once: true });
+    window.addEventListener("touchstart", dropIfTouch, { passive: true, once: true });
+  })();
+
+  /* ---------- 11. Переход между страницами ----------
+     Уходим: вода поднимается снизу и накрывает экран (шторка-волна), затем
+     переход. Приходим: штора уже накрыта (html.veil-cover, ставится в <head>),
+     показывает иероглиф и название страницы и уезжает вверх — новая страница
+     как будто выплывает. Без JS шторку убирает CSS-анимация.                */
+  (function () {
+    var root = document.documentElement;
+    var veil = document.querySelector("[data-veil]");
+
+    function read(key, fallback) {
+      try { return sessionStorage.getItem(key) || fallback; } catch (e) { return fallback; }
+    }
+    function write(key, value) {
+      try { sessionStorage.setItem(key, value); } catch (e) {}
+    }
+
+    if (veil) {
+      /* приход */
+      if (root.classList.contains("veil-cover") && !reduceMotion) {
+        var label = veil.querySelector("[data-veil-label]");
+        var kanji = veil.querySelector("[data-veil-kanji]");
+        if (label) label.textContent = read("wb-nav-label", "Дыхание воды");
+        if (kanji) kanji.textContent = read("wb-nav-sigil", "水");
+      }
+      var done = function () {
+        if (veil.classList.contains("is-cover")) return;   // уже уходим на другую страницу
+        root.classList.remove("veil-cover");
+        root.classList.add("veil-done");
+        veil.classList.remove("is-cover");
+        veil.classList.remove("is-away");
+        document.body.classList.remove("is-leaving");
+      };
+      var panel = veil.querySelector(".veil__panel");
+      if (panel) panel.addEventListener("animationend", function (e) {
+        if (e.animationName === "veilAway") done();
+      });
+      setTimeout(done, reduceMotion ? 30 : 2400);
+
+      /* уход */
+      function leave(href, title, sigil) {
+        if (reduceMotion) { window.location.href = href; return; }
+        write("wb-nav", "1");
+        if (title) write("wb-nav-label", title);
+        if (sigil) write("wb-nav-sigil", sigil);
+        var label = veil.querySelector("[data-veil-label]");
+        var kanji = veil.querySelector("[data-veil-kanji]");
+        if (label && title) label.textContent = title;
+        if (kanji && sigil) kanji.textContent = sigil;
+        root.classList.remove("veil-done");
+        veil.classList.remove("is-away");
+        void veil.offsetWidth;
+        veil.classList.add("is-cover");
+        document.body.classList.add("is-leaving");
+        setTimeout(function () { window.location.href = href; }, 880);
+      }
+
+      document.addEventListener("click", function (e) {
+        if (e.defaultPrevented || e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+        if (!a) return;
+        if (a.target && a.target !== "_self") return;
+        if (a.hasAttribute("download")) return;
+        var href = a.getAttribute("href");
+        if (!href || href.charAt(0) === "#") return;
+        var url;
+        try { url = new URL(a.href, window.location.href); } catch (err) { return; }
+        if (url.protocol !== window.location.protocol) return;
+        if (url.host !== window.location.host) return;
+        if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+        e.preventDefault();
+        var title = a.getAttribute("data-nav-title") || (a.textContent || "").trim().slice(0, 40);
+        var sigil = a.getAttribute("data-nav-sigil") || "";
+        var tab = a.closest && a.closest("[data-seals]");
+        if (tab && tab.querySelector("[data-tabs-ink]")) {
+          var ink = tab.querySelector("[data-tabs-ink]");
+          ink.style.width = a.offsetWidth + "px";
+          ink.style.height = a.offsetHeight + "px";
+          ink.style.transform = "translate(" + a.offsetLeft + "px," + a.offsetTop + "px)";
+        }
+        leave(a.href, title, sigil);
+      }, false);
+
+      /* возврат «назад» из кэша браузера */
+      window.addEventListener("pageshow", function (e) {
+        if (!e.persisted) return;
+        done();
+      });
+    }
   })();
 
 })();

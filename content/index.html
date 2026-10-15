@@ -1,196 +1,242 @@
-<!-- Главная — Дыхание Воды — фракция истребителей, без дублей -->
-<!-- 01 ВОДА — что это -->
-<section class="section" id="faction">
-  <div class="wrap">
-    <div class="shead">
-      <span class="shead__kanji">水</span>
-      <div class="shead__top"><span class="shead__num">01</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Дыхание воды</span></span></h2>
-      <p class="shead__sub">Спокойное, плавное и адаптивное. Путь защиты, а не разрушения.</p>
-    </div>
+<!-- ГЛАВНАЯ — Дыхание Воды. Новая версия: манифест → кодекс → путь → ранги → ката → состав → поместье → присяга -->
 
-    <div class="faction reveal">
-      <span class="creed__k" aria-hidden="true">水</span>
-      <p class="creed__stamp">水&nbsp;&nbsp;·&nbsp;&nbsp;корпус истребителей</p>
-      <p class="creed__text"><strong>Дыхание Воды</strong> — одно из пяти основных дыханий от Солнца. Десять форм, текучих как река. Мы — не демоны, мы — те, кто их истребляет, чтобы защитить людей.</p>
+<!-- 01 ВОДА: манифест и четыре завета -->
+<section class="hb-section hb-manifest" id="faction">
+  <div class="hb-wrap hb-manifest__grid">
+    <aside class="hb-manifest__side reveal">
+      <span class="hb-manifest__kanji" aria-hidden="true">水</span>
+      <p class="hb-manifest__stamp">корпус истребителей<br>дыхание воды</p>
+      <p class="hb-manifest__motto">«Течение не остановить.»</p>
+    </aside>
 
-      <p class="traits__cap"><span class="k" aria-hidden="true">四</span>Четыре завета воды</p>
-      <div class="traits">
-        <div class="trait">
-          <span class="trait__num">01</span>
-          <span class="trait__icon ico" data-ico="drops"></span>
-          <div>
+    <div class="hb-manifest__body reveal">
+      <p class="hb-manifest__lead">Дыхание Воды — одно из пяти основных дыханий, рождённых от Дыхания Солнца. Десять форм, текучих как река: от рассекающей поверхность до постоянного потока.</p>
+      <p class="hb-manifest__text">Мы не демоны и не охотники за славой. Мы — те, кто встаёт между людьми и тьмой, чтобы никто больше не потерял близкого. Вода не спорит с камнем — она его обтекает; истребитель воды не ломает судьбу силой, он ищет путь и проходит его.</p>
+
+      <p class="hb-manifest__cap"><span class="k" aria-hidden="true">四</span>Четыре завета воды</p>
+      <ul class="hb-vows">
+        <li class="hb-vow">
+          <span class="hb-vow__num">壱</span>
+          <span class="hb-vow__icon ico" data-ico="drops"></span>
+          <div class="hb-vow__body">
             <h3>Адаптивность</h3>
             <p>Вода принимает форму сосуда. Истребитель подстраивается под любого врага.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">02</span>
-          <span class="trait__icon ico" data-ico="shield"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">弐</span>
+          <span class="hb-vow__icon ico" data-ico="shield"></span>
+          <div class="hb-vow__body">
             <h3>Спокойствие</h3>
             <p>Поверхность спокойна даже в бурю. Эмоции не берут верх в бою.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">03</span>
-          <span class="trait__icon ico" data-ico="target"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">参</span>
+          <span class="hb-vow__icon ico" data-ico="target"></span>
+          <div class="hb-vow__body">
             <h3>Текучесть</h3>
             <p>Как вода ищет щель, так и мечник ищет путь к победе.</p>
           </div>
-        </div>
-        <div class="trait">
-          <span class="trait__num">04</span>
-          <span class="trait__icon ico" data-ico="scroll"></span>
-          <div>
+        </li>
+        <li class="hb-vow">
+          <span class="hb-vow__num">肆</span>
+          <span class="hb-vow__icon ico" data-ico="scroll"></span>
+          <div class="hb-vow__body">
             <h3>Защита</h3>
-            <p>Сила — для защиты гражданских и товарищей.</p>
+            <p>Сила дана для защиты гражданских и товарищей, а не для хвастовства.</p>
           </div>
-        </div>
-      </div>
-
-      <p class="creed__sign"><span class="creed__seal" aria-hidden="true">水</span>Корпус истребителей · дыхание воды</p>
+        </li>
+      </ul>
     </div>
   </div>
 </section>
 
 {{marquee:reverse}}
 
-<!-- 02 ПУТЬ — русло реки: четыре ступени от ученика до мечника -->
-<section class="section" id="path">
-  <div class="wrap wrap--mid">
-    <div class="shead">
-      <span class="shead__kanji">道</span>
-      <div class="shead__top"><span class="shead__num">02</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Путь истребителя</span></span></h2>
-      <p class="shead__sub">Одно русло, четыре ступени. От ученика без клинка до мечника, способного защитить.</p>
-    </div>
+<!-- 02 КОДЕКС: семь принципов -->
+<section class="hb-section hb-codex" id="codex7">
+  <div class="hb-wrap">
+    <header class="hb-head reveal">
+      <span class="hb-head__kanji" aria-hidden="true">律</span>
+      <p class="hb-head__num"><span>02</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">кодекс</span></p>
+      <h2 class="hb-head__title">Семь принципов <em>воды</em></h2>
+      <p class="hb-head__sub">Не закон, а путь. Кодекс — это то, что ты выбираешь сам, каждый день, без надзирателя.</p>
+    </header>
 
-    <ol class="pathflow reveal">
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="drops"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 01 · штаб</p>
-          <h3>Дыхание и боккен</h3>
-          <p>Тотальная концентрация дыхания и деревянный клинок. Ученик не выходит за пределы штаба без сопровождения.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">息</span>
+    <ol class="hb-codex__grid">
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">01</span>
+        <h3>Уважай других</h3>
+        <p>Это основа каждого бойца. Без уважения к товарищам, старшим и гражданским ты не мечник, а просто человек с катаной.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="target"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 02 · Фуджикасане</p>
-          <h3>Финальный отбор</h3>
-          <p>Семь дней среди демонов на горе Фуджикасане. Выжил и доказал — корпус принимает тебя.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">選</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">02</span>
+        <h3>Делай то, что нужно</h3>
+        <p>Ради большего можно пойти на жертвы. Иногда отступить — значит защитить. Вода не спорит с камнем, она его обтекает.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="katana"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 03 · клинок</p>
-          <h3>Ничирин и наставник</h3>
-          <p>Клинок, меняющий цвет, и закрепление за цугуко или Столпом. Первый ранг — Мидзуното.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">刀</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">03</span>
+        <h3>Не подавай виду эмоциям</h3>
+        <p>Неважно, что у тебя на душе — страх, злость, горе или боль. Когда эмоции берут верх, мышление притупляется.</p>
       </li>
-      <li class="pathstep">
-        <span class="pathstep__mark"><i class="ico" data-ico="wave"></i></span>
-        <div class="pathstep__body">
-          <p class="pathstep__cap">Ступень 04 · корпус</p>
-          <h3>Мечник воды</h3>
-          <p>Зачистки, сборы Столпов, защита гражданских. Ранг растёт по точкам и делам, а не по годам.</p>
-        </div>
-        <span class="pathstep__k" aria-hidden="true">流</span>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">04</span>
+        <h3>Ищи выход</h3>
+        <p>Оказавшись в трудной ситуации, всегда ищи способ выбраться — так же, как вода ищет куда просочиться. Безвыходных ситуаций нет.</p>
+      </li>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">05</span>
+        <h3>Не подводи своё дыхание</h3>
+        <p>Ты носишь имя Воды. Каждый твой поступок отражается на всех, кто дышит водой рядом с тобой.</p>
+      </li>
+      <li class="hb-principle reveal">
+        <span class="hb-principle__n">06</span>
+        <h3>Не говори гадостей за спиной</h3>
+        <p>Боевой товарищ всегда лучше, чем самая лучшая катана. Есть что сказать — скажи в лицо, честно и с уважением.</p>
+      </li>
+      <li class="hb-principle reveal hb-principle--wide">
+        <span class="hb-principle__n">07</span>
+        <h3>Имей цель</h3>
+        <p>Цель — как русло для реки. Без русла вода растекается и исчезает. С целью — становится потоком, способным снести горы. Без цели прогресса не будет.</p>
       </li>
     </ol>
 
-    <aside class="duty reveal">
-      <div class="duty__in">
-        <p class="duty__cap"><span class="k" aria-hidden="true">義</span>Долг каждого ранга</p>
-        <ul class="duty__list">
-          <li>Защищать гражданских и товарищей</li>
-          <li>Являться на сборы Столпов и зачистки</li>
-          <li>Соблюдать дресс-код и секретность корпуса</li>
-          <li>Не раскрывать тайны гражданским и не агитировать без согласия</li>
-        </ul>
-        <div class="duty__side">
-          <p class="duty__motto">«Боевой товарищ всегда лучше, чем самая лучшая катана.»</p>
-          <div class="duty__links">
-            <a class="btn btn--ghost" href="{{page:elevation}}">Требования рангов →</a>
-            <a class="btn btn--water" href="{{page:codex}}"><span>Кодекс воды →</span></a>
-          </div>
-        </div>
-      </div>
-    </aside>
+    <div class="hb-codex__more">
+      <a class="btn btn--ghost" href="{{page:codex}}">Кодекс целиком и три напоминания →</a>
+    </div>
   </div>
 </section>
 
-<!-- 03 ИЕРАРХИЯ — фракция истребителей, не демонов -->
-<section class="section section--dim" id="hierarchy">
-  <div class="wrap">
-    <div class="shead">
-      <span class="shead__kanji">階</span>
-      <div class="shead__top"><span class="shead__num">03</span><span class="shead__line"></span></div>
-      <h2 class="shead__title"><span class="mask"><span class="t">Иерархия корпуса</span></span></h2>
-      <p class="shead__sub">Каждая ступень защищает тех, кто ниже. Структура истребителей, не лун.</p>
+<!-- 03 ПУТЬ: русло от ученика до мечника -->
+<section class="hb-section hb-path" id="path">
+  <div class="hb-wrap hb-path__grid">
+    <div class="hb-path__aside reveal">
+      <span class="hb-path__kanji" aria-hidden="true">道</span>
+      <h2 class="hb-path__title">Путь<br>истребителя</h2>
+      <p class="hb-path__note">Одно русло, четыре ступени. От ученика без клинка — до мечника, способного защитить.</p>
+      <div class="hb-path__btns">
+        <a class="btn btn--water" href="{{page:elevation}}"><span>Требования рангов</span></a>
+        <a class="btn btn--ghost" href="{{page:roster}}">Состав и иерархия →</a>
+      </div>
     </div>
 
-    <div class="timeline">
-      <div class="timeline__rail"><div class="timeline__fill"></div></div>
+    <div class="hb-river reveal">
+      <span class="hb-river__rail" aria-hidden="true">
+        <span class="timeline__fill hb-river__fill"></span>
+      </span>
+      <ol class="hb-river__stops">
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 01 · штаб</p>
+            <h3>Дыхание и боккен</h3>
+            <p>Тотальная концентрация дыхания и деревянный клинок. Ученик не выходит за пределы штаба без сопровождения.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">息</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 02 · Фуджикасане</p>
+            <h3>Финальный отбор</h3>
+            <p>Семь дней среди демонов на горе. Выжил и доказал — корпус принимает тебя.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">選</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 03 · клинок</p>
+            <h3>Ничирин и наставник</h3>
+            <p>Клинок, меняющий цвет, и закрепление за инструктором или Столпом. Первый ранг — Мидзуното.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">刀</span>
+        </li>
+        <li class="hb-stop">
+          <span class="hb-stop__dot" aria-hidden="true"></span>
+          <div class="hb-stop__card">
+            <p class="hb-stop__cap">Ступень 04 · корпус</p>
+            <h3>Мечник воды</h3>
+            <p>Зачистки, сборы Столпов, защита гражданских. Ранг растёт по делам и точкам, а не по годам.</p>
+          </div>
+          <span class="hb-stop__k" aria-hidden="true">流</span>
+        </li>
+      </ol>
+    </div>
+  </div>
 
-      <div class="tnode tnode--major reveal">
-        <span class="tnode__dot ico" data-ico="crown"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Ояката-сама — Глава Организации</p><span class="tnode__idx">00</span></div>
-          <p class="tnode__sub">Семья Убуяшики — основатели корпуса</p>
-        </div>
-      </div>
+  <div class="hb-wrap">
+    <ul class="hb-duty reveal">
+      <li><span class="hb-duty__k" aria-hidden="true">義</span>Защищать гражданских и товарищей</li>
+      <li><span class="hb-duty__k" aria-hidden="true">礼</span>Являться на сборы Столпов и зачистки</li>
+      <li><span class="hb-duty__k" aria-hidden="true">忍</span>Соблюдать дресс-код и секретность корпуса</li>
+      <li><span class="hb-duty__k" aria-hidden="true">黙</span>Не раскрывать тайны корпуса гражданским</li>
+    </ul>
+  </div>
+</section>
 
-      <div class="tnode tnode--major reveal">
-        <span class="tnode__dot ico" data-ico="shield"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Столпы — 9 сильнейших</p><span class="tnode__idx">01</span></div>
-          <p class="tnode__sub">Руководители дыханий. Столп Воды — Томиока Гию</p>
-          <div class="rankchips"><span><b>水</b> Вода</span><span><b>蝶</b> Насекомое</span><span><b>炎</b> Пламя</span><span>и др.</span></div>
-        </div>
-      </div>
+<!-- 04 РАНГИ: лестница повышений -->
+{{ranks}}
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="medal"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Цугуко — преемники</p><span class="tnode__idx">02</span></div>
-          <p class="tnode__sub">Наследники столпов, вторая сила дыхания</p>
-        </div>
-      </div>
+<!-- 05 КАТА: десять форм -->
+{{kata-teaser}}
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="scroll"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Инструкторы</p><span class="tnode__idx">03</span></div>
-          <p class="tnode__sub">Младший командный состав, обучение взвода</p>
-        </div>
-      </div>
+{{marquee}}
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="drops"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Истребители — Киноэ → Мидзуното</p><span class="tnode__idx">04</span></div>
-          <p class="tnode__sub">Основа корпуса. Ранги от Seito до Киноэ. Выполняют задания, защищают гражданских.</p>
-        </div>
-      </div>
+<!-- 06 СОСТАВ -->
+{{groups}}
 
-      <div class="tnode reveal">
-        <span class="tnode__dot ico" data-ico="shield"></span>
-        <div class="tnode__card">
-          <div class="tnode__row"><p class="tnode__name">Ученики</p><span class="tnode__idx">05</span></div>
-          <p class="tnode__sub">Начинающие без клинка. Обучаются тотальному дыханию и базовым формам.</p>
-        </div>
-      </div>
+<!-- 07 ПОРЯДОК: поместье и устав -->
+<section class="hb-section hb-section--dim hb-order" id="order">
+  <div class="hb-wrap">
+    <header class="hb-head reveal">
+      <span class="hb-head__kanji" aria-hidden="true">規</span>
+      <p class="hb-head__num"><span>06</span><i aria-hidden="true"></i><span class="hb-head__tail" aria-hidden="true">порядок</span></p>
+      <h2 class="hb-head__title">Правила, которые <em>берегут</em></h2>
+      <p class="hb-head__sub">Устав корпуса и отдельные правила территории Поместья Бабочки — целиком, в удобном для чтения виде.</p>
+    </header>
 
-      <p class="timeline__foot">При встрече Столпа или Убуяшики — колено и приветствие. Ученики без сопровождения за пределы штаба не выходят, в бой с демонами — только на Финальном отборе.</p>
-      <div class="duty__links" style="margin-top:24px"><a class="btn btn--ghost" href="{{page:roster}}">Состав и иерархия →</a></div>
+    <div class="hb-order__grid">
+      <article class="hb-card hb-order__card reveal">
+        <span class="hb-card__k" aria-hidden="true">法</span>
+        <p class="hb-card__role">высший нормативный акт</p>
+        <h3 class="hb-card__title">Устав Организации</h3>
+        <p class="hb-card__text">Обязателен к исполнению каждым истребителем: права и обязанности, дисциплина, наказания и порядок на штабе и в бою.</p>
+        <ul class="hb-list">
+          <li>Дисциплина и субординация в строю</li>
+          <li>Запрет на оружие вне гальки</li>
+          <li>Секретность корпуса и отчётность</li>
+        </ul>
+        <a class="btn btn--ghost" href="{{page:law}}">Читать устав →</a>
+      </article>
+
+      <article class="hb-card hb-order__card hb-order__card--butterfly reveal">
+        <span class="hb-card__k" aria-hidden="true">蝶</span>
+        <p class="hb-card__role">медицина корпуса</p>
+        <h3 class="hb-card__title">Поместье Кочо</h3>
+        <p class="hb-card__text">Территория лечения и милосердия. Здесь свои правила: тишина, сданное оружие и уважение к работе медиков.</p>
+        <ul class="hb-list">
+          <li>Уведомить о прибытии через ворона</li>
+          <li>Сдать клинок ничирин и кунаи</li>
+          <li>Не мешать медицинскому персоналу</li>
+        </ul>
+        <a class="btn btn--ghost" href="{{page:butterfly}}">Правила поместья →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 08 ПРИСЯГА -->
+<section class="hb-cta">
+  <div class="hb-cta__glow" aria-hidden="true"></div>
+  <div class="hb-cta__in reveal">
+    <p class="hb-cta__eyebrow">присяга воды</p>
+    <h2 class="hb-cta__title">Стань <em>как вода</em></h2>
+    <p class="hb-cta__text">Течение не остановить. Если ты готов встать между людьми и тьмой — в корпусе есть место. Начни с дыхания.</p>
+    <div class="hb-cta__btns">
+      <a class="btn btn--water" href="{{page:roster}}"><span>Встать в строй</span></a>
+      <a class="btn btn--ghost" href="{{page:elevation}}">Путь и требования →</a>
     </div>
   </div>
 </section>

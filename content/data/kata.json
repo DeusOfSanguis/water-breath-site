@@ -5,8 +5,8 @@
       "name": "Первая ката: Рассекающий поверхность воды",
       "name_jp": "壱ノ型・水面斬り",
       "description": "Мощный горизонтальный удар, концентрирующий всю силу в одной линии. Базовая форма дыхания воды.",
-      "gif": "assets/kata/1-kata.gif",
-      "video": "assets/kata/1-kata.webm",
+      "video": "assets/kata/01-kata.mp4",
+      "poster": "assets/kata/01-kata-poster.jpg",
       "tips": "Используй как финишер, целься в шею."
     },
     {
@@ -14,8 +14,8 @@
       "name": "Вторая ката: Водяное колесо",
       "name_jp": "弐ノ型・水車",
       "description": "Вертикальное вращение тела с клинком, создающее круговой разрез.",
-      "gif": "assets/kata/2-kata.gif",
-      "video": "assets/kata/2-kata.webm",
+      "video": "assets/kata/02-kata.mp4",
+      "poster": "assets/kata/02-kata-poster.jpg",
       "tips": "Хороша против нескольких противников."
     },
     {
@@ -23,8 +23,8 @@
       "name": "Третья ката: Танец стремительного потока",
       "name_jp": "参ノ型・流流舞い",
       "description": "Стремительное движение как течение реки, быстрые шаги и рубящие удары.",
-      "gif": "assets/kata/3-kata.gif",
-      "video": "assets/kata/3-kata.webm",
+      "video": "assets/kata/03-kata.mp4",
+      "poster": "assets/kata/03-kata-poster.jpg",
       "tips": "Используй для сближения."
     },
     {
@@ -32,8 +32,8 @@
       "name": "Четвертая ката: Удар приливной волны",
       "name_jp": "肆ノ型・打ち潮",
       "description": "Множественные удары волной, наносятся в быстрой последовательности.",
-      "gif": "assets/kata/4-kata.gif",
-      "video": "assets/kata/4-kata.webm",
+      "video": "assets/kata/04-kata.mp4",
+      "poster": "assets/kata/04-kata-poster.jpg",
       "tips": "Держи ритм, не торопись."
     },
     {
@@ -41,8 +41,8 @@
       "name": "Пятая ката: Благословенный дождь после засухи",
       "name_jp": "伍ノ型・干天の慈雨",
       "description": "Милосердный удар — быстрая и безболезненная смерть для противника. Удар милосердия.",
-      "gif": "assets/kata/5-kata.gif",
-      "video": "assets/kata/5-kata.webm",
+      "video": "assets/kata/05-kata.mp4",
+      "poster": "assets/kata/05-kata-poster.jpg",
       "tips": "Применяется к уже побеждённому демону."
     },
     {
@@ -50,8 +50,8 @@
       "name": "Шестая ката: Вихрь",
       "name_jp": "陸ノ型・ねじれ渦",
       "description": "Мощное вращение всего тела, создающее вихрь воды, затягивающий всё вокруг.",
-      "gif": "assets/kata/6-kata.gif",
-      "video": "assets/kata/6-kata.webm",
+      "video": "assets/kata/06-kata.mp4",
+      "poster": "assets/kata/06-kata-poster.jpg",
       "tips": "Используй в окружении."
     },
     {
@@ -59,8 +59,8 @@
       "name": "Седьмая ката: Изгиб поверхности воды",
       "name_jp": "漆ノ型・雫波紋突き",
       "description": "Самый быстрый выпад — точный укол как капля, создающая рябь.",
-      "gif": "assets/kata/7-kata.gif",
-      "video": "assets/kata/7-kata.webm",
+      "video": "assets/kata/07-kata.mp4",
+      "poster": "assets/kata/07-kata-poster.jpg",
       "tips": "Требует идеальной концентрации."
     },
     {
@@ -68,8 +68,8 @@
       "name": "Восьмая ката: Удар водопада",
       "name_jp": "捌ノ型・滝壺",
       "description": "Мощный рубящий удар сверху вниз, как падающий водопад.",
-      "gif": "assets/kata/8-kata.gif",
-      "video": "assets/kata/8-kata.webm",
+      "video": "assets/kata/08-kata.mp4",
+      "poster": "assets/kata/08-kata-poster.jpg",
       "tips": "Прыжок + удар сверху."
     },
     {
@@ -77,8 +77,8 @@
       "name": "Девятая ката: Всплеск водяного потока",
       "name_jp": "玖ノ型・水流飛沫",
       "description": "Хаотичные шаги, сбивающие прицел врага, и резкие удары с разных углов.",
-      "gif": "assets/kata/9-kata.gif",
-      "video": "assets/kata/9-kata.webm",
+      "video": "assets/kata/09-kata.mp4",
+      "poster": "assets/kata/09-kata-poster.jpg",
       "tips": "Запутай противника движением."
     },
     {
@@ -86,8 +86,8 @@
       "name": "Десятая ката: Постоянный поток",
       "name_jp": "拾ノ型・生生流転",
       "description": "Непрерывная серия усиливающихся ударов, текущая как река, становящаяся сильнее с каждым вращением.",
-      "gif": "assets/kata/10-kata.gif",
-      "video": "assets/kata/10-kata.webm",
+      "video": "assets/kata/10-kata.mp4",
+      "poster": "assets/kata/10-kata-poster.jpg",
       "tips": "Финальная форма — чем дольше держишь, тем сильнее."
     }
   ]

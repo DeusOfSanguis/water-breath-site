@@ -31,6 +31,15 @@ FAVICON = (
     "%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%A7%3C/text%3E%3C/svg%3E"
 )
 
+CURSOR_HTML = (
+    '<div class="wcur" data-cursor aria-hidden="true">'
+    '<span class="wcur__glow"></span>'
+    '<span class="wcur__ring"></span>'
+    '<span class="wcur__dot"></span>'
+    '<span class="wcur__fx" data-cursor-fx></span>'
+    "</div>"
+)
+
 FONTS_URL = (
     "https://fonts.googleapis.com/css2?"
     "family=Unbounded:wght@300;400;600;800;900"
@@ -59,8 +68,10 @@ SIGIL = {
 
 SPINE = [
     ("faction", "01", "Вода"),
-    ("path", "02", "Путь"),
-    ("hierarchy", "03", "Иерархия"),
+    ("codex7", "02", "Кодекс"),
+    ("path", "03", "Путь"),
+    ("kata", "04", "Ката"),
+    ("groups", "05", "Состав"),
 ]
 
 def load():
@@ -126,6 +137,9 @@ def render_fragment(fragment, data, prefix="", asset_base=None, kind="site"):
     out = out.replace("{{marquee:reverse}}", render_marquee(data, True))
     out = out.replace("{{roster}}", render_roster(data))
     out = out.replace("{{kata}}", render_kata(data, prefix=prefix, asset_base=asset_base))
+    out = out.replace("{{kata-teaser}}", render_kata_teaser(data, prefix=prefix, asset_base=asset_base, kind=kind))
+    out = out.replace("{{ranks}}", render_ranks(data, prefix=prefix, kind=kind))
+    out = out.replace("{{groups}}", render_groups(data, prefix=prefix, kind=kind))
     out = out.replace("{{promotions}}", render_promotions(data))
     out = out.replace("{{ranking-top}}", render_ranking_top(data))
     return out
@@ -133,40 +147,86 @@ def render_fragment(fragment, data, prefix="", asset_base=None, kind="site"):
 def _sigil(page):
     return page.get("sigil") or SIGIL.get(page["slug"], "水")
 
+def plural(n, forms=("требование", "требования", "требований")):
+    """Русская форма слова по числу."""
+    n = abs(int(n))
+    if n % 10 == 1 and n % 100 != 11:
+        return forms[0]
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return forms[1]
+    return forms[2]
+
+
+def hb_head(num, kanji, title, sub="", tail=""):
+    """Заголовок секции главной: номер, иероглиф, крупное название и подпись."""
+    sub_html = f'<p class="hb-head__sub">{sub}</p>' if sub else ""
+    tail_html = f'<span class="hb-head__tail" aria-hidden="true">{tail}</span>' if tail else ""
+    return (
+        '<header class="hb-head reveal">'
+        f'<span class="hb-head__kanji" aria-hidden="true">{kanji}</span>'
+        f'<p class="hb-head__num"><span>{num}</span><i aria-hidden="true"></i>{tail_html}</p>'
+        f'<h2 class="hb-head__title">{title}</h2>'
+        f"{sub_html}"
+        "</header>"
+    )
+
+
 def render_nav(data, current_page):
+    """Шапка: логотип + лента вкладок-разделов (новый вариант — «жидкая» полоса
+    с плавающей каплей-подсветкой, которая едет за активной вкладкой)."""
     site = data["site"]
     up = rel_prefix(current_page)
     home = "./" if current_page["slug"] == "index" else up
-    seals = []
-    home_on = current_page["slug"] == "index"
-    seals.append(
-        f'<a class="seal{" seal--on" if home_on else ""}" href="{home}"'
-        + (' aria-current="page"' if home_on else "")
-        + f'><i>{SIGIL["index"]}</i><span>Вода</span></a>'
-    )
+    entries = [{
+        "slug": "index",
+        "href": home,
+        "sigil": SIGIL["index"],
+        "label": "Вода",
+        "title": site["name"],
+    }]
     for p in data["pages"]:
         if not p.get("nav"):
             continue
-        on = p["slug"] == current_page["slug"]
-        seals.append(
-            f'<a class="seal{" seal--on" if on else ""}" href="{up}{page_path(p)}"'
+        entries.append({
+            "slug": p["slug"],
+            "href": up + page_path(p),
+            "sigil": _sigil(p),
+            "label": p["nav"],
+            "title": p["title"],
+        })
+    tabs = []
+    for e in entries:
+        on = e["slug"] == current_page["slug"]
+        tabs.append(
+            f'<a class="ntab{" is-on" if on else ""}" href="{e["href"]}"'
             + (' aria-current="page"' if on else "")
-            + f'><i>{html.escape(_sigil(p))}</i><span>{html.escape(p["nav"])}</span></a>'
+            + f' data-nav-title="{html.escape(e["title"])}"'
+            + f' data-nav-sigil="{html.escape(e["sigil"])}">'
+            + f'<i class="ntab__k" aria-hidden="true">{html.escape(e["sigil"])}</i>'
+            + f'<span class="ntab__t">{html.escape(e["label"])}</span>'
+            + "</a>"
         )
     return (
         '<header class="nav">'
         '<div class="nav__in">'
-        f'<a class="nav__logo" href="{home}"><span class="nav__drop">{SIGIL["index"]}</span>'
-        f'<span>{html.escape(site["home_label"]).replace("·", "<i>·</i>")}</span></a>'
-        '<div class="nav__seals" data-seals><div class="nav__seals-track">'
-        + "".join(seals) +
-        "</div></div>"
+        f'<a class="nav__logo" href="{home}" data-nav-title="{html.escape(site["name"])}"'
+        f' data-nav-sigil="{SIGIL["index"]}"><span class="nav__drop">{SIGIL["index"]}</span>'
+        f'<span class="nav__word">{html.escape(site["home_label"]).replace("·", "<i>·</i>")}</span></a>'
+        '<nav class="ntabs" data-seals aria-label="Разделы сайта">'
+        '<span class="ntabs__track" data-tabs-track>'
+        '<span class="ntabs__ink" data-tabs-ink aria-hidden="true"></span>'
+        '<span class="ntabs__drop" data-tabs-drop aria-hidden="true"></span>'
+        + "".join(tabs) + "</span>"
+        '<span class="ntabs__wave" aria-hidden="true"></span>'
+        "</nav>"
         '<button class="nav__burger" data-menu-open aria-label="Открыть кодекс">'
         '<span class="nav__burger-k">水</span><span class="nav__burger-t">Кодекс</span></button>'
         "</div></header>"
     )
 
+
 def render_mmenu(data, current_page):
+    """Кодекс — выезжающая панель со всеми разделами (для телефона и как карта сайта)."""
     up = rel_prefix(current_page)
     home = "./" if current_page["slug"] == "index" else up
     cards = []
@@ -178,7 +238,8 @@ def render_mmenu(data, current_page):
     for i, (slug, title, short, href, sig) in enumerate(entries):
         on = " on" if slug == current_page["slug"] else ""
         cards.append(
-            f'<a class="codex__card{on}" href="{href}" style="transition-delay:{0.04 + i * 0.035:.2f}s">'
+            f'<a class="codex__card{on}" href="{href}" style="transition-delay:{0.04 + i * 0.035:.2f}s"'
+            f' data-nav-title="{html.escape(title)}" data-nav-sigil="{html.escape(sig)}">'
             f'<span class="codex__n">{i:02d}</span>'
             f'<span class="codex__t">{html.escape(title)}</span>'
             f'<span class="codex__s">{html.escape(short)}</span>'
@@ -195,6 +256,7 @@ def render_mmenu(data, current_page):
         '<span class="mmenu__foot">水 · чистота · течение · защита</span>'
         "</div>"
     )
+
 
 def render_spine():
     links = []
@@ -223,6 +285,13 @@ def render_quote(text, author, css_class):
 def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=False):
     is_index = page["slug"] == "index" and not compact
     bg = resolve_asset(page.get("cover_image") or "cover.jpg", data, prefix, asset_base)
+
+    def hero_link(slug, fallback="#faction"):
+        for pg in data["pages"]:
+            if pg["slug"] == slug:
+                return prefix + page_path(pg)
+        return fallback
+
     media = f'<img class="bg" src="{bg}" alt="" fetchpriority="high">'
     if is_index:
         w1 = page.get("hero_title_1") or "ДЫХАНИЕ"
@@ -237,14 +306,46 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
             '<span class="t">дыхание воды</span>'
             "</div>"
         )
-        cue = '<a class="hero__cue" href="#faction" aria-label="Дальше"><span aria-hidden="true">﹀</span></a>'
-        cls = "hero"
+        cue = (
+            '<a class="hero__cue" href="#faction">'
+            '<span class="hero__cue-t">Листай вниз</span><span aria-hidden="true">﹀</span></a>'
+        )
+        cls = "hero hero--index"
+        stats = [
+            ("10", "форм воды"),
+            ("7", "принципов кодекса"),
+            ("10", "рангов пути"),
+            ("4", "завета"),
+        ]
+        stats_html = "".join(
+            f'<li><b>{n}</b><span>{html.escape(label)}</span></li>' for n, label in stats
+        )
         content = (
-            f'<p class="hero__eyebrow">💧&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
+            f'<p class="hero__eyebrow">水&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
             f'<h1 class="hero__title">{title}</h1>'
             f"{quote_html}"
+            '<div class="hero__btns">'
+            f'<a class="btn btn--water" href="{hero_link("codex")}"><span>Кодекс воды</span></a>'
+            f'<a class="btn btn--ghost" href="{hero_link("kata")}">Десять форм →</a>'
+            "</div>"
+            f'<ul class="hero__stats">{stats_html}</ul>'
         )
-        crest = ""
+        crest = (
+            '<div class="hero__crest hero__crest--index" aria-hidden="true">'
+            '<span class="hero__crest-k">水</span>'
+            '<span class="hero__crest-t">стань как вода</span>'
+            "</div>"
+        )
+        waves = (
+            '<div class="hero__waves" aria-hidden="true">'
+            '<svg viewBox="0 0 1440 120" preserveAspectRatio="none" class="hero__wave hero__wave--back">'
+            '<path d="M0,70 C160,20 320,20 480,70 C640,120 800,120 960,70 C1120,20 1280,20 1440,70 L1440,120 L0,120 Z"/>'
+            "</svg>"
+            '<svg viewBox="0 0 1440 120" preserveAspectRatio="none" class="hero__wave hero__wave--front">'
+            '<path d="M0,80 C160,40 320,40 480,80 C640,120 800,120 960,80 C1120,40 1280,40 1440,80 L1440,120 L0,120 Z"/>'
+            "</svg>"
+            "</div>"
+        )
     else:
         sig = html.escape(_sigil(page))
         label = page.get("nav") or page["cover_uptitle"]
@@ -259,6 +360,7 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
             "</div>"
         )
         crest = f'<div class="hero__crest" aria-hidden="true"><span>{sig}</span></div>'
+        waves = ""
         content = (
             f'<p class="hero__eyebrow">{sig}&nbsp;&nbsp;{html.escape(page["cover_uptitle"])}</p>'
             f'<h1 class="hero__title">{title}</h1>'
@@ -270,6 +372,7 @@ def render_hero(page, data, prefix="", asset_base=None, kind="site", compact=Fal
         f"{kanji}{crest}"
         f'<div class="hero__in">{content}</div>'
         f"{cue}"
+        f"{waves}"
         "</section>"
     )
 
@@ -308,6 +411,55 @@ def render_roster(data):
         out.append('</div></div>')
     return '<section class="s">' + "".join(out) + '</section>'
 
+def kata_media(f, prefix="", asset_base=None):
+    """Возвращает <video> для формы ката.
+
+    Поддерживает mp4 (основной формат) + webm как второй источник,
+    постер берётся из поля poster, иначе — общий kata-poster.svg.
+    Ленивая загрузка: src подставляется скриптом (data-src), плеер играет
+    по наведению/тапу. Так 10 анимаций не тянутся все сразу.
+    """
+    fid = f.get("id", "")
+    name = html.escape(str(f.get("name", "")))
+    video = str(f.get("video") or f.get("gif") or "")
+    webm = str(f.get("webm") or "")
+    poster = str(f.get("poster") or "assets/kata/kata-poster.svg")
+
+    def url(path):
+        if not path:
+            return ""
+        if path.startswith("http"):
+            return path
+        if asset_base:
+            return asset_base.rstrip("/") + "/" + path
+        return prefix + path
+
+    def exists(path):
+        return bool(path) and (path.startswith("http") or os.path.exists(os.path.join(ROOT, path)))
+
+    sources = []
+    if exists(video):
+        kind = "video/webm" if video.lower().endswith(".webm") else "video/mp4"
+        sources.append(f'<source data-src="{url(video)}" type="{kind}">')
+    if exists(webm):
+        sources.append(f'<source data-src="{url(webm)}" type="video/webm">')
+    label = f'Анимация: {name}'
+    if sources:
+        return (
+            '<figure class="kata-card__media" data-kata-media>'
+            f'<video muted loop playsinline preload="none" poster="{url(poster)}"'
+            f' data-kata-video aria-label="{label}">'
+            + "".join(sources) +
+            "</video>"
+            "</figure>"
+        )
+    if exists(str(f.get("gif") or "")):
+        return (f'<figure class="kata-card__media"><img src="{url(f.get("gif"))}" '
+                f'alt="{name}" loading="lazy"></figure>')
+    return (f'<figure class="kata-card__media kata-card__media--soon">'
+            f'<span>Анимация формы {html.escape(str(fid))} — скоро</span></figure>')
+
+
 def render_kata(data, prefix="", asset_base=None):
     kata = (data.get("lists") or {}).get("kata") or {}
     forms = kata.get("forms") or []
@@ -315,31 +467,167 @@ def render_kata(data, prefix="", asset_base=None):
         return '<section class="s"><p>Формы скоро появятся.</p></section>'
     cards = []
     for f in forms:
-        fid = f.get("id","")
-        name = html.escape(f.get("name",""))
-        jp = html.escape(f.get("name_jp",""))
-        desc = html.escape(f.get("description",""))
-        tips = html.escape(f.get("tips",""))
-        gif = f.get("gif","")
-        video = f.get("video","")
-        if video and (video.startswith("http") or os.path.exists(os.path.join(ROOT, video))):
-            vsrc = (asset_base.rstrip("/") + "/" + video) if asset_base and not video.startswith("http") else (prefix + video if not video.startswith("http") else video)
-            psrc = (asset_base.rstrip("/") + "/assets/kata/kata-poster.svg") if asset_base else (prefix + "assets/kata/kata-poster.svg")
-            media = f'<div class="kata-card__media"><video src="{vsrc}" muted loop playsinline preload="metadata" poster="{psrc}" aria-label="{name}"></video></div>'
-        elif gif and (gif.startswith("http") or os.path.exists(os.path.join(ROOT, gif))):
-            gsrc = (asset_base.rstrip("/") + "/" + gif) if asset_base and not gif.startswith("http") else (prefix + gif if not gif.startswith("http") else gif)
-            media = f'<div class="kata-card__media"><img src="{gsrc}" alt="{name}" loading="lazy"></div>'
-        else:
-            media = f'<div class="kata-card__media"><span>Место для гифки {fid} — скоро</span></div>'
-        cards.append(
-            f'<div class="kata-card"><span class="kata-card__num">{fid:02d}</span>'
-            f'<p class="kata-card__jp">{jp}</p>'
-            f'<h3>{name}</h3>'
-            f'<p>{desc}</p>'
-            f'<p style="color:var(--ash);font-size:12px">💡 {tips}</p>'
-            f'{media}</div>'
+        fid = f.get("id", "")
+        num = f"{int(fid):02d}" if str(fid).isdigit() else html.escape(str(fid))
+        name = html.escape(str(f.get("name", "")))
+        jp = html.escape(str(f.get("name_jp", "")))
+        desc = html.escape(str(f.get("description", "")))
+        tips = html.escape(str(f.get("tips", "")))
+        tip_html = (
+            '<p class="kata-card__tip"><span class="kata-card__tip-k" aria-hidden="true">技</span>'
+            f"{tips}</p>" if tips else ""
         )
-    return '<section class="s"><div class="kata-grid" id="kataGrid">' + "".join(cards) + '</div></section>'
+        cards.append(
+            '<article class="kata-card reveal" data-kata-card>'
+            '<div class="kata-card__top">'
+            f'<span class="kata-card__num">{num}</span>'
+            f'<p class="kata-card__jp">{jp}</p>'
+            "</div>"
+            f"<h3>{name}</h3>"
+            f"<p>{desc}</p>"
+            f"{tip_html}"
+            f"{kata_media(f, prefix=prefix, asset_base=asset_base)}"
+            "</article>"
+        )
+    return '<section class="s"><div class="kata-grid" id="kataGrid">' + "".join(cards) + "</div></section>"
+
+
+def render_kata_teaser(data, prefix="", asset_base=None, kind="site"):
+    """Секция ката для главной: ролик-превью + список всех форм."""
+    kata = (data.get("lists") or {}).get("kata") or {}
+    forms = kata.get("forms") or []
+    if not forms:
+        return ""
+    href = page_url(data, "kata", kind, prefix)
+
+    preview = forms[-1]
+    for f in forms:
+        if str(f.get("id")) == "10":
+            preview = f
+    pname = str(preview.get("name", ""))
+    short = pname.split(":", 1)[-1].strip() or pname
+
+    chips = []
+    for f in forms:
+        fid = f.get("id", "")
+        num = f"{int(fid):02d}" if str(fid).isdigit() else html.escape(str(fid))
+        fname = str(f.get("name", ""))
+        fshort = fname.split(":", 1)[-1].strip() or fname
+        chips.append(
+            f'<a class="hb-kata__chip" href="{href}">'
+            f'<span class="hb-kata__chip-n">{num}</span>'
+            f'<span class="hb-kata__chip-t">{html.escape(fshort)}</span>'
+            f'<span class="hb-kata__chip-jp" aria-hidden="true">{html.escape(str(f.get("name_jp", "")))}</span>'
+            "</a>"
+        )
+
+    head = hb_head(
+        "04", "型", 'Десять форм <em>воды</em>',
+        'От рассекающей поверхность воды до постоянного потока, что усиливается с каждым вращением.',
+        "ката",
+    )
+    return (
+        '<section class="hb-section hb-section--dim hb-kata" id="kata">'
+        '<div class="hb-wrap">'
+        + head +
+        '<div class="hb-kata__grid">'
+        '<div class="hb-kata__preview reveal">'
+        + kata_media(preview, prefix=prefix, asset_base=asset_base) +
+        '<div class="hb-kata__cap">'
+        f'<span class="hb-kata__cap-n">{html.escape(short)}</span>'
+        f'<span class="hb-kata__cap-jp">{html.escape(str(preview.get("name_jp", "")))}</span>'
+        "</div>"
+        "</div>"
+        '<div class="hb-kata__list">' + "".join(chips) + "</div>"
+        "</div>"
+        f'<div class="hb-kata__more"><a class="btn btn--water" href="{href}">'
+        "<span>Разобрать все формы →</span></a></div>"
+        "</div></section>"
+    )
+
+
+def render_ranks(data, prefix="", kind="site"):
+    """Секция рангов для главной: лестница из промоушен-документа."""
+    prom = (data.get("lists") or {}).get("promotions") or {}
+    steps = prom.get("fighters") or []
+    if not steps:
+        return ""
+    rows = []
+    total = len(steps)
+    for i, step in enumerate(steps):
+        fr = html.escape(str(step.get("from", "")))
+        to = html.escape(str(step.get("to", "")))
+        req = len(step.get("requirements") or [])
+        pct = int(round((i + 1) / total * 100))
+        rows.append(
+            f'<li class="hb-rank reveal" style="--p:{pct}%">'
+            f'<span class="hb-rank__i">{i + 1:02d}</span>'
+            f'<p class="hb-rank__path"><span>{fr}</span><i aria-hidden="true">→</i><b>{to}</b></p>'
+            f'<span class="hb-rank__req">{req}&nbsp;{plural(req)}</span>'
+            f'<span class="hb-rank__bar" aria-hidden="true"></span>'
+            "</li>"
+        )
+    head = hb_head(
+        "03", "昇", 'Десять рангов <em>пути</em>',
+        'Мидзуното — первый ранг после отбора. Киноэ — высшая ступень истребителя воды.',
+        "ранги",
+    )
+    return (
+        '<section class="hb-section hb-ranks" id="ranks">'
+        '<div class="hb-wrap">'
+        + head +
+        '<ol class="hb-ranks__ladder">' + "".join(rows) + "</ol>"
+        '<div class="hb-ranks__more">'
+        f'<a class="btn btn--ghost" href="{page_url(data, "elevation", kind, prefix)}">Требования к каждому рангу →</a>'
+        "</div>"
+        "</div></section>"
+    )
+
+
+def render_groups(data, prefix="", kind="site"):
+    """Секция состава для главной: группы дыхания воды (Столп, цугуко, инструкторы…)."""
+    roster = (data.get("lists") or {}).get("roster") or {}
+    groups = roster.get("groups") or []
+    if not groups:
+        return ""
+    cards = []
+    for g in groups:
+        members = []
+        for m in g.get("members") or []:
+            name = html.escape(str(m.get("name", "")))
+            title = html.escape(str(m.get("title", "")))
+            status = html.escape(str(m.get("status", "")))
+            desc = html.escape(str(m.get("description", "")))
+            free = "Вакантно" in str(m.get("name", "")) or "свободно" in str(m.get("status", "")).lower()
+            members.append(
+                f'<li class="hb-group__m{" is-free" if free else ""}">'
+                f'<span class="hb-group__name">{name}</span>'
+                f'<span class="hb-group__meta">{title}{" · " + status if status else ""}</span>'
+                f'<p class="hb-group__desc">{desc}</p>'
+                "</li>"
+            )
+        cards.append(
+            '<article class="hb-card hb-group reveal">'
+            f'<p class="hb-card__role">{html.escape(str(g.get("role", "")))}</p>'
+            f'<h3 class="hb-card__title">{html.escape(str(g.get("name", "")))}</h3>'
+            '<ul class="hb-group__list">' + "".join(members) + "</ul>"
+            "</article>"
+        )
+    head = hb_head(
+        "05", "隊", 'Состав <em>корпуса</em>',
+        'Столп воды, его преемники, инструкторы, истребители и ученики — одна река.',
+        "состав",
+    )
+    return (
+        '<section class="hb-section hb-groups" id="groups">'
+        '<div class="hb-wrap">'
+        + head +
+        '<div class="hb-groups__grid">' + "".join(cards) + "</div>"
+        '<div class="hb-groups__more"><a class="btn btn--ghost" href="'
+        + page_url(data, "roster", kind, prefix) + '">Полный состав и иерархия →</a></div>'
+        "</div></section>"
+    )
+
 
 def render_promotions(data):
     prom = (data.get("lists") or {}).get("promotions") or {}
@@ -432,6 +720,31 @@ def render_preloader():
         "</div>"
     )
 
+def render_veil(sig=""):
+    """Штора-волна для переходов между страницами.
+
+    Панель = волна сверху + вода + волна снизу. При уходе со страницы вода
+    поднимается снизу и накрывает экран, при приходе — уходит вверх и открывает
+    новую страницу. Без JS штору убирает CSS-анимация в html.veil-cover.
+    """
+    sig = (sig or "").strip() or "水"
+    wave_in = "M0,64 C120,20 240,20 360,64 C480,108 600,108 720,64 C840,20 960,20 1080,64 C1200,108 1320,108 1440,64 L1440,120 L0,120 Z"
+    wave_out = "M0,56 C120,100 240,100 360,56 C480,12 600,12 720,56 C840,100 960,100 1080,56 C1200,12 1320,12 1440,56 L1440,0 L0,0 Z"
+    return (
+        '<div class="veil" data-veil aria-hidden="true">'
+        '<div class="veil__panel">'
+        f'<svg class="veil__wave veil__wave--in" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="{wave_in}"/></svg>'
+        '<div class="veil__fill">'
+        f'<span class="veil__kanji" data-veil-kanji>{html.escape(str(sig))}</span>'
+        '<span class="veil__label" data-veil-label>Дыхание воды</span>'
+        '<span class="veil__bar"><i></i></span>'
+        "</div>"
+        f'<svg class="veil__wave veil__wave--out" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="{wave_out}"/></svg>'
+        "</div>"
+        "</div>"
+    )
+
+
 def render_document(page, data, body, css_link=None, css_inline=None,
                     js_link=None, js_inline=None, body_class=""):
     site = data["site"]
@@ -449,11 +762,15 @@ def render_document(page, data, body, css_link=None, css_inline=None,
     cls = f"page-{slug} {body_class}".strip()
     visit = (
         "<script>try{"
-        "if(sessionStorage.getItem('wb-visited')){document.documentElement.classList.add('bp-seen');}"
+        "var de=document.documentElement;"
+        "if(sessionStorage.getItem('wb-visited')){de.classList.add('bp-seen');}"
         "else{sessionStorage.setItem('wb-visited','1');}"
+        "if(sessionStorage.getItem('wb-nav')){de.classList.add('veil-cover');"
+        "try{sessionStorage.removeItem('wb-nav');}catch(e2){}}"
         "}catch(e){}</script>"
     )
     theme_init = ""
+    veil = render_veil(sig)
     return f"""<!DOCTYPE html>
 <html lang="{site['lang']}">
 <head>
@@ -474,7 +791,7 @@ def render_document(page, data, body, css_link=None, css_inline=None,
 {head_css}
 </head>
 <body id="top" class="{cls}" data-sigil="{sig}">
-<div class="veil" aria-hidden="true"></div>
+{veil}
 {body}
 {script}
 </body>
@@ -562,7 +879,7 @@ def build(asset_base=None):
         up = rel_prefix(page)
         main_cls = ' id="content"' if is_index else f' id="content" class="article" data-kanji="{sig}"'
         body = (
-            '<div class="water-cursor" aria-hidden="true"></div>\n'
+            CURSOR_HTML + "\n"
             '<div class="progress"></div>\n'
             + (render_spine() if is_index else "")
             + render_nav(data, page)
@@ -613,6 +930,7 @@ def build(asset_base=None):
 def write_404(data, css, js):
     quote = data["quotes"]["not_found"]
     body = (
+        CURSOR_HTML + "\n"
         '<div class="progress"></div>\n'
         '<section class="hero hero--inner">'
         '<div class="hero__shade"></div>'
