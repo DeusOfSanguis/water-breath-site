@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Сборка сайта «Дыхание Воды — корпус истребителей» из папки content/.
-Адаптировано с bloodpact-site, но под тёмную тему воды — фракция истребителей.
+Адаптировано с bloodpact-site: одна тёмная тема воды — фракция истребителей.
 
 Результат (GitHub Pages публикует КОРЕНЬ ветки main):
   ./                 — сайт: index.html, law/, codex/, kata/, …
@@ -59,9 +59,8 @@ SIGIL = {
 
 SPINE = [
     ("faction", "01", "Вода"),
-    ("codex", "02", "Кодекс"),
-    ("path", "03", "Путь"),
-    ("hierarchy", "04", "Иерархия"),
+    ("path", "02", "Путь"),
+    ("hierarchy", "03", "Иерархия"),
 ]
 
 def load():
@@ -361,12 +360,12 @@ def render_ranking_top(data):
     aria = "Место чемпиона пока свободно" if free else "Печать чемпиона"
     champion = (
         '<section class="s narrow center champion">\n'
-        '<h2 class="xl c-gold">Чемпион</h2>\n'
+        '<h2 class="xl c-foam">Чемпион</h2>\n'
         f'<div class="avatar-mark" role="img" aria-label="{html.escape(aria)}">\n'
         '<span class="avatar-mark__kanji" aria-hidden="true">位</span>\n'
         f'<span class="avatar-mark__label">{html.escape(status)}</span>\n'
         "</div>\n"
-        f'<p class="name c-darkred">{html.escape(name)}</p>\n'
+        f'<p class="name c-water">{html.escape(name)}</p>\n'
         "</section>"
     )
     rows = []
@@ -376,7 +375,7 @@ def render_ranking_top(data):
         if not label and not ename:
             continue
         if e.get("highlight"):
-            span = f'<span class="c-darkred">{html.escape(label)} - </span>' if label else ""
+            span = f'<span class="c-water">{html.escape(label)} - </span>' if label else ""
             rows.append(f"<p><strong>{span}{html.escape(ename)}</strong></p>")
         else:
             tail = f" - {html.escape(ename)}" if ename else " -"
@@ -409,7 +408,7 @@ def render_footer(data, current_page):
         "</div>"
         "</div>"
         '<div class="footer__bot">'
-        f'<p>© <span data-year>2026</span> {html.escape(site["name"])}. Корпус истребителей демонов — фракция добра.</p>'
+        f'<p>© <span data-year>2026</span> {html.escape(site["name"])}</p>'
         "<p>水 · 隊 · 蝶 · 斬</p>"
         "</div>"
         "</div></footer>"
@@ -617,7 +616,7 @@ def write_404(data, css, js):
         '<p class="hero__eyebrow">Ошибка 404</p>'
         f'<h1 class="hero__title">{split_word("ПУСТОТА", 0.2, "bone")}</h1>'
         + render_quote(quote["text"], quote["author"], "hero__quote")
-        + '<div class="hero__btns"><a class="btn btn--blood" id="home" href="/"><span>На главную</span></a></div>'
+        + '<div class="hero__btns"><a class="btn btn--water" id="home" href="/"><span>На главную</span></a></div>'
         "</div></section>"
         "<script>(function(){var h=location.hostname,p=location.pathname.split('/');"
         "document.getElementById('home').href=/\\.github\\.io$/.test(h)&&p[1]?'/'+p[1]+'/':'/';})();</script>"
