@@ -125,7 +125,7 @@ def render_fragment(fragment, data, prefix="", asset_base=None, kind="site"):
     out = out.replace("{{marquee}}", render_marquee(data, False))
     out = out.replace("{{marquee:reverse}}", render_marquee(data, True))
     out = out.replace("{{roster}}", render_roster(data))
-    out = out.replace("{{kata}}", render_kata(data))
+    out = out.replace("{{kata}}", render_kata(data, prefix=prefix, asset_base=asset_base))
     out = out.replace("{{promotions}}", render_promotions(data))
     out = out.replace("{{ranking-top}}", render_ranking_top(data))
     return out
@@ -308,7 +308,7 @@ def render_roster(data):
         out.append('</div></div>')
     return '<section class="s">' + "".join(out) + '</section>'
 
-def render_kata(data):
+def render_kata(data, prefix="", asset_base=None):
     kata = (data.get("lists") or {}).get("kata") or {}
     forms = kata.get("forms") or []
     if not forms:
@@ -321,8 +321,14 @@ def render_kata(data):
         desc = html.escape(f.get("description",""))
         tips = html.escape(f.get("tips",""))
         gif = f.get("gif","")
-        if gif:
-            media = f'<div class="kata-card__media"><img src="{gif}" alt="{name}" loading="lazy"><span style="display:none">gif</span></div>' if os.path.exists(os.path.join(ROOT, gif)) or gif.startswith("http") else f'<div class="kata-card__media"><span>Место для гифки {fid} — скоро</span></div>'
+        video = f.get("video","")
+        if video and (video.startswith("http") or os.path.exists(os.path.join(ROOT, video))):
+            vsrc = (asset_base.rstrip("/") + "/" + video) if asset_base and not video.startswith("http") else (prefix + video if not video.startswith("http") else video)
+            psrc = (asset_base.rstrip("/") + "/assets/kata/kata-poster.svg") if asset_base else (prefix + "assets/kata/kata-poster.svg")
+            media = f'<div class="kata-card__media"><video src="{vsrc}" muted loop playsinline preload="metadata" poster="{psrc}" aria-label="{name}"></video></div>'
+        elif gif and (gif.startswith("http") or os.path.exists(os.path.join(ROOT, gif))):
+            gsrc = (asset_base.rstrip("/") + "/" + gif) if asset_base and not gif.startswith("http") else (prefix + gif if not gif.startswith("http") else gif)
+            media = f'<div class="kata-card__media"><img src="{gsrc}" alt="{name}" loading="lazy"></div>'
         else:
             media = f'<div class="kata-card__media"><span>Место для гифки {fid} — скоро</span></div>'
         cards.append(
@@ -333,7 +339,7 @@ def render_kata(data):
             f'<p style="color:var(--ash);font-size:12px">💡 {tips}</p>'
             f'{media}</div>'
         )
-    return '<section class="s"><div class="kata-grid">' + "".join(cards) + '</div></section>'
+    return '<section class="s"><div class="kata-grid" id="kataGrid">' + "".join(cards) + '</div></section>'
 
 def render_promotions(data):
     prom = (data.get("lists") or {}).get("promotions") or {}
@@ -556,10 +562,8 @@ def build(asset_base=None):
         up = rel_prefix(page)
         main_cls = ' id="content"' if is_index else f' id="content" class="article" data-kanji="{sig}"'
         body = (
-            '<div class="cursor" aria-hidden="true">'
-            '<div class="cursor__ring"></div><div class="cursor__dot"></div></div>\n'
+            '<div class="water-cursor" aria-hidden="true"></div>\n'
             '<div class="progress"></div>\n'
-            + (render_preloader() if is_index else "")
             + (render_spine() if is_index else "")
             + render_nav(data, page)
             + render_mmenu(data, page)

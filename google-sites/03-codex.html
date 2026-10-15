@@ -61,7 +61,6 @@
   --ash: rgb(var(--ash-rgb));
   --mist: rgb(var(--mist-rgb));
   --ink: rgb(var(--ink-rgb));
-  --ember: rgb(var(--glow-rgb));   /* старое имя яркого акцента */
   --line: rgb(var(--bone-rgb) / 0.14);
 
   --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
@@ -135,7 +134,7 @@ a { color: inherit; }
   top: 0; left: 0; right: 0;
   height: 2px;
   z-index: 85;
-  background: linear-gradient(90deg, var(--water-deep), var(--water), var(--ember));
+  background: linear-gradient(90deg, var(--water-deep), var(--water), var(--glow));
   transform-origin: left;
   transform: scaleX(0);
 }
@@ -814,7 +813,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
   letter-spacing: 0.05em;
   transition: color 0.5s;
 }
-.trait:hover h3 { color: var(--ember); }
+.trait:hover h3 { color: var(--glow); }
 .trait p { margin: 8px 0 0; font-size: 14px; color: var(--ash); line-height: 1.7; }
 @media (min-width: 768px) { .trait p { font-size: 15px; } }
 
@@ -910,7 +909,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 13px;
-  color: var(--ember);
+  color: var(--glow);
 }
 @media (min-width: 768px) { .acc__note { font-size: 14px; } }
 
@@ -946,7 +945,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
 }
 @media (min-width: 768px) { .alert { padding: 24px; font-size: 16px; } }
 .alert .a-icon { flex-shrink: 0; color: var(--water); font-size: 20px; }
-.alert b.water { color: var(--ember); }
+.alert b.water { color: var(--glow); }
 .mooncols { position: relative; display: grid; gap: 24px; }
 @media (min-width: 768px) { .mooncols { grid-template-columns: 1fr 1fr; gap: 32px; } }
 .mooncol {
@@ -1159,7 +1158,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
 .timeline { position: relative; max-width: 780px; }
 .timeline__rail { position: absolute; left: 14px; top: 0; bottom: 0; width: 1px; background: rgb(var(--bone-rgb) / 0.1); }
 @media (min-width: 768px) { .timeline__rail { left: 18px; } }
-.timeline__fill { width: 100%; height: 100%; background: linear-gradient(180deg, var(--water), var(--ember), var(--water-deep)); transform-origin: top; transform: scaleY(0); }
+.timeline__fill { width: 100%; height: 100%; background: linear-gradient(180deg, var(--water), var(--glow), var(--water-deep)); transform-origin: top; transform: scaleY(0); }
 .tnode { position: relative; display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
 @media (min-width: 768px) { .tnode { gap: 28px; margin-bottom: 24px; } }
 .tnode__dot {
@@ -1270,7 +1269,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
 .permit__col--yes { border: 1px solid rgb(var(--water-rgb) / 0.35); background: linear-gradient(180deg, rgb(var(--water-rgb) / 0.12), transparent); }
 .permit__col--no { border: 1px solid rgb(var(--bone-rgb) / 0.12); background: rgb(var(--abyss-rgb) / 0.6); }
 .permit__cap { display: flex; align-items: center; gap: 8px; margin: 0 0 24px; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 0.25em; text-transform: uppercase; }
-.permit__col--yes .permit__cap { color: var(--ember); }
+.permit__col--yes .permit__cap { color: var(--glow); }
 .permit__col--no .permit__cap { color: var(--ash); }
 .permit ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
 .permit li { display: flex; gap: 12px; font-size: 14px; line-height: 1.65; color: rgb(var(--bone-rgb) / 0.8); }
@@ -1326,7 +1325,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
 @media (min-width: 768px) { .gloss { grid-template-columns: 1fr 1fr; } }
 .gloss__card { border: 1px solid rgb(var(--bone-rgb) / 0.1); border-radius: 12px; background: rgb(var(--abyss-rgb) / 0.5); padding: 24px; }
 .gloss__card h4 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; font-size: 14px; color: rgb(var(--bone-rgb) / 0.7); }
-.gloss__card--red h4 { color: var(--ember); }
+.gloss__card--red h4 { color: var(--glow); }
 .gloss__card p { margin: 0; font-size: 12px; line-height: 1.7; color: var(--ash); }
 @media (min-width: 768px) { .gloss__card p { font-size: 14px; } }
 
@@ -1366,7 +1365,7 @@ b.red { color: var(--foam); font-weight: 700; } /* старое имя из де
 @media (min-width: 768px) { .s ul, .s ol { font-size: 17px; } }
 .s li { margin: 0 0 8px; }
 .s li::marker { color: var(--water); }
-.s a { color: var(--ember); }
+.s a { color: var(--glow); }
 .s u { text-decoration-color: var(--water); }
 
 /* старая цепочка иерархии (если где-то осталась) */
@@ -1965,15 +1964,6 @@ body:has(.mmenu.open) .spine { opacity: 0; pointer-events: none; }
   color: rgb(var(--water-rgb) / 0.45);
   opacity: 0;
 }
-body.leaving .veil {
-  pointer-events: auto;
-  animation: veilDown 0.55s cubic-bezier(0.6, 0, 0.25, 1) forwards;
-}
-body.leaving .veil::after { opacity: 1; transition: opacity 0.3s 0.14s ease; }
-@keyframes veilDown {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
-}
 
 /* ---------- внутренний герой ---------- */
 .hero--inner { min-height: 68svh; }
@@ -2394,7 +2384,7 @@ body.embed .hero__crest { display: none; }
 .article .s ul,
 .article .s ol { max-width: 76ch; margin-bottom: 20px; }
 .article .s strong { font-weight: 750; }
-.article .s em { color: var(--ember); font-family: var(--font-serif); font-size: 1.05em; }
+.article .s em { color: var(--glow); font-family: var(--font-serif); font-size: 1.05em; }
 
 .article .s h3:not(.squad) {
   font-family: var(--font-sans);
@@ -2459,7 +2449,7 @@ body.embed .hero__crest { display: none; }
   border-color: rgb(var(--water-rgb) / 0.34);
   background: rgb(var(--water-rgb) / 0.1);
 }
-.article .s p.note--exception::before { content: "!"; color: var(--ember); }
+.article .s p.note--exception::before { content: "!"; color: var(--glow); }
 .article .s p.note--addition::before { content: "+"; }
 .article .s p.note--example::before { content: "↳"; }
 
@@ -2476,7 +2466,7 @@ body.embed .hero__crest { display: none; }
   font-size: 13px;
   line-height: 1.5;
 }
-.article .s p.squad-parent strong { color: var(--ember); }
+.article .s p.squad-parent strong { color: var(--glow); }
 
 .article .s.squad-updates {
   border-color: rgb(var(--water-rgb) / 0.48);
@@ -2519,7 +2509,7 @@ body.embed .hero__crest { display: none; }
 .article .s.squad-updates .squad-updates__quote p::before {
   content: "↳";
   flex: 0 0 auto;
-  color: var(--ember);
+  color: var(--glow);
 }
 .article .s.squad-updates .squad-updates__quote strong { font-weight: 750; }
 @media (min-width: 768px) {
@@ -2544,7 +2534,7 @@ body.embed .hero__crest { display: none; }
 }
 .permit__detail strong { color: var(--bone); font-weight: 700; }
 .permit__detail--exception {
-  border-left-color: var(--ember);
+  border-left-color: var(--glow);
   background: rgb(var(--water-rgb) / 0.09);
 }
 .permit__detail--warning { border-left-color: rgb(var(--water-rgb) / 0.7); }
@@ -2599,6 +2589,7 @@ body.embed .hero__crest { display: none; }
   border: 1px dashed var(--line);
 }
 .kata-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.kata-card__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Promotion timeline */
 .promo { display: grid; gap: 16px; }
@@ -2717,6 +2708,36 @@ body.embed .hero__crest { display: none; }
   color: var(--water);
 }
 
+
+/* ---------- Плавные переходы между страницами (View Transitions) ---------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
+
+/* ---------- Водный курсор ---------- */
+.water-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgb(var(--water-rgb) / 0.55), rgb(var(--glow-rgb) / 0.15) 60%, transparent 72%);
+  box-shadow: 0 0 24px rgb(var(--water-rgb) / 0.45);
+  transform: translate(-100px, -100px);
+  transition: transform 0.08s linear, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  opacity: 0.9;
+}
+@media (prefers-reduced-motion: reduce) { .water-cursor { display: none; } }
+
 </style>
 </head>
 <body id="top" class="page-codex embed" data-sigil="律">
@@ -2776,9 +2797,8 @@ body.embed .hero__crest { display: none; }
 
 <script>
 /* =====================================================================
-   ПАКТ КРОВИ — скрипты сайта (без библиотек, чистый JavaScript).
-   Файл копируется сборкой в assets/app.js. Править тут ничего не надо.
-   Каждый блок сам проверяет, есть ли нужные элементы на странице.
+   ДЫХАНИЕ ВОДЫ — скрипты сайта (без библиотек, чистый JavaScript).
+   Файл копируется сборкой в assets/app.js.
    ===================================================================== */
 (function () {
   "use strict";
@@ -2827,15 +2847,7 @@ body.embed .hero__crest { display: none; }
       var max = document.documentElement.scrollHeight - window.innerHeight;
       if (bar && max > 0) bar.style.transform = "scaleX(" + Math.min(1, y / max) + ")";
       if (nav) nav.classList.toggle("scrolled", y > 60);
-      // лёгкий параллакс героя
-      if (heroIn && y < window.innerHeight * 1.2) {
-        heroIn.style.transform = "translateY(" + y * 0.25 + "px)";
-        heroIn.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.7));
-      }
       if (heroCue) heroCue.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.5));
-      if (heroMedia && y < window.innerHeight) {
-        heroMedia.style.transform = "translateY(" + y * 0.18 + "px) scale(" + (1 + y / window.innerHeight * 0.08) + ")";
-      }
       // заливка линии иерархии по мере прокрутки
       rails.forEach(function (tl) {
         var fill = tl.querySelector(".timeline__fill");
@@ -3009,45 +3021,66 @@ body.embed .hero__crest { display: none; }
     document.body.style.overflow = "";
   });
 
-  /* ---------- Переход между свитками: кровавая штора, не рябь ---------- */
-  document.addEventListener("click", function (e) {
-    var a = e.target && e.target.closest ? e.target.closest("a") : null;
-    if (!a || e.defaultPrevented) return;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    if (a.target && a.target !== "_self") return;
-    var href = a.getAttribute("href");
-    if (!href || href.charAt(0) === "#" || href.indexOf("mailto:") === 0 || href.indexOf("javascript:") === 0) return;
-    var url;
-    try { url = new URL(a.href, location.href); } catch (err) { return; }
-    if (url.origin !== location.origin) return;
-    if (url.pathname === location.pathname && url.search === location.search) return;
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    e.preventDefault();
-    document.body.classList.add("leaving");
-    setTimeout(function () { location.href = a.href; }, 540);
-  });
-  window.addEventListener("pageshow", function () {
-    document.body.classList.remove("leaving");
-  });
+  /* ---------- Плавные переходы отключены: обычная навигация ---------- */
 
-  /* ---------- Свой курсор (только для мыши) ---------- */
+  /* ---------- Ката: видео как в тестовом сайте ---------- */
   (function () {
-    if (!window.matchMedia || !window.matchMedia("(pointer: fine)").matches) return;
-    var c = document.querySelector(".cursor");
+    var cards = document.querySelectorAll('.kata-card');
+    if (!cards.length) return;
+    function playVideo(video) {
+      if (!video || !video.paused) return;
+      video.muted = true;
+      var p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(function () {});
+    }
+    cards.forEach(function (card) {
+      var video = card.querySelector('video');
+      if (!video) return;
+      card.addEventListener('mouseenter', function () { playVideo(video); });
+      card.addEventListener('mouseleave', function () { video.pause(); });
+      card.addEventListener('click', function () {
+        if (video.paused) playVideo(video); else video.pause();
+      });
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target.querySelector('video');
+          if (!video) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.2 && !document.hidden) playVideo(video);
+          else video.pause();
+        });
+      }, { threshold: [0, 0.2, 0.5], rootMargin: '0px 0px -60px 0px' });
+      cards.forEach(function (card) { io.observe(card); });
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) document.querySelectorAll('#kataGrid video').forEach(function (v) { v.pause(); });
+    });
+  })();
+
+
+  /* ---------- Водный курсор: следует за мышью ---------- */
+  (function () {
+    var c = document.querySelector('.water-cursor');
     if (!c) return;
-    c.classList.add("on");
+    if (window.matchMedia && !window.matchMedia('(pointer: fine)').matches) { c.style.display = 'none'; return; }
     var x = -100, y = -100, sx = -100, sy = -100;
-    document.addEventListener("mousemove", function (e) {
+    document.addEventListener('mousemove', function (e) {
       x = e.clientX; y = e.clientY;
       var t = e.target;
-      c.classList.toggle("hover", !!(t && t.closest && t.closest("a, button, summary")));
+      var hover = !!(t && t.closest && t.closest('a, button, summary, .kata-card'));
+      c.style.width = hover ? '40px' : '28px';
+      c.style.height = hover ? '40px' : '28px';
+      c.style.margin = hover ? '-20px 0 0 -20px' : '-14px 0 0 -14px';
     }, { passive: true });
     (function loop() {
-      sx += (x - sx) * 0.25; sy += (y - sy) * 0.25;
-      c.style.transform = "translate(" + sx + "px," + sy + "px)";
+      sx += (x - sx) * 0.18;
+      sy += (y - sy) * 0.18;
+      c.style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
       requestAnimationFrame(loop);
     })();
   })();
+
 })();
 
 </script>
